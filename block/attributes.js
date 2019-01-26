@@ -78,7 +78,6 @@ const attributes = {
     firstPollId: {
         type: 'string',
         default: null
-        // default: getPollById( getFirstPollId() )
     },
     classes: {
         type: 'string',

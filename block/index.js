@@ -9,7 +9,6 @@ import Inspector from "./inspector";
 import Controls from "./controls";
 import attributes from "./attributes";
 import colourAttributes from "./colours";
-// import React from 'react';
 import PotdSelect from "./components/PotdSelect";
 import PotdAnswers from "./components/PotdAnswers";
 import './style.scss';
@@ -26,12 +25,10 @@ const { __ } = wp.i18n;
 const { registerBlockType } = wp.blocks;
 const { 
     RichText,
-    ColorPalette,
-    // RadioControl
+    ColorPalette
 } = wp.editor;
 const { 
     Button,
-    // TabbableContainer,
     TabPanel
 } = wp.components;
 const { Component } = wp.element;
@@ -48,24 +45,23 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
     },         
     category: 'common',
     keywords: [
-        __( 'Test', 'gutenbergtemplateblock' ),
-        __( 'Template', 'gutenbergtemplateblock' )
+        __( 'Poll', 'gutenbergtemplateblock' ),
+        __( 'Vote', 'gutenbergtemplateblock' ),
+        __( 'Day', 'gutenbergtemplateblock' )
     ],
     attributes,
     getEditWrapperProps( { blockAlignment } ) {
-        if ( 'left' === blockAlignment || 'right' === blockAlignment || 'full' === blockAlignment )
-        {
+        if ( 'left' === blockAlignment || 'right' === blockAlignment || 'full' === blockAlignment ) {
             return { 'data-align': blockAlignment };
         }
     },
     // edit: props => {
     edit: class extends Component {
+
         constructor( props ) {
             console.log( 'constructor' );
             super( ...arguments );
             this.props = props;
-            // console.log( this.props === props );
-            // console.log( props );
             const {
                 attributes: { 
                     // textAlignment, 
@@ -82,15 +78,15 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     // error,
                     pollQuestionTitle,
                     // firstPoll,
-                    classes
+                    classes,
+                    firstPollId
                 }, 
                 className, 
                 setAttributes
             } = props;
-            // console.log( arguments );
             this.onChangeTitle = this.onChangeTitle.bind( this );
             this.onChangeContent = this.onChangeContent.bind( this );
-            this.onChangePollQuestions = this.onChangePollQuestions.bind( this );
+            this.onChangePollQuestion = this.onChangePollQuestion.bind( this );
             this.setPoll = this.setPoll.bind( this );
             this.setError = this.setError.bind( this );
             this.setPollQuestionTitle = this.setPollQuestionTitle.bind( this );
@@ -101,22 +97,12 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 { 'style-toggle': styleToggle }
             )});
 
-            // let firstPollId = this.getFirstPollId();
-            // console.log( 'firstPollId' );
-            // console.log( firstPollId );
-            // this.getPollById( firstPollId );
-            // console.log( props );
-
             this.initPoll();
         }
 
         componentDidMount() {
-            console.log( 'componentDidMount' );
+            // console.log( 'componentDidMount' );
         }
-        // const onInit = () => {
-        //     let firstPollId = getFirstPollId();
-        //     getPollById( firstPollId );
-        // }
 
         initPoll() { 
             var self = this;
@@ -124,18 +110,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         '?action=gutenbergtemplateblock_getFirstPollQid' + 
                         '&security=' + gutenbergtemplateblock_ajax_object.security;
     
-            // console.log( 'componentDidMount' );
-            // console.log( this.props.value );
-            // console.log( this );
-            // console.log( props );
-    
             fetch( url )
                 .then(response => {
                     return response.json();
                 })
                 .then(
                     (result) => {
-                        self.props.setAttributes( { firstPollId: result } );
+                        // console.log( result );
+                        self.props.setAttributes( { firstPollId: result[0].qid } );
                         this.getPollById( result[0].qid );
                     },
                     (err) => {
@@ -149,64 +131,28 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         onChangeTitle( title ) { this.props.setAttributes( { title } ) }
         onChangeContent( content ) { this.props.setAttributes( { content } ) }
         setPoll( poll ) { this.props.setAttributes( { poll } ) }
-        // const setIsLoaded = isLoaded => { setAttributes( { isLoaded } ) };
         setError( error ) { this.props.setAttributes( { error } ) }
         setPollQuestionTitle( pollQuestionTitle ) { this.props.setAttributes( { pollQuestionTitle } ) }
         setRefreshQid( refreshQid ) { this.props.setAttributes( { refreshQid } ) }
-        
-        // const onChangePollQuestions = questions => { setAttributes( { questions } ); console.log( 'onChangePollQuestions' ); console.log( questions ); };
 
-        onChangePollQuestions( selectedPoll ) {
-            // console.log( 'onChangePollQuestions!' );
-            // console.log( this );
-            // console.log( this.props.attributes.refreshQid );
-            // console.log( selectedPoll.target );
-            // console.log( selectedPoll.target.options[selectedPoll.target.selectedIndex].value );
+        onChangePollQuestion( selectedPoll ) {
             let index = selectedPoll.target.selectedIndex;
             let qid = selectedPoll.target.options[ index ].value;
-            // this.props.setAttributes({
-            //     // pollOptionsHidden: true,
-            //     // pollQuestionId: id
-            //     refreshQid: id
-            // });
-            // console.log( qid );
             this.setRefreshQid( qid );
-            // console.log( { refreshQid } );
-            // console.log( this.props.attributes );
             this.getPollById( qid );
         };
 
-        // const onInit = initialised => { setAttributes( { initialised } ) };
-        // const onChangePollAnswers = () => {
-        //     console.log( 'onChangePollAnswers?!' );
-        // };
         onButtonClick() {
             console.log( 'onButtonClick!' );
             console.log( props );
-            // let test = 'testing';
-            
-            // var data = {
-            //     action: 'gutenbergtemplateblock_get',
-            //     security: gutenbergtemplateblock_ajax_object.security//,
-            //     //t: test
-            // };
-            
-            // $.post( gutenbergtemplateblock_ajax_object.ajax_url, data, function( output )
-            // {
-            //     var output = $.parseJSON( output );
-            //     onChangeContent( output );
-            //     $( '#GTBContentText' ).find( 'p' ).html( output );
-            //     $( '#GTBContentText' ).find( '.editor-rich-text__tinymce:eq(2)' ).find( 'p' ).html( '' );
-            // });
         };
+
         onTabSelect() {
             console.log( 'onTabSelect' );
         };
 
+        // Helpers \\
         getPollById( qid ) {
-            // console.log( 'getPollById' );
-            // console.log( qid );
-            // console.log( refreshQid )
             var self = this;
             let url = gutenbergtemplateblock_ajax_object.ajax_url +
                         '?action=gutenbergtemplateblock_getPollById' +
@@ -219,37 +165,22 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( result ) => {
-                        // console.log('getPollById result:');
                         // console.log( result );
-                        // console.log(result[0].question);
-
                         const pollOptions = result.map( ( object, key ) => {
                             return [
                                 <p><input type="radio" name="options" value={ object.oid }/>{ object.option }</p>
                             ];
                         });
-                        // console.log( pollOptions );
-                        // setIsLoaded( true );
-                        // console.log( self );
                         self.setPoll( pollOptions );
-                        // setPoll( result[0].option );
-                        // console.log( 'self.setPoll' );
                         self.setPollQuestionTitle( result[0].question );
-                        // console.log( 'self.props' );
-                        // console.log( self.props );
                     },
                     ( err ) => {
-                        // setIsLoaded( true );
                         setError( err );
                     }
                 )
         };
 
-        // console.log( 'props' );
-        // console.log(props);
         render() {
-            // console.log( 'render start' );
-            // console.log( this.props );
             const { 
                 className, 
                 setAttributes,
@@ -273,6 +204,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             value = { titleColour }
                             onChange = { titleColour => { setAttributes( { titleColour } ) } }
                         />
+                        <div>
+                            { __( 'Title', 'gutenbergtemplateblock' ) }
+                        </div>
                         <RichText
                             tagName = "h2"
                             multiline = "p"
@@ -289,6 +223,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             onChange = { contentColour => { setAttributes( { contentColour } ) } }
                         />
                         <div id = "GTBContentText">
+                            <div>
+                                { __( 'Content', 'gutenbergtemplateblock' ) }
+                            </div>
                             <RichText
                                 class = "gutenbergtemplateblock-content"
                                 tagName = "div"
@@ -316,17 +253,17 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         tabs={[
                             {
                                 name: 'tab1',
-                                title: 'Tab 1',
+                                title: 'Select Poll',
                                 className: 'tab-one'
                             },
                             {
                                 name: 'tab2',
-                                title: 'Tab 2',
+                                title: 'Add / Edit / Delete',
                                 className: 'tab-two'
                             },
                             {
                                 name: 'tab3',
-                                title: 'Tab 3',
+                                title: 'Settings',
                                 className: 'tab-three'
                             }
                         ]}
@@ -336,11 +273,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                 if ( tab.name === 'tab1' ) {
                                     return [
                                         <div className = { classes }>
-                                            <div className={ className } onChange={ this.onChangePollQuestions }>
+                                            <div className={ className } onChange={ this.onChangePollQuestion }>
                                                 <PotdSelect
-                                                    // onChange={ onChangePollQuestions }
+                                                    // onChange={ onChangePollQuestion }
                                                     // onChange={ ( selectedPoll ) => { console.log( selectedPoll ); } }
-                                                    // onChange={onChangePollQuestions.bind(this)}
+                                                    // onChange={onChangePollQuestion.bind(this)}
                                                 />
                                             </div>
                                             <div className={ className }>
@@ -354,8 +291,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                 } else if ( tab.name === 'tab2' ) {
                                     return [
                                         <div className={ className }>
-                                            <p>{ tab.name }</p>
-                                            <p>tab2?</p>
+                                            <PotdSelect/>
                                         </div>
                                     ];
                                 } else if ( tab.name === 'tab3' ) {
@@ -381,7 +317,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         ]}
                         onChange={() => {console.log( 'onChange' );}}
                     /> */}
-                    <Button
+                    {/* <Button
                         isDefault
                         className = "button button-large"
                         onClick = { this.onButtonClick }
@@ -394,7 +330,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         onClick = { this.onButtonClick }
                     >
                         Delete Poll
-                    </Button>
+                    </Button> */}
                 </div>
             ];
         }

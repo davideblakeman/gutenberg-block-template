@@ -4,13 +4,9 @@ const {
 
 export default class PotdSelect extends React.Component {
 
-    constructor(props) {
-        super(props);
-        
+    constructor( props ) {
+        super( props );
         this.componentDidMount = this.componentDidMount.bind( this );
-        // this.onChangePollQuestions = this.onChangePollQuestions.bind( this );
-        // this.selectControlRef = React.createRef();
-
         this.state = {
             error: null,
             isLoaded: false,
@@ -19,24 +15,23 @@ export default class PotdSelect extends React.Component {
     }
 
     componentDidMount() {
-        // console.log( 'PotdSelect: componentDidMount' );
         var self = this;
         let url = gutenbergtemplateblock_ajax_object.ajax_url + 
                   '?action=gutenbergtemplateblock_getPollQuestions&security=' + 
                   gutenbergtemplateblock_ajax_object.security;
 
         fetch( url )
-            .then(response => {
+            .then( response => {
                 return response.json();
             })
             .then(
-                (result) => {
+                ( result ) => {
                     self.setState({
                         isLoaded: true,
                         questions: result
                     });
                 },
-                (error) => {
+                ( error ) => {
                     self.setState({
                         isLoaded: true,
                         error
@@ -45,12 +40,8 @@ export default class PotdSelect extends React.Component {
             )
     }
 
-    componentDidUpdate() {
-        // console.log( this );
-    }
-
-    // onChangePollQuestions() {
-    //     console.log( this );
+    // componentDidUpdate() {
+    //     // console.log( this );
     // }
 
     render() {
@@ -63,23 +54,10 @@ export default class PotdSelect extends React.Component {
             return (
                 <SelectControl
                     label={ 'Select a question:' }
-                    // value={'test value'}
-                    // onChange={ onChangePollQuestions.bind(this) }
-                    // onChange={ () => {return this;} }
-                    // onSelect={()=>{
-                    //     console.log( 'onSelect' );
-                    //     console.log( this );
-                    // }}
                     options={ questions }
-                    // options={[
-                    //     {value: 'a', label: 'PotdSelect A'},
-                    //     {value: 'b', label: 'PotdSelect B'},
-                    //     {value: 'c', label: 'PotdSelect C'}
-                    // ]}
                 />
             );
         }
     }
 
 }
-

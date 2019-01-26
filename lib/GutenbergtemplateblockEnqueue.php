@@ -166,7 +166,7 @@ class GutenbergtemplateblockEnqueue
     {
         check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
 
-        $qid = $_REQUEST[ 'q' ];
+        $qid = $_REQUEST[ 'qid' ];
 
         $GTBWPDB = new GutenbergtemplateblockWpdb;
         // print_r( $GTBWPDB->getPollQuestions() );
