@@ -1,0 +1,22 @@
+.entry-content .wp-block-gutenbergtemplateblock-templateblock,
+.wp-block-gutenbergtemplateblock-templateblock {
+  background: rgba(254, 243, 224, 0.52);
+  color: black;
+  border: 2px darkblue solid;
+  padding: 1rem; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock.style-toggle,
+  .wp-block-gutenbergtemplateblock-templateblock.style-toggle {
+    background: #222;
+    border: 2px darkred solid;
+    color: white; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .inline-flex,
+  .wp-block-gutenbergtemplateblock-templateblock .inline-flex {
+    display: -ms-inline-flexbox;
+    display: inline-flex; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .grid,
+  .wp-block-gutenbergtemplateblock-templateblock .grid {
+    display: -ms-grid;
+    display: grid; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .components-base-control,
+  .wp-block-gutenbergtemplateblock-templateblock .components-base-control {
+    width: 100%; }
