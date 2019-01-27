@@ -3,17 +3,16 @@ const {
     TextControl
 } = wp.components;
 
-export default class PotdAnswersEdit extends React.Component {
+export default class PotdAnswer extends React.Component {
 
     constructor( props ) {
         super( props );
-        this.getPollAnswersById = this.getPollAnswersById.bind( this );
+        // this.getPollAnswersById = this.getPollAnswersById.bind( this );
         this.state = {
             error: null,
             isLoaded: false,
             answers: [],
-            qid: null,
-            newQid: null
+            qid: null
         };
     }
 
@@ -77,13 +76,13 @@ export default class PotdAnswersEdit extends React.Component {
 
     static getDerivedStateFromProps( nextProps, prevState ) {
         if ( nextProps.refresh && nextProps.refresh !== prevState.qid ) {
-            return { newQid: nextProps.refresh };
+            return { qid: nextProps.refresh };
         } else return null;
     }
 
     componentDidUpdate( prevProps, prevState ) {
         if ( prevProps.refresh !== this.props.refresh ) {
-            this.getPollAnswersById( this.props.refresh );
+            this.getPollAnswersById( this.state.qid );
         }
     }
 

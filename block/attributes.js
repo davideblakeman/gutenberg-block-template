@@ -67,6 +67,10 @@ const attributes = {
         type: 'string',
         default: '1'
     },
+    currentQid: {
+        type: 'string',
+        default: null
+    },
     poll: {
         type: 'array',
         default: null

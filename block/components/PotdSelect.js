@@ -11,7 +11,9 @@ export default class PotdSelect extends React.Component {
             error: null,
             isLoaded: false,
             questions: [],
-            selectedIndex: '1'
+            // selectedIndex: undefined,
+            // currentQid: null
+            refresh: false
         };
     }
 
@@ -26,19 +28,28 @@ export default class PotdSelect extends React.Component {
         // console.log( 'prevState' );
         // console.log( prevState );
         
-        if ( nextProps.refresh && nextProps.refresh !== prevState.selectedIndex ) {
-            return { selectedIndex: nextProps.refresh };
+        if ( nextProps.refresh && nextProps.refresh !== prevState.refresh ) {
+            // console.log( 'getDerivedStateFromProps' );
+            return { refresh: nextProps.refresh };
         } else return null;
     }
 
     componentDidUpdate( prevProps, prevState ) {
+        console.log( 'componentDidUpdate' );
         if( prevProps.refresh !== this.props.refresh ) {
             // console.log( 'componentDidUpdate' );
-            // this.setState(
-            //     selectedQid: 
-            // );
-            // this.getPollQuestions();
+            // this.setState({
+            //     refresh: false
+            // });
+            this.getPollQuestions();
         }
+
+        // if ( prevProps.currentQid !== this.props.currentQid ) {
+        //     this.setState({
+        //         currentQid: this.props.currentQid
+        //     });
+        //     this.getPollQuestions();
+        // }
     }
 
     getPollQuestions() {
@@ -75,11 +86,30 @@ export default class PotdSelect extends React.Component {
         } else if ( !isLoaded ) {
             return <div>Loading...</div>;
         } else {
+            // return (
+            //     () => { 
+            //         if ( selectedIndex ) {
+            //             return ( 
+            //                 <SelectControl
+            //                     label={ 'Select a question:' }
+            //                     options={ questions }
+            //                     value={ selectedIndex }
+            //                 />
+            //             );
+            //         } else {
+            //             return (
+            //                 <SelectControl
+            //                     label={ 'Select a question:' }
+            //                     options={ questions }
+            //                 />
+            //             );
+            //         }
+            //     }
+            // );
             return (
                 <SelectControl
                     label={ 'Select a question:' }
                     options={ questions }
-                    // value={ selectedIndex }
                 />
             );
         }
