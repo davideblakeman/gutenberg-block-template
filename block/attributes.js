@@ -59,6 +59,14 @@ const attributes = {
         type: 'string',
         default: null
     },
+    refreshT2Qid: {
+        type: 'string',
+        default: null
+    },
+    selectedIndex: {
+        type: 'string',
+        default: '1'
+    },
     poll: {
         type: 'array',
         default: null

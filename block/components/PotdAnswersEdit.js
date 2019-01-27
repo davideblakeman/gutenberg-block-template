@@ -3,7 +3,7 @@ const {
     TextControl
 } = wp.components;
 
-export default class PotdAnswer extends React.Component {
+export default class PotdAnswersEdit extends React.Component {
 
     constructor( props ) {
         super( props );
@@ -107,30 +107,29 @@ export default class PotdAnswer extends React.Component {
                                 key={ key }
                                 // label={ 'Pol Answers:' }
                                 value={ object.option }
-                                disabled
                             />
-                            {/* <Button
+                            <Button
                                 className = "button button-large"
                                 onClick = { this.onRemoveBtnClick }
                                 value={ object.oid }
                             >
                                 Delete
-                            </Button> */}
+                            </Button>
                         </div>
                     )}
-                    {/* <Button
-                        className = "button button-large"
-                        onClick = { this.onButtonClick }
-                    >
-                        Save Answers
-                    </Button>
                     <Button
                         isDefault
                         className = "button button-large"
                         onClick = { this.onButtonClick }
                     >
                         Add New Answer
-                    </Button> */}
+                    </Button>
+                    <Button
+                        className = "button button-large"
+                        onClick = { this.onButtonClick }
+                    >
+                        Save Answers
+                    </Button>
                 </div>
             );
         }
