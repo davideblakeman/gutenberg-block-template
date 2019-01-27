@@ -10,11 +10,39 @@ export default class PotdSelect extends React.Component {
         this.state = {
             error: null,
             isLoaded: false,
-            questions: []
+            questions: [],
+            selectedIndex: '1'
         };
     }
 
     componentDidMount() {
+        this.getPollQuestions();
+    }
+
+    static getDerivedStateFromProps( nextProps, prevState ) {
+        // console.log( 'getDerivedStateFromProps' );
+        // console.log( 'nextProps' );
+        // console.log( nextProps );
+        // console.log( 'prevState' );
+        // console.log( prevState );
+        
+        if ( nextProps.refresh && nextProps.refresh !== prevState.selectedIndex ) {
+            return { selectedIndex: nextProps.refresh };
+        } else return null;
+    }
+
+    componentDidUpdate( prevProps, prevState ) {
+        if( prevProps.refresh !== this.props.refresh ) {
+            // console.log( 'componentDidUpdate' );
+            // this.setState(
+            //     selectedQid: 
+            // );
+            // this.getPollQuestions();
+        }
+    }
+
+    getPollQuestions() {
+        this.setState({ isLoaded: false });
         var self = this;
         let url = gutenbergtemplateblock_ajax_object.ajax_url + 
                   '?action=gutenbergtemplateblock_getPollQuestions&security=' + 
@@ -40,12 +68,8 @@ export default class PotdSelect extends React.Component {
             )
     }
 
-    // componentDidUpdate() {
-    //     // console.log( this );
-    // }
-
     render() {
-        const { error, isLoaded, questions } = this.state;
+        const { error, isLoaded, questions, selectedIndex } = this.state;
         if ( error ) {
             return <div>Error!</div>
         } else if ( !isLoaded ) {
@@ -55,6 +79,7 @@ export default class PotdSelect extends React.Component {
                 <SelectControl
                     label={ 'Select a question:' }
                     options={ questions }
+                    // value={ selectedIndex }
                 />
             );
         }

@@ -82,7 +82,7 @@ export default class PotdAnswer extends React.Component {
     }
 
     componentDidUpdate( prevProps, prevState ) {
-        if( prevProps.refresh !== this.props.refresh ) {
+        if ( prevProps.refresh !== this.props.refresh ) {
             this.getPollAnswersById( this.props.refresh );
         }
     }
