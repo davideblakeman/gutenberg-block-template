@@ -74,10 +74,26 @@ export default class PotdAnswer extends React.Component {
             )
     }
 
+    // static getDerivedStateFromProps( nextProps, prevState ) {
+    //     if ( nextProps.refresh && nextProps.refresh !== prevState.qid ) {
+    //         return { qid: nextProps.refresh };
+    //     } else return null;
+    // }
+
     static getDerivedStateFromProps( nextProps, prevState ) {
-        if ( nextProps.refresh && nextProps.refresh !== prevState.qid ) {
-            return { qid: nextProps.refresh };
-        } else return null;
+        let r = {};
+        if ( nextProps.selectRefresh && nextProps.selectRefresh !== prevState.qid ) {
+            // return { qid: nextProps.selectRefresh };
+            r.qid = nextProps.selectRefresh;
+        } 
+        
+        if ( nextProps.tabRefresh !== prevState.tabRefresh ) {
+            r.tabRefresh = nextProps.tabRefresh;
+        }
+console.log( r );
+        return r ? r : null;
+        
+        // else return null;
     }
 
     componentDidUpdate( prevProps, prevState ) {

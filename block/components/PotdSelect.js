@@ -13,7 +13,7 @@ export default class PotdSelect extends React.Component {
             questions: [],
             // selectedIndex: undefined,
             // currentQid: null
-            refresh: false
+            tabRefresh: false
         };
     }
 
@@ -28,15 +28,15 @@ export default class PotdSelect extends React.Component {
         // console.log( 'prevState' );
         // console.log( prevState );
         
-        if ( nextProps.refresh && nextProps.refresh !== prevState.refresh ) {
+        if ( nextProps.tabRefresh && nextProps.tabRefresh !== prevState.tabRefresh ) {
             // console.log( 'getDerivedStateFromProps' );
-            return { refresh: nextProps.refresh };
+            return { tabRefresh: nextProps.tabRefresh };
         } else return null;
     }
 
     componentDidUpdate( prevProps, prevState ) {
         console.log( 'componentDidUpdate' );
-        if( prevProps.refresh !== this.props.refresh ) {
+        if( prevProps.tabRefresh !== this.props.tabRefresh ) {
             // console.log( 'componentDidUpdate' );
             // this.setState({
             //     refresh: false

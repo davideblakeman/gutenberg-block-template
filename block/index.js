@@ -75,8 +75,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     // pollQuestionId,
                     refreshQid,
                     refreshT2Qid,
-                    selectedIndex,
-                    currentQid,
+                    // selectedIndex,
+                    // currentQid,
+                    tabRefresh,
                     poll,
                     // isLoaded,
                     // error,
@@ -99,6 +100,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.setRefreshQid = this.setRefreshQid.bind( this );
             this.setTefreshT2Qid = this.setRefreshT2Qid.bind( this );
             // this.setCurrentQid = this.setCurrentQid.bind( this );
+            this.setTabRefresh = this.setTabRefresh.bind( this );
 
             setAttributes({
                 classes: classnames(
@@ -148,6 +150,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         setRefreshT2Qid( refreshT2Qid ) { this.props.setAttributes( { refreshT2Qid } ) }
         // setCurrentQid( currentQid ) {  }
         setSelectRefresh( selectRefresh ) { this.props.setAttributes( { selectRefresh } ) }
+        setTabRefresh( tabRefresh ) { this.props.setAttributes( { tabRefresh } ) }
 
         onChangePollQuestion( selectedPoll ) {
             let index = selectedPoll.target.selectedIndex;
@@ -178,6 +181,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             console.log( tab );
             console.log( this.props );
             this.setSelectRefresh( !this.props.attributes.selectRefresh );
+            this.setTabRefresh( !this.props.attributes.tabRefresh );
             if ( tab === 'tab1' ) {
                 // this.setSelectedIndex( index );
                 // this.setSelectRefresh( true );
@@ -314,13 +318,13 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                         <div className = { classes }>
                                             <div className={ className } onChange={ this.onChangePollQuestion }>
                                                 <PotdSelect
-                                                    refresh={ this.props.attributes.selectRefresh }
+                                                    tabRefresh={ this.props.attributes.tabRefresh }
                                                 />
                                             </div>
                                             <div className={ className }>
                                                 <PotdAnswers
-                                                    currentQid={ this.props.attributes.currentQid }
-                                                    refresh={ this.props.attributes.refreshQid }
+                                                    tabRefresh={ this.props.attributes.tabRefresh }
+                                                    selectRefresh={ this.props.attributes.refreshQid }
                                                 />
                                             </div>
                                         </div>
@@ -330,13 +334,13 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                         <div className={ className }>
                                             <div className={ className } onChange={ this.onChangePollEditQuestion }>
                                                 <PotdSelect
-                                                    refresh={ this.props.attributes.selectRefresh }
+                                                    tabRefresh={ this.props.attributes.tabRefresh }
                                                 />
                                             </div>
                                             <div className={ className }>
                                                 <PotdAnswersEdit
-                                                    currentQid={ this.props.attributes.currentQid }
-                                                    refresh={ this.props.attributes.refreshT2Qid }
+                                                    tabRefresh={ this.props.attributes.tabRefresh }
+                                                    selectRefresh={ this.props.attributes.refreshT2Qid }
                                                 />
                                             </div>
                                         </div>
