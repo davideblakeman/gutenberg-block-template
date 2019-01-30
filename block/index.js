@@ -10,7 +10,6 @@ import Controls from "./controls";
 import attributes from "./attributes";
 import colourAttributes from "./colours";
 import PotdSelect from "./components/PotdSelect";
-import PotdAnswers from "./components/PotdAnswers";
 import './style.scss';
 import './editor.scss';
 
@@ -61,103 +60,273 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         constructor( props ) {
             console.log( 'constructor' );
             super( ...arguments );
-            this.props = props;
+
             const {
-                attributes: { 
-                    // textAlignment, 
-                    title,
-                    content,
+                attributes: {
                     styleToggle,
-                    // titleColour,
-                    // contentColour,
-                    // radioControl,
-                    // pollQuestionId,
-                    refreshQid,
-                    poll,
-                    // isLoaded,
-                    // error,
-                    pollQuestionTitle,
-                    // firstPoll,
-                    classes,
-                    firstPollId
                 }, 
                 className, 
                 setAttributes
             } = props;
+
+            this.state = {
+                isLoaded: false,
+                error: null,
+                questions: [],
+                answers: [],
+                tabChange: null,
+                selectChange: null,
+                answersQid: null,
+                firstQid: null
+            };
+            // console.log(this.state);
             this.onChangeTitle = this.onChangeTitle.bind( this );
             this.onChangeContent = this.onChangeContent.bind( this );
-            this.onChangePollQuestion = this.onChangePollQuestion.bind( this );
-            this.setPoll = this.setPoll.bind( this );
-            this.setError = this.setError.bind( this );
-            this.setPollQuestionTitle = this.setPollQuestionTitle.bind( this );
-            this.setRefreshQid = this.setRefreshQid.bind( this );
+            this.setSavePoll = this.setSavePoll.bind( this );
+            this.setSavePollTitle = this.setSavePollTitle.bind( this );
+            // this.getPollById = this.getPollById.bind( this );
+            this.handleSelectChange = this.handleSelectChange.bind( this );
+            this.handleTabChange = this.handleTabChange.bind( this );
+            this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
 
-            setAttributes( { classes: classnames(
-                className,
-                { 'style-toggle': styleToggle }
-            )});
-
-            this.initPoll();
-        }
-
-        componentDidMount() {
-            // console.log( 'componentDidMount' );
-        }
-
-        initPoll() { 
-            var self = this;
-            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
-                        '?action=gutenbergtemplateblock_getFirstPollQid' + 
-                        '&security=' + gutenbergtemplateblock_ajax_object.security;
-    
-            fetch( url )
-                .then(response => {
-                    return response.json();
-                })
-                .then(
-                    (result) => {
-                        // console.log( result );
-                        self.props.setAttributes( { firstPollId: result[0].qid } );
-                        this.getPollById( result[0].qid );
-                    },
-                    (err) => {
-                        console.log( error );
-                        self.props.setAttributes( { error: err } );
-                    }
+            setAttributes({
+                classes: classnames(
+                    className,
+                    { 'style-toggle': styleToggle }
                 )
+            });
+
+            // this.init();
+        }
+
+        /** componentDidMount()
+         * Invoked immediately after a component is mounted (inserted into the tree).
+         * Initialization that requires DOM nodes should go here. If you need to load
+         * data from a remote endpoint, this is a good place to instantiate the network
+         * request.
+         */
+        componentDidMount() {
+            console.log( 'componentDidMount' );
+            // this.init();
+            this.getPollQuestions();
+        }
+
+        init() {
+            // var self = this;
+            // let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+            //             '?action=gutenbergtemplateblock_getFirstPollQid' + 
+            //             '&security=' + gutenbergtemplateblock_ajax_object.security;
+    
+            // fetch( url )
+            //     .then(response => {
+            //         return response.json();
+            //     })
+            //     .then(
+            //         (result) => {
+            //             // console.log( result );
+            //             self.props.setAttributes( { firstPollId: result[0].qid } );
+            //             this.getPollById( result[0].qid );
+            //         },
+            //         (err) => {
+            //             console.log( error );
+            //             self.props.setAttributes( { error: err } );
+            //         }
+            //     )
         }
         
         // Events \\
         onChangeTitle( title ) { this.props.setAttributes( { title } ) }
         onChangeContent( content ) { this.props.setAttributes( { content } ) }
-        setPoll( poll ) { this.props.setAttributes( { poll } ) }
-        setError( error ) { this.props.setAttributes( { error } ) }
-        setPollQuestionTitle( pollQuestionTitle ) { this.props.setAttributes( { pollQuestionTitle } ) }
-        setRefreshQid( refreshQid ) { this.props.setAttributes( { refreshQid } ) }
+        setSavePoll( poll ) { this.props.setAttributes( { poll } ) }
+        setSavePollTitle( pollTitle ) { this.props.setAttributes( { pollTitle } ) }
 
-        onChangePollQuestion( selectedPoll ) {
-            let index = selectedPoll.target.selectedIndex;
-            let qid = selectedPoll.target.options[ index ].value;
-            this.setRefreshQid( qid );
-            this.getPollById( qid );
-        };
+        // Handle Events \\
+        handleSelectChange( event ) {
+            // console.log( 'handleSelectChange' );
+            // console.log( event );
+            this.getPollAnswersById( event );
+        }
 
-        onButtonClick() {
-            console.log( 'onButtonClick!' );
-            console.log( props );
-        };
+        handleTabChange( event ) {
+            // console.log( 'handleTabChange' );
+            this.getPollQuestions();
+        }
 
-        onTabSelect() {
-            console.log( 'onTabSelect' );
-        };
+        handleAddQuestionClick( event ) {
+            let question = [{
+                'value': '1',
+                'label': 'New Question Title'
+            }];
+
+            let answer = [{
+                'oid': '1',
+                'option': 'Answer 1'
+            }];
+
+            console.log( 'this.state.questions' );
+            console.log( this.state.questions );
+            console.log( 'this.state.answers' );
+            console.log( this.state.answers );
+            console.log( question[0] );
+            console.log( answer[0] );
+
+            this.setState({
+                questions: question,
+                answers: answer
+            });
+        }
+
+        /** 
+         * https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
+         * // Correct
+         * this.setState((state, props) => ({
+         *     counter: state.counter + props.increment
+         * }));
+         */
 
         // Helpers \\
-        getPollById( qid ) {
+        getPollQuestions() {
+            // console.log( 'getPollQuestions' );
+            if ( this.state.isLoaded ) {
+                this.setState({ isLoaded: false });
+            }
+            
             var self = this;
-            let url = gutenbergtemplateblock_ajax_object.ajax_url +
-                        '?action=gutenbergtemplateblock_getPollById' +
-                        '&qid=' + qid +
-                        '&security=' + gutenbergtemplateblock_ajax_object.security;
+            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                      '?action=gutenbergtemplateblock_getPollQuestions&security=' + 
+                      gutenbergtemplateblock_ajax_object.security;
+    
+            fetch( url )
+                .then( response => {
+                    return response.json();
+                })
+                .then(
+                    ( results ) => {
+                        // console.log(results[0].value);
+                        // if ( self.state.firstQid === null ) {
+                        //     // self.setState( ( results ) => ({
+                        //     self.setState({
+                        //         // isLoaded: true,
+                        //         questions: results,
+                        //         firstQid: results[0].value
+                        //     });
+                        // } else {
+                            self.setState({
+                                // isLoaded: true,
+                                questions: results
+                            });
+                        // }
+                        self.getFirstPoll();
+                    },
+                    ( error ) => {
+                        self.setState({
+                            isLoaded: true,
+                            error
+                        });
+                    }
+                )
+        }
+
+        getFirstPoll() {
+            // console.log( 'getFirstPoll' );
+            if ( this.state.isLoaded ) {
+                this.setState({ isLoaded: false });
+            }
+            
+            var self = this;
+            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                      '?action=gutenbergtemplateblock_getFirstPoll&security=' + 
+                      gutenbergtemplateblock_ajax_object.security;
+    
+            fetch( url )
+                .then( response => {
+                    return response.json();
+                })
+                .then(
+                    ( results ) => {
+                        let answersByOid = [];
+                        const pollOptions = results.map( ( object, key ) => {
+                            answersByOid.push({ oid: object.oid, option: object.option });
+                            return [
+                                <p><input type="radio" name="options" value={ object.oid }/>{ object.option }</p>
+                            ];
+                        });
+                        // console.log('answersByOid');
+                        // console.log(answersByOid);
+                        
+                        self.setSavePoll( pollOptions );
+                        self.setSavePollTitle( results[0].question );
+                        self.setState({
+                            isLoaded: true,
+                            answers: answersByOid,
+                            // firstQid: results[0].qid
+                        });
+                        // console.log('this.state.firstQid');
+                        // console.log(this.state.firstQid);
+                        // this.state.firstQid === null ? 
+                        //     self.setState( ( result ) => ({
+                        //         isLoaded: true,
+                        //         answers: result,
+                        //         firstQid: result[0].qid
+                        //     }))
+                        //     : 
+                        //     self.setState({
+                        //         isLoaded: true,
+                        //         answers: result
+                        //     });
+                    },
+                    ( error ) => {
+                        self.setState({
+                            isLoaded: true,
+                            error
+                        });
+                    }
+                )
+        }
+
+        // getPollById( qid ) {
+        //     var self = this;
+        //     let url = gutenbergtemplateblock_ajax_object.ajax_url +
+        //               '?action=gutenbergtemplateblock_getPollById' +
+        //               '&qid=' + qid +
+        //               '&security=' + gutenbergtemplateblock_ajax_object.security;
+    
+        //     fetch( url )
+        //         .then( response => {
+        //             return response.json();
+        //         })
+        //         .then(
+        //             ( result ) => {
+        //                 // console.log( result );
+        //                 const pollOptions = result.map( ( object, key ) => {
+        //                     return [
+        //                         <p><input type="radio" name="options" value={ object.oid }/>{ object.option }</p>
+        //                     ];
+        //                 });
+                        
+        //                 self.setSavePoll( pollOptions );
+        //                 self.setSavePollTitle( result[0].question );
+        //                 self.setState({
+        //                     // isLoaded: true,
+        //                     questions: result
+        //                 });
+        //             },
+        //             ( error ) => {
+        //                 self.setState({
+        //                     isLoaded: true,
+        //                     error
+        //                 });
+        //             }
+        //         )
+        // };
+
+        getPollAnswersById( qid ) {
+            // this.setState({ isLoaded: false });
+            var self = this;
+            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                      '?action=gutenbergtemplateblock_getPollAnswersById' + 
+                      '&qid=' + qid +
+                      '&security=' + gutenbergtemplateblock_ajax_object.security;
     
             fetch( url )
                 .then( response => {
@@ -165,34 +334,42 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( result ) => {
+                        // console.log( 'result' );
                         // console.log( result );
-                        const pollOptions = result.map( ( object, key ) => {
-                            return [
-                                <p><input type="radio" name="options" value={ object.oid }/>{ object.option }</p>
-                            ];
+                        self.setState({
+                            // isLoaded: true,
+                            answers: result
                         });
-                        self.setPoll( pollOptions );
-                        self.setPollQuestionTitle( result[0].question );
+                        
                     },
-                    ( err ) => {
-                        setError( err );
+                    ( error ) => {
+                        console.log( error );
+                        self.setState({
+                            // isLoaded: true,
+                            error
+                        });
                     }
                 )
-        };
+        }
 
         render() {
             const { 
                 className, 
                 setAttributes,
-                attributes: { 
-                    // colourAttributes,
+                attributes: {
                     classes,
                     titleColour,
                     contentColour,
                     textAlignment,
                     title,
                     content
-                }} = this.props;
+            }} = this.props;
+            
+            const {
+                isLoaded,
+                questions,
+                answers
+            }  = this.state;
 
             return [
                 <Inspector {...{ setAttributes, ...this.props }} />,
@@ -237,19 +414,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             />
                         </div>
                     </div>
-                    {/* <RadioControl
-                        label = { __( 'Radio Control', 'gutenbergtemplateblock' ) }
-                        selected = { radioControl }
-                        options = {[
-                            { label: 'Author', value: 'a' },
-                            { label: 'Editor', value: 'e' },
-                        ]}
-                        onChange = { radioControl => setAttributes( { radioControl } ) }
-                    /> */}
                     <TabPanel
                         className="my-tab-panel"
                         activeClass="active-tab"
-                        onSelect={ this.onTabSelect }
+                        onSelect={ this.handleTabChange }
                         tabs={[
                             {
                                 name: 'tab1',
@@ -273,32 +441,40 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                 if ( tab.name === 'tab1' ) {
                                     return [
                                         <div className = { classes }>
-                                            <div className={ className } onChange={ this.onChangePollQuestion }>
+                                            { isLoaded ? 
                                                 <PotdSelect
-                                                    // onChange={ onChangePollQuestion }
-                                                    // onChange={ ( selectedPoll ) => { console.log( selectedPoll ); } }
-                                                    // onChange={onChangePollQuestion.bind(this)}
+                                                    // isLoaded={ isLoaded }
+                                                    onSelectChange={ this.handleSelectChange }
+                                                    questions={ questions }
+                                                    answers={ answers }
+                                                    editable={ false }
                                                 />
-                                            </div>
-                                            <div className={ className }>
-                                                <PotdAnswers
-                                                    // value={ pollQuestionId }
-                                                    refresh={ this.props.attributes.refreshQid }
-                                                />
-                                            </div>
+                                                :
+                                                <div>Loading...</div>
+                                            }
                                         </div>
                                     ];
                                 } else if ( tab.name === 'tab2' ) {
                                     return [
                                         <div className={ className }>
-                                            <PotdSelect/>
+                                            { isLoaded ? 
+                                                <PotdSelect
+                                                    // isLoaded={ isLoaded }
+                                                    onSelectChange={ this.handleSelectChange }
+                                                    questions={ questions }
+                                                    answers={ answers }
+                                                    editable={ true }
+                                                    onAddQuestionClick={ this.handleAddQuestionClick }
+                                                />
+                                                :
+                                                <div>Loading...</div>
+                                            }
                                         </div>
                                     ];
                                 } else if ( tab.name === 'tab3' ) {
                                     return [
                                         <div className={ className }>
                                             <p>{ tab.name }</p>
-                                            <p>tab3?</p>
                                         </div>
                                     ];
                                 }
@@ -306,31 +482,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             }
                         }
                     </TabPanel>
-                    {/* </div> */}
-                    {/* <SelectControl
-                        label="Test Select"
-                        value="test value"
-                        options={[
-                            {key: '1', value: 'a', label: 'PotdSelect A'},
-                            {key: '2', value: 'b', label: 'PotdSelect B'},
-                            {key: '3', value: 'c', label: 'PotdSelect C'}
-                        ]}
-                        onChange={() => {console.log( 'onChange' );}}
-                    /> */}
-                    {/* <Button
-                        isDefault
-                        className = "button button-large"
-                        onClick = { this.onButtonClick }
-                    >
-                        Add Poll
-                    </Button>
-                    <Button
-                        isDefault
-                        className = "button button-large"
-                        onClick = { this.onButtonClick }
-                    >
-                        Delete Poll
-                    </Button> */}
                 </div>
             ];
         }
@@ -345,29 +496,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 content,
                 titleColour,
                 contentColour,
-                // radioControl,
-                // refreshQid,
-                // isLoaded,
-                // error,
-                poll,
-                pollQuestionTitle
             }
         } = props;
-        // var poll = null;
-        // var isLoaded = false;
-        // var error = null;
-        // console.log(refreshQid);
+
         const className = classnames(
             'wp-block-gutenbergtemplateblock-templateblock',
             { 'style-toggle': styleToggle },
         );
         
-        // if ( error ) {
-        //     return <div>Error!</div>
-        // } else if ( !isLoaded ) {
-        //     return <div>Loading...</div>;
-        // } else {
-        // console.log( poll[0].question );
         return (
             <div className = { className }>
                 <h2 
@@ -387,16 +523,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 >
                     { content }
                 </div>
-                {/* <h4>{ poll[0].question }</h4>
-                { poll.map( ( object, key ) => {
-                    <p>{ object.option }</p>
-                })} */}
-                <h4>{ pollQuestionTitle }</h4>
-                <form>
-                    { poll }
-                    <button class="potd-vote-btn" type="button">Btn</button>
-                </form>
-                <div class="potd-result"></div>
             </div>
         );
     },

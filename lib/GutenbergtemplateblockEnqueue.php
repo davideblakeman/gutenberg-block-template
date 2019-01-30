@@ -59,8 +59,13 @@ class GutenbergtemplateblockEnqueue
         add_action( 'enqueue_block_assets', array( $this, 'enqueue_frontend_assets' ) );
 
         // ajax
+        // TODO
+        // Remove unsafe no_priv's 
         add_action( 'wp_ajax_gutenbergtemplateblock_get', [ __CLASS__, 'gutenbergtemplateblock_get'] );
         add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_get', [ __CLASS__, 'gutenbergtemplateblock_get'] );
+
+        add_action( 'wp_ajax_gutenbergtemplateblock_getFirstPoll', [ __CLASS__, 'gutenbergtemplateblock_getFirstPoll'] );
+        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getFirstPoll', [ __CLASS__, 'gutenbergtemplateblock_getFirstPoll'] );
 
         add_action( 'wp_ajax_gutenbergtemplateblock_getPollQuestions', [ __CLASS__, 'gutenbergtemplateblock_getPollQuestions'] );
         add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getPollQuestions', [ __CLASS__, 'gutenbergtemplateblock_getPollQuestions'] );
@@ -135,6 +140,17 @@ class GutenbergtemplateblockEnqueue
 
         $GTBWPDB = new GutenbergtemplateblockWpdb;
         echo json_encode( $GTBWPDB->get() );
+        wp_die();
+    }
+
+    public static function gutenbergtemplateblock_getFirstPoll()
+    {
+        check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
+
+        $GTBWPDB = new GutenbergtemplateblockWpdb;
+        // print_r( $GTBWPDB->getFirstPoll() );
+        // exit;
+        echo json_encode( $GTBWPDB->getFirstPoll() );
         wp_die();
     }
 
