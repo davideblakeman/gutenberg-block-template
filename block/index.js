@@ -225,63 +225,18 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         handleInputChange( event, name ) {
             console.log( 'handleInputChange' );
-            console.log( event );
-            console.log( name );
+            // console.log( 'event' );
+            // console.log( event );
+            // console.log( 'name' );
+            // console.log( name );
 
             let newAnswers = this.state.answers.map( ( answer, id ) => {
-                if ( name !== id ) return answer;
+                if ( name[0] !== id ) return answer;
                 return { ...answer, option: event };
             });
-
-            console.log( newAnswers );
             
             // this.setState({ answers: newAnswers }, () => console.log( this.state.answers ));
-
-            // handleShareholderNameChange = idx => evt => {
-            //     const newShareholders = this.state.shareholders.map((shareholder, sidx) => {
-            //       if (idx !== sidx) return shareholder;
-            //       return { ...shareholder, name: evt.target.value };
-            //     });
-            
-            //     this.setState({ shareholders: newShareholders });
-            // };
-
-            // console.log( this.state.answers[ name[0] ].option );
-
-            // this.setState( ( event ) => { answers[name]: event.target.value });
-            // this.setState({
-            //     // answers: [ this.state.answers[ name[0] ].option, event ]
-            //     answers: {  }
-            // });
-            
-            // function updateInput( answers ) {
-            //     return { ...answers, option: event };
-            // }
-
-            // this.setState( state => ({
-            //     answers: [ ...state.answers[ name ].option, event ]
-            // }, () => console.log(this.state.answers)));
-
-            // let answers = { ...this.state.answers }
-            // console.log( answers[ name ].option );
-            // answers[ name ].option = event
-            // console.log( answers );
-            // answers[ name ].option = event;
-            // this.setState({ answers });
-
-            // this.setState(prevState => ({
-            //     ...prevState,
-            //     someProperty: {
-            //         ...prevState.someProperty,
-            //         someOtherProperty: {
-            //             ...prevState.someProperty.someOtherProperty, 
-            //             anotherProperty: {
-            //                ...prevState.someProperty.someOtherProperty.anotherProperty,
-            //                flag: false
-            //             }
-            //         }
-            //     }
-            // }))
+            this.setState({ answers: newAnswers });
         }
 
         /** 
