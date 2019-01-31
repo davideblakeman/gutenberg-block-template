@@ -25,6 +25,7 @@ export default class PotdAnswer extends React.Component {
         if ( !this.handlers[ name ] ) {
             this.handlers[ name ] = event => {
                 // this.setState({ [name]: event.target.value });
+                // console.log( [ name ][0] );
                 this.props.onInputChange( event, [ name ] );
             };
         }
@@ -51,7 +52,7 @@ export default class PotdAnswer extends React.Component {
                         <div class="inline-flex">
                             { editable ? 
                                 <TextControl
-                                    key={ key }
+                                    name={ key }
                                     value={ object.option }
                                     // onChange={ this.handleChange }
                                     onChange={ this.handleChange( key ) }
