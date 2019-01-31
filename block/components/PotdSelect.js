@@ -1,5 +1,8 @@
+import PotdAnswers from "./PotdAnswers";
 const {
-    SelectControl
+    SelectControl,
+    Button,
+    TextControl
 } = wp.components;
 
 export default class PotdSelect extends React.Component {
@@ -7,82 +10,115 @@ export default class PotdSelect extends React.Component {
     constructor( props ) {
         super( props );
         this.componentDidMount = this.componentDidMount.bind( this );
+        this.handleChange = this.handleChange.bind( this );
+        this.handleInputChange = this.handleInputChange.bind( this );
+        this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
+        this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this );
+
         this.state = {
-            error: null,
-            isLoaded: false,
-            questions: [],
-            selectedIndex: '1'
-        };
+            selectedValue: null
+        }
     }
 
     componentDidMount() {
-        this.getPollQuestions();
+        // this.getPollQuestions();
     }
 
-    static getDerivedStateFromProps( nextProps, prevState ) {
-        // console.log( 'getDerivedStateFromProps' );
-        // console.log( 'nextProps' );
-        // console.log( nextProps );
-        // console.log( 'prevState' );
-        // console.log( prevState );
-        
-        if ( nextProps.refresh && nextProps.refresh !== prevState.selectedIndex ) {
-            return { selectedIndex: nextProps.refresh };
-        } else return null;
+    handleChange( event ) {
+        this.setState({
+            selectedValue: event
+        });
+        this.props.onSelectChange( event );
     }
 
-    componentDidUpdate( prevProps, prevState ) {
-        if( prevProps.refresh !== this.props.refresh ) {
-            // console.log( 'componentDidUpdate' );
-            // this.setState(
-            //     selectedQid: 
-            // );
-            // this.getPollQuestions();
-        }
+    handleInputChange( event, name ) {
+        // console.log( event );
+        this.props.onInputChange( event, name );
     }
 
-    getPollQuestions() {
-        this.setState({ isLoaded: false });
-        var self = this;
-        let url = gutenbergtemplateblock_ajax_object.ajax_url + 
-                  '?action=gutenbergtemplateblock_getPollQuestions&security=' + 
-                  gutenbergtemplateblock_ajax_object.security;
+    handleAddQuestionClick( event ) {
+        this.props.onAddQuestionClick( event );
+    }
 
-        fetch( url )
-            .then( response => {
-                return response.json();
-            })
-            .then(
-                ( result ) => {
-                    self.setState({
-                        isLoaded: true,
-                        questions: result
-                    });
-                },
-                ( error ) => {
-                    self.setState({
-                        isLoaded: true,
-                        error
-                    });
-                }
-            )
+    handleAddAnswerClick( event ) {
+        this.props.onAddAnswerClick( event );
     }
 
     render() {
-        const { error, isLoaded, questions, selectedIndex } = this.state;
-        if ( error ) {
-            return <div>Error!</div>
-        } else if ( !isLoaded ) {
-            return <div>Loading...</div>;
-        } else {
-            return (
-                <SelectControl
-                    label={ 'Select a question:' }
-                    options={ questions }
-                    // value={ selectedIndex }
-                />
-            );
+        const { questions, answers, editable, editing } = this.props;
+        const { selectedValue } = this.state;
+        // if ( error ) {
+        //     return <div>Error!</div>
+        // } else if ( !isLoaded ) {
+        //     return <div>Loading...</div>;
+        // } else {
+        let selectedKey = null;
+        for ( let i = 0; i < questions.length; i++ ) {
+            if ( parseInt( questions[i].value ) == selectedValue ) {
+                selectedKey = i;
+            }
         }
+
+        return (
+            <div>
+                { editable &&
+                    <Button
+                        className = "gutenbergtemplateblock-add-question button button-large"
+                        onClick = { this.handleAddQuestionClick }
+                        // value={ selectedValue === null ? questions[0].value : questions[ selectedKey ].value }
+                    > 
+                        New Question
+                    </Button>
+                }
+                { !editing &&
+                    <SelectControl
+                        label={ 'Select a question:' }
+                        options={ questions }
+                        onChange={ this.handleChange }
+                    />
+                }
+                { editable &&
+                    <div class="grid">
+                        <div class="inline-flex">
+                            <TextControl
+                                value={ selectedValue === null ? questions[0].label : questions[ selectedKey ].label }
+                            />
+                            { !editing &&
+                                <Button
+                                    className = "gutenbergtemplateblock-delete-question button button-large"
+                                    // onClick = { this.onRemoveBtnClick }
+                                    value={ selectedValue === null ? questions[0].value : questions[ selectedKey ].value }
+                                > 
+                                    Delete
+                                </Button>
+                            }
+                        </div>
+                    </div>
+                }
+                <PotdAnswers
+                    answers={ answers }
+                    editable={ editable }
+                    onInputChange={ this.handleInputChange }
+                />
+                { editable &&
+                    <div>
+                        <Button
+                            className = "gutenbergtemplateblock-add-question button button-large"
+                            onClick = { this.handleAddAnswerClick }
+                        > 
+                            Add Answer
+                        </Button>
+                        <Button
+                            className = "gutenbergtemplateblock-save-poll button button-large"
+                            onClick = { this.handleSavePollClick }
+                        > 
+                            Save
+                        </Button>
+                    </div>
+                }
+            </div>
+        );
+        // }
     }
 
 }

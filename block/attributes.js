@@ -63,9 +63,21 @@ const attributes = {
         type: 'string',
         default: null
     },
-    selectedIndex: {
-        type: 'string',
-        default: '1'
+    // selectedIndex: {
+    //     type: 'string',
+    //     default: '1'
+    // },
+    // currentQid: {
+    //     type: 'string',
+    //     default: null
+    // },
+    tabRefresh: {
+        type: 'boolean',
+        default: false
+    },
+    tabT2Refresh: {
+        type: 'boolean',
+        default: false
     },
     poll: {
         type: 'array',
@@ -79,7 +91,7 @@ const attributes = {
         type: 'string', //?
         default: null
     },
-    pollQuestionTitle: {
+    pollTitle: {
         type: 'string',
         default: null
     },

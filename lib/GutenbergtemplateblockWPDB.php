@@ -28,6 +28,33 @@ class GutenbergtemplateblockWpdb
         return $result[0]->post_title;
     }
 
+    public function getFirstPoll()
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        #print_r( $wpdb->queries );
+        // $sql = 'SELECT q.qid, q.question, q.vote_count, o.oid, o.option, o.votes 
+        //         FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
+        //         JOIN wp_gutenbergtemplateblock_options o ON q.qid = o.qid
+        //         WHERE q.qid = ' . $qid;
+        // return print_r( $sql );
+        // exit;
+        #$result = $wpdb->get_results('SELECT question FROM ' . $wpdb->gutenbergtemplateblock_questions . ' WHERE qid = ' . $qid );
+
+        $result = $wpdb->get_results('
+            SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
+            FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
+            JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
+            WHERE q.qid = (SELECT MIN(qid) FROM ' . $wpdb->gutenbergtemplateblock_questions . ')
+            ORDER BY o.votes DESC'
+        );
+
+        #echo '<pre>';
+        #print_r( $wpdb->queries );
+        #return var_dump($result);
+        return $result;
+    }
+
     public function getPollQuestions()
     {
         global $wpdb;
