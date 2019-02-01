@@ -96,6 +96,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this );
             this.handleInputChange = this.handleInputChange.bind( this );
             this.handleSelectInputChange = this.handleSelectInputChange.bind( this );
+            this.handleDeleteQuestionClick = this.handleDeleteQuestionClick.bind( this );
 
             setAttributes({
                 classes: classnames(
@@ -149,9 +150,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         setSavePollTitle( pollTitle ) { this.props.setAttributes( { pollTitle } ) }
 
         // Handle Events \\
-        handleSelectChange( event ) {
+        handleSelectChange( event, editable = null ) {
             // console.log( 'handleSelectChange' );
             // console.log( event );
+            if ( editable ) {
+                this.setState({
+                    editing: true
+                });
+            }
             this.getPollAnswersById( event );
         }
 
@@ -241,11 +247,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         handleSelectInputChange( event, index ) {
-            console.log( 'handleSelectInputChange' );
-            console.log( 'event' );
-            console.log( event );
-            console.log( 'index' );
-            console.log( index );
+            // console.log( 'handleSelectInputChange' );
+            // console.log( 'event' );
+            // console.log( event );
+            // console.log( 'index' );
+            // console.log( index );
 
             let newQuestions = this.state.questions.map( ( question, id ) => {
                 if ( index !== id ) return question;
@@ -253,6 +259,19 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             });
 
             this.setState({ questions: newQuestions });
+        }
+
+        // https://stackoverflow.com/questions/29527385/removing-element-from-array-in-component-state
+        handleDeleteQuestionClick( index ) {
+            console.log( 'handleDeleteQuestionClick' );
+
+            if ( confirm( 'Are you sure you wish to delete this poll question?' ) ) {
+                let newQuestions = [ ...this.state.questions.slice( 0, index ), ...this.state.questions.slice( index + 1 ) ];
+                this.setState({
+                    questions: newQuestions,
+                    editing: false
+                });
+            }
         }
 
         /** 
@@ -549,6 +568,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     onAddAnswerClick={ this.handleAddAnswerClick }
                                                     onInputChange={ this.handleInputChange }
                                                     onSelectInputChange={ this.handleSelectInputChange }
+                                                    onDeleteQuestionClick={ this.handleDeleteQuestionClick }
                                                 />
                                                 :
                                                 <div>Loading...</div>
