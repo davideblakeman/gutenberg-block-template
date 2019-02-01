@@ -82,7 +82,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 selectChange: null,
                 answersQid: null,
                 firstQid: null,
-                editing: false
+                editing: false,
+                newQuestion: false
             };
             // console.log(this.state);
             this.onChangeTitle = this.onChangeTitle.bind( this );
@@ -164,7 +165,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         handleTabChange( event ) {
             // console.log( 'handleTabChange' );
             this.setState({
-                editing: false
+                editing: false,
+                newQuestion: false
             });
             this.getPollQuestions();
         }
@@ -198,7 +200,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.setState({
                 questions: question,
                 answers: answer,
-                editing: true
+                editing: true,
+                newQuestion: true
             });
         }
 
@@ -467,7 +470,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 isLoaded,
                 questions,
                 answers,
-                editing
+                editing,
+                newQuestion
             }  = this.state;
 
             return [
@@ -564,6 +568,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     answers={ answers }
                                                     editable={ true }
                                                     editing={ editing }
+                                                    inNewQuestion= { newQuestion }
                                                     onAddQuestionClick={ this.handleAddQuestionClick }
                                                     onAddAnswerClick={ this.handleAddAnswerClick }
                                                     onInputChange={ this.handleInputChange }

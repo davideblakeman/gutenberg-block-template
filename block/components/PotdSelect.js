@@ -87,7 +87,7 @@ export default class PotdSelect extends React.Component {
     };
 
     render() {
-        const { questions, answers, editable, editing } = this.props;
+        const { questions, answers, editable, editing, inNewQuestion } = this.props;
         const { selectedValue, lastSelectableKey } = this.state;
         const selectedKey = this.getSelectedKey();
         const editTitleText = questions[ selectedKey ].label;
@@ -128,7 +128,7 @@ export default class PotdSelect extends React.Component {
                                 value={ editTitleText }
                                 onChange={ this.handleSelectInputChange }
                             />
-                            {/* { !editing && */}
+                            { ( !inNewQuestion && editing ) && // BROKEN
                                 <Button
                                     className="gutenbergtemplateblock-delete-question button button-large"
                                     value={ selectedValue }
@@ -136,7 +136,7 @@ export default class PotdSelect extends React.Component {
                                 > 
                                     Delete
                                 </Button>
-                            {/* } */}
+                            }
                         </div>
                     </div>
                 }
@@ -165,69 +165,6 @@ export default class PotdSelect extends React.Component {
                 }
             </div>
         );
-
-        // return (
-        //     <div>
-        //         { editable &&
-        //             <Button
-        //                 className = "gutenbergtemplateblock-add-question button button-large"
-        //                 onClick = { this.handleAddQuestionClick }
-        //             > 
-        //                 New Question
-        //             </Button>
-        //         }
-        //         { !editing &&
-        //             <SelectControl
-        //                 label={ 'Select a question:' }
-        //                 options={ questions }
-        //                 onChange={ this.handleChange }
-        //                 // value={ selectedKey }
-        //             />
-        //         }
-        //         { editable &&
-        //             <div class="grid">
-        //                 <div class="inline-flex">
-        //                     <TextControl
-        //                         name={ selectedKey }
-        //                         // value={ selectedValue === null ? questions[0].label : questions[ selectedKey ].label }
-        //                         value={ editTitleText }
-        //                         onChange={ this.handleSelectInputChange }
-        //                     />
-        //                     { !editing &&
-        //                         <Button
-        //                             className="gutenbergtemplateblock-delete-question button button-large"
-        //                             // onClick = { this.onRemoveBtnClick }
-        //                             value={ selectedValue }
-        //                         > 
-        //                             Delete
-        //                         </Button>
-        //                     }
-        //                 </div>
-        //             </div>
-        //         }
-        //         <PotdAnswers
-        //             answers={ answers }
-        //             editable={ editable }
-        //             onInputChange={ this.handleInputChange }
-        //         />
-        //         { editable &&
-        //             <div>
-        //                 <Button
-        //                     className = "gutenbergtemplateblock-add-question button button-large"
-        //                     onClick = { this.handleAddAnswerClick }
-        //                 > 
-        //                     Add Answer
-        //                 </Button>
-        //                 <Button
-        //                     className = "gutenbergtemplateblock-save-poll button button-large"
-        //                     onClick = { this.handleSavePollClick }
-        //                 > 
-        //                     Save
-        //                 </Button>
-        //             </div>
-        //         }
-        //     </div>
-        // );
     }
 
 }
