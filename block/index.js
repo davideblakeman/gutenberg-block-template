@@ -95,6 +95,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
             this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this );
             this.handleInputChange = this.handleInputChange.bind( this );
+            this.handleSelectInputChange = this.handleSelectInputChange.bind( this );
 
             setAttributes({
                 classes: classnames(
@@ -224,7 +225,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         handleInputChange( event, name ) {
-            console.log( 'handleInputChange' );
+            // console.log( 'handleInputChange' );
             // console.log( 'event' );
             // console.log( event );
             // console.log( 'name' );
@@ -237,6 +238,21 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             
             // this.setState({ answers: newAnswers }, () => console.log( this.state.answers ));
             this.setState({ answers: newAnswers });
+        }
+
+        handleSelectInputChange( event, index ) {
+            console.log( 'handleSelectInputChange' );
+            console.log( 'event' );
+            console.log( event );
+            console.log( 'index' );
+            console.log( index );
+
+            let newQuestions = this.state.questions.map( ( question, id ) => {
+                if ( index !== id ) return question;
+                return { ...question, label: event };
+            });
+
+            this.setState({ questions: newQuestions });
         }
 
         /** 
@@ -532,6 +548,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     onAddQuestionClick={ this.handleAddQuestionClick }
                                                     onAddAnswerClick={ this.handleAddAnswerClick }
                                                     onInputChange={ this.handleInputChange }
+                                                    onSelectInputChange={ this.handleSelectInputChange }
                                                 />
                                                 :
                                                 <div>Loading...</div>

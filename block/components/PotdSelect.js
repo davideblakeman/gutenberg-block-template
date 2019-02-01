@@ -12,52 +12,61 @@ export default class PotdSelect extends React.Component {
         this.componentDidMount = this.componentDidMount.bind( this );
         this.handleChange = this.handleChange.bind( this );
         this.handleInputChange = this.handleInputChange.bind( this );
+        this.handleSelectInputChange = this.handleSelectInputChange.bind( this );
         this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
         this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this );
+        this.getSelectedKey = this.getSelectedKey.bind( this );
 
         this.state = {
-            selectedValue: null
-        }
+            selectedValue: null,
+            selectedKey: null
+        };
     }
 
     componentDidMount() {
-        // this.getPollQuestions();
+        // console.log( 'componentDidMount' );
+        // Always needs at least one question returned from the database
+        this.setState({
+            selectedValue: this.props.questions[0].value
+        }, () => this.setState({
+            selectedKey: this.getSelectedKey() 
+        }));
     }
 
     handleChange( event ) {
         this.setState({
             selectedValue: event
+        }, () => {
+            this.setState({
+                selectedKey: this.getSelectedKey() 
+            });
+            this.props.onSelectChange( event );
         });
-        this.props.onSelectChange( event );
     }
 
-    handleInputChange( event, name ) {
-        // console.log( event );
-        this.props.onInputChange( event, name );
+    handleSelectInputChange( event ) {
+        console.log( 'handleSelectInputChange' );
+        console.log( event );
+        this.props.onSelectInputChange( event, this.state.selectedKey );
     }
 
-    handleAddQuestionClick( event ) {
-        this.props.onAddQuestionClick( event );
-    }
+    handleInputChange( event, name ) { this.props.onInputChange( event, name ) }
+    handleAddQuestionClick( event ) { this.props.onAddQuestionClick( event ) }
+    handleAddAnswerClick( event ) { this.props.onAddAnswerClick( event ) }
 
-    handleAddAnswerClick( event ) {
-        this.props.onAddAnswerClick( event );
-    }
+    getSelectedKey() {
+        for ( let i = 0; i < this.props.questions.length; i++ ) {
+            if ( parseInt( this.props.questions[i].value ) == this.state.selectedValue ) {
+                return i;
+            }
+        } return 0;
+    };
 
     render() {
         const { questions, answers, editable, editing } = this.props;
         const { selectedValue } = this.state;
-        // if ( error ) {
-        //     return <div>Error!</div>
-        // } else if ( !isLoaded ) {
-        //     return <div>Loading...</div>;
-        // } else {
-        let selectedKey = null;
-        for ( let i = 0; i < questions.length; i++ ) {
-            if ( parseInt( questions[i].value ) == selectedValue ) {
-                selectedKey = i;
-            }
-        }
+        const selectedKey = this.getSelectedKey();
+        const editTitleText = questions[ selectedKey ].label;
 
         return (
             <div>
@@ -65,7 +74,6 @@ export default class PotdSelect extends React.Component {
                     <Button
                         className = "gutenbergtemplateblock-add-question button button-large"
                         onClick = { this.handleAddQuestionClick }
-                        // value={ selectedValue === null ? questions[0].value : questions[ selectedKey ].value }
                     > 
                         New Question
                     </Button>
@@ -75,19 +83,23 @@ export default class PotdSelect extends React.Component {
                         label={ 'Select a question:' }
                         options={ questions }
                         onChange={ this.handleChange }
+                        value={ selectedKey }
                     />
                 }
                 { editable &&
                     <div class="grid">
                         <div class="inline-flex">
                             <TextControl
-                                value={ selectedValue === null ? questions[0].label : questions[ selectedKey ].label }
+                                name={ selectedKey }
+                                // value={ selectedValue === null ? questions[0].label : questions[ selectedKey ].label }
+                                value={ editTitleText }
+                                onChange={ this.handleSelectInputChange }
                             />
                             { !editing &&
                                 <Button
-                                    className = "gutenbergtemplateblock-delete-question button button-large"
+                                    className="gutenbergtemplateblock-delete-question button button-large"
                                     // onClick = { this.onRemoveBtnClick }
-                                    value={ selectedValue === null ? questions[0].value : questions[ selectedKey ].value }
+                                    value={ selectedValue }
                                 > 
                                     Delete
                                 </Button>
@@ -118,7 +130,6 @@ export default class PotdSelect extends React.Component {
                 }
             </div>
         );
-        // }
     }
 
 }
