@@ -27,7 +27,7 @@ const {
     ColorPalette
 } = wp.editor;
 const { 
-    Button,
+    // Button,
     TabPanel
 } = wp.components;
 const { Component } = wp.element;
@@ -142,14 +142,16 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         handleAddQuestionClick() {
             let question = [{
                 'value': this.uuidv4(),
-                'label': 'New Question Title'
+                'label': 'New Question Title',
+                edited: true
             }];
 
             let answer = [
                 {
                     'name': 0,
                     'oid': this.uuidv4(),
-                    'option': 'Answer 1'
+                    'option': 'Answer 1',
+                    edited: true
                 },
                 {
                     'name': 1,
@@ -188,7 +190,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         handleInputChange( event, name ) {
             let newAnswers = this.state.answers.map( ( answer, id ) => {
                 if ( name[0] !== id ) return answer;
-                return { ...answer, option: event };
+                return { ...answer, ...{ option: event, edited: true } };
             });
             
             this.setState({ answers: newAnswers });
@@ -197,7 +199,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         handleSelectInputChange( event, index ) {
             let newQuestions = this.state.questions.map( ( question, id ) => {
                 if ( index !== id ) return question;
-                return { ...question, label: event };
+                return { ...question, ...{ label: event, edited: true } };
             });
 
             this.setState({ questions: newQuestions });
@@ -240,32 +242,79 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 if ( this.state.isLoaded ) {
                     this.setState({ isLoaded: false });
                 }
-                
-                console.log( this.state );
 
-                // var self = this;
-                // let url = gutenbergtemplateblock_ajax_object.ajax_url + 
-                //           '?action=gutenbergtemplateblock_setPoll' + 
-                //           '&q=' +
-                //           '&security=' + 
-                //           gutenbergtemplateblock_ajax_object.security;
-        
-                // fetch( url )
-                //     .then( response => {
-                //         return response.json();
-                //     })
-                //     .then(
-                //         ( results ) => {
-                //             // self.setState({ questions: results });
-                //         },
-                //         ( error ) => {
-                //             self.setState({
-                //                 // isLoaded: true,
-                //                 error
-                //             });
-                //         }
-                //     )
+                /** https://codeburst.io/learn-understand-javascripts-reduce-function-b2b0406efbdc
+                 * reduce( callback( accumulator, value, index, array ), initialValue )
+                 * accumulator — the accumulator accumulates all of the callbacks returned values.
+                 * val — the current value being processed
+                 * index — the current index of the value being processed
+                 * arr — the original array
+                 * 
+                 * reduce( callback( result, value, key, original ), initialValue )
+                 */
+
+                // Return edited question and answers
+                let saveQuestion = this.state.questions.reduce( ( result, value  ) => {
+                    if ( value.edited ) {
+                        result.push({
+                            value: this.isNumeric( value.value ) ? value.value : 'new',
+                            label: encodeURIComponent( value.label )
+                        });
+                    } return result;
+                }, [] );
+
+                let saveAnswers = this.state.answers.reduce( ( result, value  ) => {
+                    if ( value.edited ) {
+                        result.push({
+                            oid: this.isNumeric( value.oid ) ? value.oid : 'new',
+                            option: encodeURIComponent( value.option )
+                        });
+                    } return result;
+                }, [] );
+
+                console.log( 'saveQuestion' );
+                // console.log( saveQuestion[0].value );
+                // console.log( saveQuestion[0].label );
+                console.log( saveQuestion );
+                // console.log( 'saveAnswers' );
+                // console.log( saveAnswers );
+
+                let qid = saveQuestion[0].value;
+                let q = saveQuestion[0].label;
+                let a = saveAnswers.map( ( object, key ) => {
+                    return 'oid=' + object.oid + '&a=' + object.option
+                });
+
+                this.setPollById( qid, q, a );
             }
+        }
+
+        setPollById( qid, question, answers ) {
+                var self = this;
+
+                let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                          '?action=gutenbergtemplateblock_setPollQuestionById' + 
+                          '&qid=' + qid +
+                          '&q=' + question +
+                          '&security=' + 
+                          gutenbergtemplateblock_ajax_object.security;
+        
+                fetch( url )
+                    .then( response => {
+                        return response.json();
+                    })
+                    .then(
+                        ( results ) => {
+                            // self.setState({ questions: results });
+                            console.log( results );
+                        },
+                        ( error ) => {
+                            self.setState({
+                                // isLoaded: true,
+                                error
+                            });
+                        }
+                    )
         }
 
         /** 
@@ -293,6 +342,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( results ) => {
+                        // console.log( results );
+                        // let editedResults = results.map( ( object, key ) => {
+                        //     object.edited = false;
+                        //     return object;
+                        // });
                         self.setState({ questions: results });
                         self.getFirstPoll();
                     },
@@ -323,7 +377,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     ( results ) => {
                         let answersByOid = [];
                         const pollOptions = results.map( ( object, key ) => {
-                            answersByOid.push({ oid: object.oid, option: object.option });
+                            answersByOid.push({
+                                oid: object.oid,
+                                option: object.option
+                            });
                             return [
                                 <p><input type="radio" name="options" value={ object.oid }/>{ object.option }</p>
                             ];
@@ -331,6 +388,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         
                         self.setSavePoll( pollOptions );
                         self.setSavePollTitle( results[0].question );
+
                         self.setState({
                             isLoaded: true,
                             answers: answersByOid
@@ -377,6 +435,13 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             return ( [1e7]+-1e3+-4e3+-8e3+-1e11 ).replace( /[018]/g, c =>
                 ( c ^ crypto.getRandomValues( new Uint8Array(1) )[0] & 15 >> c / 4 ).toString(16)
             )
+        }
+
+        /**
+         * https://stackoverflow.com/questions/9716468/pure-javascript-a-function-like-jquerys-isnumeric
+         */
+        isNumeric( n ) {
+            return !isNaN( parseFloat( n ) ) && isFinite( n );
         }
 
         render() {

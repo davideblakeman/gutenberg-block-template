@@ -112,7 +112,7 @@ class GutenbergtemplateblockWpdb
         return $results;
     }
 
-    public function setPollById( $qid, $question, $answers )
+    public function setPollQuestionById( $qid, $question )
     {
         // print_r( $answers );
         // wp_die();
@@ -133,7 +133,7 @@ class GutenbergtemplateblockWpdb
             )
         );
 
-        // UPDATE each answer
+        // UPDATE each answer or INSERT new
         foreach( $answers as $k => $v )
         {
             if ( substr( $k, 0, 3 ) !== 'new' )
