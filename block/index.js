@@ -54,13 +54,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             return { 'data-align': blockAlignment };
         }
     },
-    // edit: props => {
     edit: class extends Component {
 
         constructor( props ) {
-            console.log( 'constructor' );
             super( ...arguments );
-
             const {
                 attributes: {
                     styleToggle,
@@ -68,7 +65,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 className, 
                 setAttributes
             } = props;
-
             this.state = {
                 isLoaded: false,
                 error: null,
@@ -85,12 +81,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 editing: false,
                 newQuestion: false
             };
-            // console.log(this.state);
+            
             this.onChangeTitle = this.onChangeTitle.bind( this );
             this.onChangeContent = this.onChangeContent.bind( this );
             this.setSavePoll = this.setSavePoll.bind( this );
             this.setSavePollTitle = this.setSavePollTitle.bind( this );
-            // this.getPollById = this.getPollById.bind( this );
             this.handleSelectChange = this.handleSelectChange.bind( this );
             this.handleTabChange = this.handleTabChange.bind( this );
             this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
@@ -98,6 +93,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleInputChange = this.handleInputChange.bind( this );
             this.handleSelectInputChange = this.handleSelectInputChange.bind( this );
             this.handleDeleteQuestionClick = this.handleDeleteQuestionClick.bind( this );
+            this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
+            this.handleCancelClick = this.handleCancelClick.bind( this );
 
             setAttributes({
                 classes: classnames(
@@ -105,8 +102,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     { 'style-toggle': styleToggle }
                 )
             });
-
-            // this.init();
         }
 
         /** componentDidMount()
@@ -116,32 +111,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
          * request.
          */
         componentDidMount() {
-            // console.log( 'componentDidMount' );
-            // this.init();
             this.getPollQuestions();
-        }
-
-        init() {
-            // var self = this;
-            // let url = gutenbergtemplateblock_ajax_object.ajax_url + 
-            //             '?action=gutenbergtemplateblock_getFirstPollQid' + 
-            //             '&security=' + gutenbergtemplateblock_ajax_object.security;
-    
-            // fetch( url )
-            //     .then(response => {
-            //         return response.json();
-            //     })
-            //     .then(
-            //         (result) => {
-            //             // console.log( result );
-            //             self.props.setAttributes( { firstPollId: result[0].qid } );
-            //             this.getPollById( result[0].qid );
-            //         },
-            //         (err) => {
-            //             console.log( error );
-            //             self.props.setAttributes( { error: err } );
-            //         }
-            //     )
         }
         
         // Events \\
@@ -152,50 +122,40 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         // Handle Events \\
         handleSelectChange( event, editable = null ) {
-            // console.log( 'handleSelectChange' );
-            // console.log( event );
             if ( editable ) {
-                this.setState({
-                    editing: true
-                });
+                this.setState({ editing: true });
             }
+
             this.getPollAnswersById( event );
         }
 
         handleTabChange( event ) {
-            // console.log( 'handleTabChange' );
             this.setState({
                 editing: false,
                 newQuestion: false
             });
+
             this.getPollQuestions();
         }
 
-        handleAddQuestionClick( event ) {
+        handleAddQuestionClick() {
             let question = [{
-                'value': 'new',
+                'value': this.uuidv4(),
                 'label': 'New Question Title'
             }];
 
             let answer = [
                 {
                     'name': 0,
-                    'oid': 'new',
+                    'oid': this.uuidv4(),
                     'option': 'Answer 1'
                 },
                 {
                     'name': 1,
-                    'oid': 'new',
+                    'oid': this.uuidv4(),
                     'option': ''
                 }
             ];
-
-            // console.log( 'this.state.questions' );
-            // console.log( this.state.questions );
-            // console.log( 'this.state.answers' );
-            // console.log( this.state.answers );
-            // console.log( question[0] );
-            // console.log( answer[0] );
 
             this.setState({
                 questions: question,
@@ -204,58 +164,36 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 newQuestion: true
             });
         }
-
-        handleAddAnswerClick( event ) {
+        
+        /** https://medium.freecodecamp.org/handling-state-in-react-four-immutable-approaches-to-consider-d1f5c00249d5
+         * let user = this.state.user; // this is a reference, not a copy...
+         * Never mutate this.state directly, as calling setState() afterwards may 
+         * replace the mutation you made. Treat this.state as if it were immutable.
+         * Warning: Watch Out For Nested Objects!
+         */
+        handleAddAnswerClick() {
             let answer = [
                 {
-                    'name': '',
-                    'oid': 'new',
+                    'oid': this.uuidv4(),
                     'option': ''
                 }
             ];
 
-            // console.log( this.state );
-
-            /** https://medium.freecodecamp.org/handling-state-in-react-four-immutable-approaches-to-consider-d1f5c00249d5
-             * let user = this.state.user; // this is a reference, not a copy...
-             * Never mutate this.state directly, as calling setState() afterwards may 
-             * replace the mutation you made. Treat this.state as if it were immutable.
-             * Warning: Watch Out For Nested Objects!
-             */
-            // updateState({target}) {
-            //     this.setState({
-            //         user: {...this.state.user, [target.name]: target.value}
-            //     });
-            // }
-
             this.setState({
                 answers: [ ...this.state.answers, ...answer ]
-            }, () => console.log(this.state.answers));
+            });
         }
 
         handleInputChange( event, name ) {
-            // console.log( 'handleInputChange' );
-            // console.log( 'event' );
-            // console.log( event );
-            // console.log( 'name' );
-            // console.log( name );
-
             let newAnswers = this.state.answers.map( ( answer, id ) => {
                 if ( name[0] !== id ) return answer;
                 return { ...answer, option: event };
             });
             
-            // this.setState({ answers: newAnswers }, () => console.log( this.state.answers ));
             this.setState({ answers: newAnswers });
         }
 
         handleSelectInputChange( event, index ) {
-            // console.log( 'handleSelectInputChange' );
-            // console.log( 'event' );
-            // console.log( event );
-            // console.log( 'index' );
-            // console.log( index );
-
             let newQuestions = this.state.questions.map( ( question, id ) => {
                 if ( index !== id ) return question;
                 return { ...question, label: event };
@@ -266,15 +204,32 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         // https://stackoverflow.com/questions/29527385/removing-element-from-array-in-component-state
         handleDeleteQuestionClick( index ) {
-            console.log( 'handleDeleteQuestionClick' );
-
             if ( confirm( 'Are you sure you wish to delete this poll question?' ) ) {
-                let newQuestions = [ ...this.state.questions.slice( 0, index ), ...this.state.questions.slice( index + 1 ) ];
+                let newQuestions = [
+                    ...this.state.questions.slice( 0, index ),
+                    ...this.state.questions.slice( index + 1 ) 
+                ];
+
                 this.setState({
                     questions: newQuestions,
                     editing: false
                 });
             }
+        }
+
+        handleDeleteAnswerClick( index ) {
+            if ( confirm( 'Are you sure you wish to delete this poll answer?' ) ) {
+                let newAnswers = [
+                    ...this.state.answers.slice( 0, index ),
+                    ...this.state.answers.slice( index + 1 ) 
+                ];
+
+                this.setState({ answers: newAnswers });
+            }
+        }
+
+        handleCancelClick() {
+            this.handleTabChange();
         }
 
         /** 
@@ -287,7 +242,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         // Helpers \\
         getPollQuestions() {
-            // console.log( 'getPollQuestions' );
             if ( this.state.isLoaded ) {
                 this.setState({ isLoaded: false });
             }
@@ -303,20 +257,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( results ) => {
-                        // console.log(results[0].value);
-                        // if ( self.state.firstQid === null ) {
-                        //     // self.setState( ( results ) => ({
-                        //     self.setState({
-                        //         // isLoaded: true,
-                        //         questions: results,
-                        //         firstQid: results[0].value
-                        //     });
-                        // } else {
-                            self.setState({
-                                // isLoaded: true,
-                                questions: results
-                            });
-                        // }
+                        self.setState({ questions: results });
                         self.getFirstPoll();
                     },
                     ( error ) => {
@@ -329,7 +270,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         getFirstPoll() {
-            // console.log( 'getFirstPoll' );
             if ( this.state.isLoaded ) {
                 this.setState({ isLoaded: false });
             }
@@ -352,29 +292,13 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                 <p><input type="radio" name="options" value={ object.oid }/>{ object.option }</p>
                             ];
                         });
-                        // console.log('answersByOid');
-                        // console.log(answersByOid);
                         
                         self.setSavePoll( pollOptions );
                         self.setSavePollTitle( results[0].question );
                         self.setState({
                             isLoaded: true,
-                            answers: answersByOid,
-                            // firstQid: results[0].qid
+                            answers: answersByOid
                         });
-                        // console.log('this.state.firstQid');
-                        // console.log(this.state.firstQid);
-                        // this.state.firstQid === null ? 
-                        //     self.setState( ( result ) => ({
-                        //         isLoaded: true,
-                        //         answers: result,
-                        //         firstQid: result[0].qid
-                        //     }))
-                        //     : 
-                        //     self.setState({
-                        //         isLoaded: true,
-                        //         answers: result
-                        //     });
                     },
                     ( error ) => {
                         self.setState({
@@ -385,44 +309,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 )
         }
 
-        // getPollById( qid ) {
-        //     var self = this;
-        //     let url = gutenbergtemplateblock_ajax_object.ajax_url +
-        //               '?action=gutenbergtemplateblock_getPollById' +
-        //               '&qid=' + qid +
-        //               '&security=' + gutenbergtemplateblock_ajax_object.security;
-    
-        //     fetch( url )
-        //         .then( response => {
-        //             return response.json();
-        //         })
-        //         .then(
-        //             ( result ) => {
-        //                 // console.log( result );
-        //                 const pollOptions = result.map( ( object, key ) => {
-        //                     return [
-        //                         <p><input type="radio" name="options" value={ object.oid }/>{ object.option }</p>
-        //                     ];
-        //                 });
-                        
-        //                 self.setSavePoll( pollOptions );
-        //                 self.setSavePollTitle( result[0].question );
-        //                 self.setState({
-        //                     // isLoaded: true,
-        //                     questions: result
-        //                 });
-        //             },
-        //             ( error ) => {
-        //                 self.setState({
-        //                     isLoaded: true,
-        //                     error
-        //                 });
-        //             }
-        //         )
-        // };
-
         getPollAnswersById( qid ) {
-            // this.setState({ isLoaded: false });
             var self = this;
             let url = gutenbergtemplateblock_ajax_object.ajax_url + 
                       '?action=gutenbergtemplateblock_getPollAnswersById' + 
@@ -435,22 +322,26 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( result ) => {
-                        // console.log( 'result' );
-                        // console.log( result );
-                        self.setState({
-                            // isLoaded: true,
-                            answers: result
-                        });
+                        self.setState({ answers: result });
                         
                     },
                     ( error ) => {
                         console.log( error );
                         self.setState({
-                            // isLoaded: true,
+                            isLoaded: true,
                             error
                         });
                     }
                 )
+        }
+
+        /** https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+         *  Solution that uses ES6 and the crypto API
+         */
+        uuidv4() {
+            return ( [1e7]+-1e3+-4e3+-8e3+-1e11 ).replace( /[018]/g, c =>
+                ( c ^ crypto.getRandomValues( new Uint8Array(1) )[0] & 15 >> c / 4 ).toString(16)
+            )
         }
 
         render() {
@@ -546,7 +437,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                         <div className = { classes }>
                                             { isLoaded ? 
                                                 <PotdSelect
-                                                    // isLoaded={ isLoaded }
                                                     onSelectChange={ this.handleSelectChange }
                                                     questions={ questions }
                                                     answers={ answers }
@@ -562,7 +452,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                         <div className={ className }>
                                             { isLoaded ? 
                                                 <PotdSelect
-                                                    // isLoaded={ isLoaded }
                                                     onSelectChange={ this.handleSelectChange }
                                                     questions={ questions }
                                                     answers={ answers }
@@ -574,6 +463,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     onInputChange={ this.handleInputChange }
                                                     onSelectInputChange={ this.handleSelectInputChange }
                                                     onDeleteQuestionClick={ this.handleDeleteQuestionClick }
+                                                    onDeleteAnswerClick={ this.handleDeleteAnswerClick }
+                                                    onCancelClick={ this.handleCancelClick }
                                                 />
                                                 :
                                                 <div>Loading...</div>

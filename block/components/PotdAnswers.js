@@ -8,6 +8,7 @@ export default class PotdAnswer extends React.Component {
     constructor( props ) {
         super( props );
         this.handleChange = this.handleChange.bind( this );
+        this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
         this.handlers = {};
     }
 
@@ -26,6 +27,20 @@ export default class PotdAnswer extends React.Component {
             };
         }
         return this.handlers[ name ];  
+    }
+
+    handleDeleteAnswerClick( event ) {
+        // console.log( 'handleDeleteAnswerClick' );
+        this.props.onDeleteAnswerClick( this.getAnswerKey( event.target.value ) );
+    }
+
+    getAnswerKey( oid ) {
+        for ( let i = 0; i < this.props.answers.length; i++ ) {
+            if ( parseInt( this.props.answers[i].oid ) == parseInt( oid ) ) {
+                // console.log( i );
+                return i;
+            }
+        } return 0;
     }
 
     render() {
@@ -51,7 +66,7 @@ export default class PotdAnswer extends React.Component {
                         { editable &&
                             <Button
                                 className = "gutenbergtemplateblock-delete-answer button button-large"
-                                onClick = { this.onRemoveBtnClick }
+                                onClick = { this.handleDeleteAnswerClick }
                                 value={ object.oid }
                             > 
                                 Delete

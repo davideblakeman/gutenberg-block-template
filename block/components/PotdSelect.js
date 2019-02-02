@@ -16,6 +16,8 @@ export default class PotdSelect extends React.Component {
         this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
         this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this );
         this.handleDeleteQuestionClick = this.handleDeleteQuestionClick.bind( this );
+        this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
+        this.handleCancelClick = this.handleCancelClick.bind( this );
         this.getSelectedKey = this.getSelectedKey.bind( this );
 
         this.state = {
@@ -62,8 +64,8 @@ export default class PotdSelect extends React.Component {
         this.props.onSelectInputChange( event, this.state.selectedKey );
     }
 
-    handleDeleteQuestionClick( event ) {
-        console.log( 'handleDeleteQuestionClick' );
+    handleDeleteQuestionClick() {
+        // console.log( 'handleDeleteQuestionClick' );
         // console.log( event.target.value );
         // console.log( this.getSelectedKey() );
 
@@ -71,10 +73,18 @@ export default class PotdSelect extends React.Component {
         this.props.onDeleteQuestionClick( this.getSelectedKey() );
     }
 
+    handleDeleteAnswerClick( event ) {
+        // console.log( 'handleDeleteAnswerClick' );
+        this.props.onDeleteAnswerClick( event );
+    }
+
+    handleCancelClick() {
+        this.props.onCancelClick();
+    }
+
     handleInputChange( event, name ) { this.props.onInputChange( event, name ) }
     handleAddQuestionClick( event ) { this.props.onAddQuestionClick( event ) }
     handleAddAnswerClick( event ) { this.props.onAddAnswerClick( event ) }
-    
 
     getSelectedKey() {
         // console.log( 'getSelectedKey' );
@@ -88,20 +98,29 @@ export default class PotdSelect extends React.Component {
 
     render() {
         const { questions, answers, editable, editing, inNewQuestion } = this.props;
-        const { selectedValue, lastSelectableKey } = this.state;
+        const { selectedValue } = this.state;
         const selectedKey = this.getSelectedKey();
         const editTitleText = questions[ selectedKey ].label;
-        // const lastSelectableKey = questions.length - 1;
 
         return (
             <div>
                 { editable &&
-                    <Button
-                        className = "gutenbergtemplateblock-add-question button button-large"
-                        onClick = { this.handleAddQuestionClick }
-                    > 
-                        New Question
-                    </Button>
+                    <div>
+                        <Button
+                            className = "gutenbergtemplateblock-add-question button button-large"
+                            onClick = { this.handleAddQuestionClick }
+                        > 
+                            New Question
+                        </Button>
+                        { editing && 
+                            <Button
+                                className = "gutenbergtemplateblock-cancel button button-large"
+                                onClick = { this.handleCancelClick }
+                            >
+                                Cancel
+                            </Button>
+                        }
+                    </div>
                 }
                 { ( !editable || !editing ) &&
                     <SelectControl
@@ -128,7 +147,7 @@ export default class PotdSelect extends React.Component {
                                 value={ editTitleText }
                                 onChange={ this.handleSelectInputChange }
                             />
-                            { ( !inNewQuestion && editing ) && // BROKEN
+                            { ( !inNewQuestion && editing ) &&
                                 <Button
                                     className="gutenbergtemplateblock-delete-question button button-large"
                                     value={ selectedValue }
@@ -145,9 +164,10 @@ export default class PotdSelect extends React.Component {
                         answers={ answers }
                         editable={ editable }
                         onInputChange={ this.handleInputChange }
+                        onDeleteAnswerClick={ this.handleDeleteAnswerClick }
                     />
                 }
-                { editable &&
+                { ( editable && editing ) &&
                     <div>
                         <Button
                             className = "gutenbergtemplateblock-add-question button button-large"
