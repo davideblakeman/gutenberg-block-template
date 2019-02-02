@@ -95,6 +95,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleDeleteQuestionClick = this.handleDeleteQuestionClick.bind( this );
             this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
             this.handleCancelClick = this.handleCancelClick.bind( this );
+            this.handleSaveClick = this.handleSaveClick.bind( this );
 
             setAttributes({
                 classes: classnames(
@@ -232,6 +233,41 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleTabChange();
         }
 
+        handleSaveClick() {
+            console.log( 'handleSaveClick' );
+
+            if ( confirm( 'Are you sure you wish to save changes?' ) ) {
+                if ( this.state.isLoaded ) {
+                    this.setState({ isLoaded: false });
+                }
+                
+                console.log( this.state );
+
+                // var self = this;
+                // let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                //           '?action=gutenbergtemplateblock_setPoll' + 
+                //           '&q=' +
+                //           '&security=' + 
+                //           gutenbergtemplateblock_ajax_object.security;
+        
+                // fetch( url )
+                //     .then( response => {
+                //         return response.json();
+                //     })
+                //     .then(
+                //         ( results ) => {
+                //             // self.setState({ questions: results });
+                //         },
+                //         ( error ) => {
+                //             self.setState({
+                //                 // isLoaded: true,
+                //                 error
+                //             });
+                //         }
+                //     )
+            }
+        }
+
         /** 
          * https://reactjs.org/docs/state-and-lifecycle.html#state-updates-may-be-asynchronous
          * // Correct
@@ -323,7 +359,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 .then(
                     ( result ) => {
                         self.setState({ answers: result });
-                        
                     },
                     ( error ) => {
                         console.log( error );
@@ -457,7 +492,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     answers={ answers }
                                                     editable={ true }
                                                     editing={ editing }
-                                                    inNewQuestion= { newQuestion }
+                                                    inNewQuestion={ newQuestion }
                                                     onAddQuestionClick={ this.handleAddQuestionClick }
                                                     onAddAnswerClick={ this.handleAddAnswerClick }
                                                     onInputChange={ this.handleInputChange }
@@ -465,6 +500,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     onDeleteQuestionClick={ this.handleDeleteQuestionClick }
                                                     onDeleteAnswerClick={ this.handleDeleteAnswerClick }
                                                     onCancelClick={ this.handleCancelClick }
+                                                    onSaveClick={ this.handleSaveClick }
                                                 />
                                                 :
                                                 <div>Loading...</div>

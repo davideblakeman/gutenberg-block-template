@@ -18,6 +18,7 @@ export default class PotdSelect extends React.Component {
         this.handleDeleteQuestionClick = this.handleDeleteQuestionClick.bind( this );
         this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
         this.handleCancelClick = this.handleCancelClick.bind( this );
+        this.handleSaveClick = this.handleSaveClick.bind( this )
         this.getSelectedKey = this.getSelectedKey.bind( this );
 
         this.state = {
@@ -40,11 +41,6 @@ export default class PotdSelect extends React.Component {
     }
 
     handleChange( event ) {
-        // console.log( 'handleChange' );
-        // console.log( this.state.selectedKey );
-        // console.log( 'event' );
-        // console.log( event );
-
         this.setState({
             selectedValue: event,
             lastSelectableKey: null
@@ -57,24 +53,14 @@ export default class PotdSelect extends React.Component {
     }
 
     handleSelectInputChange( event ) {
-        // console.log( 'handleSelectInputChange' );
-        // console.log( event );
-        // console.log( 'this.state.selectedKey' );
-        // console.log( this.state.selectedKey );
         this.props.onSelectInputChange( event, this.state.selectedKey );
     }
 
     handleDeleteQuestionClick() {
-        // console.log( 'handleDeleteQuestionClick' );
-        // console.log( event.target.value );
-        // console.log( this.getSelectedKey() );
-
-        // this.props.onDeleteQuestionClick( event.target.value );
         this.props.onDeleteQuestionClick( this.getSelectedKey() );
     }
 
     handleDeleteAnswerClick( event ) {
-        // console.log( 'handleDeleteAnswerClick' );
         this.props.onDeleteAnswerClick( event );
     }
 
@@ -82,15 +68,17 @@ export default class PotdSelect extends React.Component {
         this.props.onCancelClick();
     }
 
+    handleSaveClick() {
+        this.props.onSaveClick();
+    }
+
     handleInputChange( event, name ) { this.props.onInputChange( event, name ) }
     handleAddQuestionClick( event ) { this.props.onAddQuestionClick( event ) }
     handleAddAnswerClick( event ) { this.props.onAddAnswerClick( event ) }
 
     getSelectedKey() {
-        // console.log( 'getSelectedKey' );
         for ( let i = 0; i < this.props.questions.length; i++ ) {
             if ( parseInt( this.props.questions[i].value ) == this.state.selectedValue ) {
-                // console.log( i );
                 return i;
             }
         } return 0;
@@ -143,7 +131,6 @@ export default class PotdSelect extends React.Component {
                         <div class="inline-flex">
                             <TextControl
                                 name={ selectedKey }
-                                // value={ selectedValue === null ? questions[0].label : questions[ selectedKey ].label }
                                 value={ editTitleText }
                                 onChange={ this.handleSelectInputChange }
                             />
@@ -151,7 +138,7 @@ export default class PotdSelect extends React.Component {
                                 <Button
                                     className="gutenbergtemplateblock-delete-question button button-large"
                                     value={ selectedValue }
-                                    onClick = { this.handleDeleteQuestionClick }
+                                    onClick={ this.handleDeleteQuestionClick }
                                 > 
                                     Delete
                                 </Button>
@@ -170,14 +157,14 @@ export default class PotdSelect extends React.Component {
                 { ( editable && editing ) &&
                     <div>
                         <Button
-                            className = "gutenbergtemplateblock-add-question button button-large"
-                            onClick = { this.handleAddAnswerClick }
+                            className="gutenbergtemplateblock-add-question button button-large"
+                            onClick={ this.handleAddAnswerClick }
                         > 
                             Add Answer
                         </Button>
                         <Button
-                            className = "gutenbergtemplateblock-save-poll button button-large"
-                            onClick = { this.handleSavePollClick }
+                            className="gutenbergtemplateblock-save-poll button button-large"
+                            onClick={ this.handleSaveClick }
                         > 
                             Save
                         </Button>
