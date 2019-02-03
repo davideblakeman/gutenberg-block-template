@@ -118,7 +118,7 @@ class GutenbergtemplateblockWpdb
         // wp_die();
         global $wpdb;
         $wpdb->show_errors();
-        $outcome = 'success';
+        $outcome = null;
 
         if ( $qid === 'new' )
         {
@@ -132,6 +132,8 @@ class GutenbergtemplateblockWpdb
                     '%s'
                 )
             );
+
+            $outcome = $wpdb->insert_id;
         }
         else
         {
@@ -147,6 +149,8 @@ class GutenbergtemplateblockWpdb
                     $qid
                 )
             );
+
+            $outcome = $qid;
         }
 
         if ( $wpdb->last_error !== '' )

@@ -243,7 +243,8 @@ class GutenbergtemplateblockEnqueue
         check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
 
         $oid = $_REQUEST[ 'oid' ];
-        $answer = $_REQUEST[ 'q' ];
+        $qid = $_REQUEST[ 'qid' ];
+        $answer = $_REQUEST[ 'a' ];
         // echo $question;
         $GTBWPDB = new GutenbergtemplateblockWpdb;
         echo json_encode( $GTBWPDB->setPollAnswerById( $oid, $qid, $answer ) );

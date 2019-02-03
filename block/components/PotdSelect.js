@@ -68,13 +68,13 @@ export default class PotdSelect extends React.Component {
         this.props.onCancelClick();
     }
 
-    handleSaveClick() {
-        this.props.onSaveClick();
+    handleSaveClick( event ) {
+        this.props.onSaveClick( event.target.value );
     }
 
     handleInputChange( event, name ) { this.props.onInputChange( event, name ) }
     handleAddQuestionClick( event ) { this.props.onAddQuestionClick( event ) }
-    handleAddAnswerClick( event ) { this.props.onAddAnswerClick( event ) }
+    handleAddAnswerClick( event ) { this.props.onAddAnswerClick( event.target.value ) }
 
     getSelectedKey() {
         for ( let i = 0; i < this.props.questions.length; i++ ) {
@@ -158,12 +158,14 @@ export default class PotdSelect extends React.Component {
                     <div>
                         <Button
                             className="gutenbergtemplateblock-add-question button button-large"
+                            value={ inNewQuestion ? 'new' : selectedValue }
                             onClick={ this.handleAddAnswerClick }
                         > 
                             Add Answer
                         </Button>
                         <Button
                             className="gutenbergtemplateblock-save-poll button button-large"
+                            value={ inNewQuestion ? 'new' : selectedValue }
                             onClick={ this.handleSaveClick }
                         > 
                             Save
