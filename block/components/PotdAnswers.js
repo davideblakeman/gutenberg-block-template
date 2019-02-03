@@ -12,9 +12,9 @@ export default class PotdAnswer extends React.Component {
         this.handlers = {};
     }
 
-    componentDidMount() {
-        // console.log( 'componentDidMount' );
-    }
+    // componentDidMount() {
+    //     // console.log( 'componentDidMount' );
+    // }
 
     /** https://medium.freecodecamp.org/the-best-way-to-bind-event-handlers-in-react-282db2cf1530
      * If you must generate bindings dynamically, consider caching 
@@ -30,14 +30,12 @@ export default class PotdAnswer extends React.Component {
     }
 
     handleDeleteAnswerClick( event ) {
-        // console.log( 'handleDeleteAnswerClick' );
         this.props.onDeleteAnswerClick( this.getAnswerKey( event.target.value ) );
     }
 
     getAnswerKey( oid ) {
         for ( let i = 0; i < this.props.answers.length; i++ ) {
             if ( parseInt( this.props.answers[i].oid ) == parseInt( oid ) ) {
-                // console.log( i );
                 return i;
             }
         } return 0;

@@ -50,26 +50,11 @@ export default class PotdSelect extends React.Component {
         });
     }
 
-    handleSelectInputChange( event ) {
-        this.props.onSelectInputChange( event, this.state.selectedKey );
-    }
-
-    handleDeleteQuestionClick() {
-        this.props.onDeleteQuestionClick( this.getSelectedKey() );
-    }
-
-    handleDeleteAnswerClick( event ) {
-        this.props.onDeleteAnswerClick( event );
-    }
-
-    handleCancelClick() {
-        this.props.onCancelClick();
-    }
-
-    handleSaveClick( event ) {
-        this.props.onSaveClick( event.target.value );
-    }
-
+    handleSelectInputChange( event ) { this.props.onSelectInputChange( event, this.state.selectedKey ) }
+    handleDeleteQuestionClick() { this.props.onDeleteQuestionClick( this.getSelectedKey() ) }
+    handleDeleteAnswerClick( event ) { this.props.onDeleteAnswerClick( event ) }
+    handleCancelClick() { this.props.onCancelClick() }
+    handleSaveClick( event ) { this.props.onSaveClick( event.target.value ) }
     handleInputChange( event, name ) { this.props.onInputChange( event, name ) }
     handleAddQuestionClick( event ) { this.props.onAddQuestionClick( event ) }
     handleAddAnswerClick( event ) { this.props.onAddAnswerClick( event.target.value ) }
