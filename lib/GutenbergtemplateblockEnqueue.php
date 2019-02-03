@@ -62,31 +62,34 @@ class GutenbergtemplateblockEnqueue
         // TODO
         // Remove unsafe no_priv's 
         add_action( 'wp_ajax_gutenbergtemplateblock_get', [ __CLASS__, 'gutenbergtemplateblock_get'] );
-        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_get', [ __CLASS__, 'gutenbergtemplateblock_get'] );
+        // add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_get', [ __CLASS__, 'gutenbergtemplateblock_get'] );
 
         add_action( 'wp_ajax_gutenbergtemplateblock_getFirstPoll', [ __CLASS__, 'gutenbergtemplateblock_getFirstPoll'] );
-        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getFirstPoll', [ __CLASS__, 'gutenbergtemplateblock_getFirstPoll'] );
+        // add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getFirstPoll', [ __CLASS__, 'gutenbergtemplateblock_getFirstPoll'] );
 
         add_action( 'wp_ajax_gutenbergtemplateblock_getPollQuestions', [ __CLASS__, 'gutenbergtemplateblock_getPollQuestions'] );
-        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getPollQuestions', [ __CLASS__, 'gutenbergtemplateblock_getPollQuestions'] );
+        // add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getPollQuestions', [ __CLASS__, 'gutenbergtemplateblock_getPollQuestions'] );
 
         add_action( 'wp_ajax_gutenbergtemplateblock_getPollAnswersById', [ __CLASS__, 'gutenbergtemplateblock_getPollAnswersById'] );
-        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getPollAnswersById', [ __CLASS__, 'gutenbergtemplateblock_getPollAnswersById'] );
+        // add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getPollAnswersById', [ __CLASS__, 'gutenbergtemplateblock_getPollAnswersById'] );
 
         add_action( 'wp_ajax_gutenbergtemplateblock_getFirstPollAnswers', [ __CLASS__, 'gutenbergtemplateblock_getFirstPollAnswers'] );
-        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getFirstPollAnswers', [ __CLASS__, 'gutenbergtemplateblock_getFirstPollAnswers'] );
+        // add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getFirstPollAnswers', [ __CLASS__, 'gutenbergtemplateblock_getFirstPollAnswers'] );
 
         add_action( 'wp_ajax_gutenbergtemplateblock_getFirstPollQid', [ __CLASS__, 'gutenbergtemplateblock_getFirstPollQid'] );
-        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getFirstPollQid', [ __CLASS__, 'gutenbergtemplateblock_getFirstPollQid'] );
+        // add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getFirstPollQid', [ __CLASS__, 'gutenbergtemplateblock_getFirstPollQid'] );
 
         add_action( 'wp_ajax_gutenbergtemplateblock_getPollById', [ __CLASS__, 'gutenbergtemplateblock_getPollById'] );
-        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getPollById', [ __CLASS__, 'gutenbergtemplateblock_getPollById'] );
+        // add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getPollById', [ __CLASS__, 'gutenbergtemplateblock_getPollById'] );
 
         add_action( 'wp_ajax_gutenbergtemplateblock_setOptionVoteById', [ __CLASS__, 'gutenbergtemplateblock_setOptionVoteById'] );
-        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_setOptionVoteById', [ __CLASS__, 'gutenbergtemplateblock_setOptionVoteById'] );
+        // add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_setOptionVoteById', [ __CLASS__, 'gutenbergtemplateblock_setOptionVoteById'] );
 
         add_action( 'wp_ajax_gutenbergtemplateblock_setPollQuestionById', [ __CLASS__, 'gutenbergtemplateblock_setPollQuestionById'] );
         // add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_setPollById', [ __CLASS__, 'gutenbergtemplateblock_setPollById'] );
+        
+        add_action( 'wp_ajax_gutenbergtemplateblock_setPollAnswerById', [ __CLASS__, 'gutenbergtemplateblock_setPollAnswerById'] );
+        
     }
     
     /**
@@ -228,10 +231,22 @@ class GutenbergtemplateblockEnqueue
         check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
 
         $qid = $_REQUEST[ 'qid' ];
-        $q = $_REQUEST[ 'q' ];
-
+        $question = $_REQUEST[ 'q' ];
+        // echo $question;
         $GTBWPDB = new GutenbergtemplateblockWpdb;
-        echo json_encode( $GTBWPDB->setPollById( $qid, $q ) );
+        echo json_encode( $GTBWPDB->setPollQuestionById( $qid, $question ) );
+        wp_die();
+    }
+
+    public static function gutenbergtemplateblock_setPollAnswerById()
+    {
+        check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
+
+        $oid = $_REQUEST[ 'oid' ];
+        $answer = $_REQUEST[ 'q' ];
+        // echo $question;
+        $GTBWPDB = new GutenbergtemplateblockWpdb;
+        echo json_encode( $GTBWPDB->setPollAnswerById( $oid, $qid, $answer ) );
         wp_die();
     }
 }

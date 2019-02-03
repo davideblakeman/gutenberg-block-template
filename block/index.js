@@ -70,7 +70,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 error: null,
                 questions: [],
                 answers: [{ 
-                    name: '', 
+                    name: '',
+                    qid: '',
                     oid: '', 
                     option: '' 
                 }],
@@ -96,6 +97,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
             this.handleCancelClick = this.handleCancelClick.bind( this );
             this.handleSaveClick = this.handleSaveClick.bind( this );
+            this.setPoll = this.setPoll.bind( this );
+            this.setAnswers = this.setAnswers.bind( this );
 
             setAttributes({
                 classes: classnames(
@@ -140,8 +143,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         handleAddQuestionClick() {
+            let qid = this.uuidv4();
             let question = [{
-                'value': this.uuidv4(),
+                'value': qid,
                 'label': 'New Question Title',
                 edited: true
             }];
@@ -149,12 +153,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             let answer = [
                 {
                     'name': 0,
+                    'qid': qid,
                     'oid': this.uuidv4(),
                     'option': 'Answer 1',
                     edited: true
                 },
                 {
                     'name': 1,
+                    'qid': qid,
                     'oid': this.uuidv4(),
                     'option': ''
                 }
@@ -174,9 +180,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
          * replace the mutation you made. Treat this.state as if it were immutable.
          * Warning: Watch Out For Nested Objects!
          */
-        handleAddAnswerClick() {
+        handleAddAnswerClick( event ) {
             let answer = [
                 {
+                    'name': 1,
+                    'qid': event,
                     'oid': this.uuidv4(),
                     'option': ''
                 }
@@ -239,9 +247,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             console.log( 'handleSaveClick' );
 
             if ( confirm( 'Are you sure you wish to save changes?' ) ) {
-                if ( this.state.isLoaded ) {
-                    this.setState({ isLoaded: false });
-                }
+                // if ( this.state.isLoaded ) {
+                //     this.setState({ isLoaded: false });
+                // }
+
+                console.log( this.state );
 
                 /** https://codeburst.io/learn-understand-javascripts-reduce-function-b2b0406efbdc
                  * reduce( callback( accumulator, value, index, array ), initialValue )
@@ -272,33 +282,86 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     } return result;
                 }, [] );
 
-                console.log( 'saveQuestion' );
+                // console.log( 'saveQuestion' );
                 // console.log( saveQuestion[0].value );
                 // console.log( saveQuestion[0].label );
-                console.log( saveQuestion );
+                // console.log( saveQuestion );
                 // console.log( 'saveAnswers' );
                 // console.log( saveAnswers );
 
-                let qid = saveQuestion[0].value;
-                let q = saveQuestion[0].label;
+                let qid = saveQuestion.length > 0 ? saveQuestion[0].value : null;
+                let q = saveQuestion.length > 0 ? saveQuestion[0].label : null;
                 let a = saveAnswers.map( ( object, key ) => {
-                    return 'oid=' + object.oid + '&a=' + object.option
+                    // console.log( 'oid=' + object.oid + '&a=' + object.option );
+                    return 'oid=' + object.oid + '&a=' + encodeURIComponent( object.option );
                 });
+                a = a.length > 0 ? a : null;
 
-                this.setPollById( qid, q, a );
+                // console.log( 'qid', qid );
+                // console.log( 'q', q );
+                // console.log( 'a', a );
+
+                this.setPoll( qid, q, a );
             }
         }
 
-        setPollById( qid, question, answers ) {
+        setPoll( qid, question, answers ) {
+            if ( qid && question ) {
                 var self = this;
-
                 let url = gutenbergtemplateblock_ajax_object.ajax_url + 
-                          '?action=gutenbergtemplateblock_setPollQuestionById' + 
-                          '&qid=' + qid +
-                          '&q=' + question +
-                          '&security=' + 
-                          gutenbergtemplateblock_ajax_object.security;
-        
+                          '?action=gutenbergtemplateblock_setPollQuestionById';
+                url += '&qid=' + qid;
+                url += '&q=' + question;
+                url += '&security=' + gutenbergtemplateblock_ajax_object.security;
+                // console.log( url );
+                fetch( url )
+                    .then( response => {
+                        return response.json();
+                    })
+                    .then(
+                        ( results ) => {
+                            console.log( results );
+                            if ( result === 'success' ) {
+                                if ( answers ) {
+                                    this.setAnswers( answers );
+                                }// else {
+                            //         handleSuccessfulSave
+                            //     }
+                                
+                            // } else {
+                            //     handleFailedSave
+                            }
+                        },
+                        ( error ) => {
+                            self.setState({
+                                isLoaded: true,
+                                error
+                            });
+                        }
+                    )
+            } else if ( answers ) {
+                // console.log( 'setPoll if answers' );
+                this.setAnswers( answers );
+            } else {
+                console.log( 'setPoll nothing to save' );
+            }
+        }
+
+        setAnswers( answers ) {
+            var self = this;
+            console.log( answers );
+            var url = '';
+
+            for ( let i = 0; i < answers.length; i++ ) {
+                // console.log( answers[i] );
+
+                url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                      '?action=gutenbergtemplateblock_setPollAnswerById';
+                url += '&' + answers[i];
+                url += '&security=' + gutenbergtemplateblock_ajax_object.security;
+
+                // console.log( url );
+
                 fetch( url )
                     .then( response => {
                         return response.json();
@@ -310,11 +373,12 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         },
                         ( error ) => {
                             self.setState({
-                                // isLoaded: true,
+                                isLoaded: true,
                                 error
                             });
                         }
                     )
+            }
         }
 
         /** 

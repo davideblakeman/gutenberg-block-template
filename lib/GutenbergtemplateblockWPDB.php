@@ -120,52 +120,33 @@ class GutenbergtemplateblockWpdb
         $wpdb->show_errors();
         $outcome = 'success';
 
-        // UPDATE question text
-        $wpdb->query(
-            $wpdb->prepare( 
-                "
-                UPDATE $wpdb->gutenbergtemplateblock_questions 
-                SET question = %s
-                WHERE qid = %d
-                ",
-                $question,
-                $qid
-            )
-        );
-
-        // UPDATE each answer or INSERT new
-        foreach( $answers as $k => $v )
+        if ( $qid === 'new' )
         {
-            if ( substr( $k, 0, 3 ) !== 'new' )
-            {
-                $wpdb->query(
-                    $wpdb->prepare( 
-                        "
-                        UPDATE $wpdb->gutenbergtemplateblock_options 
-                        SET option = %s
-                        WHERE oid = %d
-                        ",
-                        $v,
-                        $k
-                    )
-                );
-            }
-            else if ( substr( $k, 0, 3 ) === 'new' )
-            {
-                $wpdb->insert( 
-                    $wpdb->gutenbergtemplateblock_options, 
-                    array( 
-                        'qid' => $qid, 
-                        'option' => $v,
-                        'votes' => 0
-                    ), 
-                    array( 
-                        '%d', 
-                        '%s',
-                        '%d'
-                    ) 
-                );
-            }
+            // INSERT new question
+            $wpdb->insert(
+                $wpdb->gutenbergtemplateblock_questions, 
+                array(
+                    'question' => $question
+                ),
+                array(
+                    '%s'
+                )
+            );
+        }
+        else
+        {
+            // UPDATE question text
+            $wpdb->query(
+                $wpdb->prepare(
+                    "
+                    UPDATE $wpdb->gutenbergtemplateblock_questions 
+                    SET question = %s
+                    WHERE qid = %d
+                    ",
+                    $question,
+                    $qid
+                )
+            );
         }
 
         if ( $wpdb->last_error !== '' )
@@ -185,6 +166,95 @@ class GutenbergtemplateblockWpdb
             return $outcome;
         }
     }
+
+    public function setPollAnswerById( $oid, $qid, $answer )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        if ( $oid === 'new' )
+        {
+            // INSERT new question
+            $wpdb->insert(
+                $wpdb->gutenbergtemplateblock_options, 
+                array(
+                    'qid' => $qid,
+                    'option' => $answer
+                ),
+                array(
+                    '%d',
+                    '%s'
+                )
+            );
+        }
+        else
+        {
+            // UPDATE question text
+            $wpdb->query(
+                $wpdb->prepare(
+                    "
+                    UPDATE $wpdb->gutenbergtemplateblock_options 
+                    SET option = %s
+                    WHERE oid = %d
+                    ",
+                    $answer,
+                    $oid
+                )
+            );
+        }
+
+        if ( $wpdb->last_error !== '' )
+        {
+            // $str   = htmlspecialchars( $wpdb->last_result, ENT_QUOTES );
+            // $query = htmlspecialchars( $wpdb->last_query, ENT_QUOTES );
+    
+            // print "<div id='error'>
+            // <p class='wpdberror'><strong>WordPress database error:</strong> [$str]<br />
+            // <code>$query</code></p>
+            // </div>";
+            $outcome = 'fail';
+            return $outcome;
+        }
+        else
+        {
+            return $outcome;
+        }
+    }
+
+    // public function setAnswerById( $answers ) {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
+    //     $outcome = 'success';
+
+    //     // UPDATE
+    //     $wpdb->query(
+    //         $wpdb->prepare( 
+    //             "
+    //             UPDATE $wpdb->gutenbergtemplateblock_questions 
+    //             SET question = %s
+    //             WHERE qid = %d
+    //             ",
+    //             $question,
+    //             $qid
+    //         )
+    //     );
+
+    //     // INSERT
+    //     $wpdb->insert( 
+    //         $wpdb->gutenbergtemplateblock_options, 
+    //         array( 
+    //             'qid' => $qid, 
+    //             'option' => $v,
+    //             'votes' => 0
+    //         ), 
+    //         array( 
+    //             '%d', 
+    //             '%s',
+    //             '%d'
+    //         ) 
+    //     );
+    // }
 
     public function createNewPoll( $question, $answers )
     {
