@@ -9,12 +9,9 @@ add_action( 'enqueue_block_editor_assets', __NAMESPACE__ . '\enqueue_block_edito
 function enqueue_block_editor_assets()
 {
 	$namespace = 'gutenbergtemplateblock';
-	// Make paths variables so we don't write em twice ;)
+	// Make DRY paths variables
 	$block_path = '/assets/js/editor.block.js';
 	$style_path = '/assets/css/block.editor.css';
-
-	// print_r( _get_plugin_directory() . $block_path );
-	// exit;
 
 	// Enqueue the bundled block JS file
 	wp_enqueue_script(
@@ -32,17 +29,6 @@ function enqueue_block_editor_assets()
 		[ 'wp-blocks' ],
 		filemtime( _get_plugin_directory() . $style_path )
 	);
-
-	// doesn't work -_-
-	// Setup token security for ajax
-	// wp_localize_script(
-	// 	$namespace . '-block-js',
-	// 	$namespace . '_ajax_object',
-	// 	[
-	// 		'ajax_url'  => admin_url( 'admin-ajax.php' ),
-	// 		'security'  => wp_create_nonce( $namespace . '-security-token' ),
-	// 	]
-	// );
 }
 
 add_action( 'enqueue_block_assets', __NAMESPACE__ . '\enqueue_assets' );
@@ -84,18 +70,3 @@ function enqueue_frontend_assets()
 	);
 
 }
-
-// add_action( 'wp_ajax_gutenbergtemplateblock_get', 'gutenbergtemplateblock_get' );
-// add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_get', 'gutenbergtemplateblock_get' );
-
-// function gutenbergtemplateblock_get()
-// {
-// 	// gutenbergtemplateblock_check_ajax_token();
-// 	print_r( 'here?!' );
-// 	exit;
-
-// 	$t = $_REQUEST[ 't' ];
-
-// 	echo $t;
-// 	wp_die();
-// }

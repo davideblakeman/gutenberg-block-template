@@ -29,8 +29,6 @@ export default class PotdSelect extends React.Component {
     }
 
     componentDidMount() {
-        // console.log( 'componentDidMount' );
-        // Always needs at least one question returned from the database
         let lastIndex = this.props.questions.length - 1;
         this.setState({
             selectedValue: this.props.questions[0].value

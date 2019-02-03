@@ -4,42 +4,10 @@ namespace Gutenberg\Template_Block;
 
 class GutenbergtemplateblockWpdb
 {
-
-    public function get()
-    {
-        global $wpdb;
-        // $wpdb->show_errors();
-
-        $result = $wpdb->get_results(
-            "
-                SELECT post_title 
-                FROM " . $wpdb->prefix . "posts 
-                WHERE ID = 5
-            ",
-            OBJECT
-        );
-
-        // if ( $wpdb->last_error !== '' )
-        // {
-        //     print_r( $wpdb->last_error );
-        //     // exit;
-        // }
-
-        return $result[0]->post_title;
-    }
-
     public function getFirstPoll()
     {
         global $wpdb;
         $wpdb->show_errors();
-        #print_r( $wpdb->queries );
-        // $sql = 'SELECT q.qid, q.question, q.vote_count, o.oid, o.option, o.votes 
-        //         FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
-        //         JOIN wp_gutenbergtemplateblock_options o ON q.qid = o.qid
-        //         WHERE q.qid = ' . $qid;
-        // return print_r( $sql );
-        // exit;
-        #$result = $wpdb->get_results('SELECT question FROM ' . $wpdb->gutenbergtemplateblock_questions . ' WHERE qid = ' . $qid );
 
         $result = $wpdb->get_results('
             SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
@@ -49,16 +17,13 @@ class GutenbergtemplateblockWpdb
             ORDER BY o.votes DESC'
         );
 
-        #echo '<pre>';
-        #print_r( $wpdb->queries );
-        #return var_dump($result);
         return $result;
     }
 
     public function getPollQuestions()
     {
         global $wpdb;
-        // $wpdb->show_errors();
+        $wpdb->show_errors();
 
         $result = $wpdb->get_results(
             "
@@ -68,33 +33,6 @@ class GutenbergtemplateblockWpdb
             "
         );
 
-        return $result;
-    }
-
-    public function getPollById( $qid )
-    {
-        global $wpdb;
-        $wpdb->show_errors();
-        #print_r( $wpdb->queries );
-        // $sql = 'SELECT q.qid, q.question, q.vote_count, o.oid, o.option, o.votes 
-        //         FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
-        //         JOIN wp_gutenbergtemplateblock_options o ON q.qid = o.qid
-        //         WHERE q.qid = ' . $qid;
-        // return print_r( $sql );
-        // exit;
-        #$result = $wpdb->get_results('SELECT question FROM ' . $wpdb->gutenbergtemplateblock_questions . ' WHERE qid = ' . $qid );
-
-        $result = $wpdb->get_results('
-            SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
-            FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
-            JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
-            WHERE q.qid = ' . $qid . '
-            ORDER BY o.votes DESC'
-        );
-
-        #echo '<pre>';
-        #print_r( $wpdb->queries );
-        #return var_dump($result);
         return $result;
     }
 
@@ -226,6 +164,60 @@ class GutenbergtemplateblockWpdb
         }
     }
 
+    public function getAllPollQuestions()
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+
+        $result = $wpdb->get_results('
+            SELECT qid AS value, question AS label
+            FROM ' . $wpdb->gutenbergtemplateblock_questions . '
+        ');
+
+        return $result;
+    }
+
+    public function setOptionVoteById( $oid )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $wpdb->query(
+            $wpdb->prepare( 
+                "
+                UPDATE $wpdb->gutenbergtemplateblock_options 
+                SET votes = votes + 1
+                WHERE oid = %d
+                ",
+                $oid
+            )
+        );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            $outcome = 'fail';
+        }
+        
+        return $outcome;
+    }
+
+    // public function getPollById( $qid )
+    // {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
+
+    //     $result = $wpdb->get_results('
+    //         SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
+    //         FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
+    //         JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
+    //         WHERE q.qid = ' . $qid . '
+    //         ORDER BY o.votes DESC'
+    //     );
+        
+    //     return $result;
+    // }
+
     // public function setAnswerById( $answers ) {
     //     global $wpdb;
     //     $wpdb->show_errors();
@@ -260,359 +252,275 @@ class GutenbergtemplateblockWpdb
     //     );
     // }
 
-    public function createNewPoll( $question, $answers )
-    {
-        global $wpdb;
-        $outcome = 'success';
+    // public function createNewPoll( $question, $answers )
+    // {
+    //     global $wpdb;
+    //     $outcome = 'success';
 
-        $wpdb->insert( 
-            $wpdb->gutenbergtemplateblock_questions, 
-            array( 
-                'question' => $question, 
-                'time_added' => current_time( 'mysql' ),
-                'added_by_user' => wp_get_current_user(),
-                'vote_count' => 0,
-                'active' => 0
-            ), 
-            array( 
-                '%s', 
-                '%s',
-                '%d',
-                '%d',
-                '%d'
-            ) 
-        );
+    //     $wpdb->insert( 
+    //         $wpdb->gutenbergtemplateblock_questions, 
+    //         array( 
+    //             'question' => $question, 
+    //             'time_added' => current_time( 'mysql' ),
+    //             'added_by_user' => wp_get_current_user(),
+    //             'vote_count' => 0,
+    //             'active' => 0
+    //         ), 
+    //         array( 
+    //             '%s', 
+    //             '%s',
+    //             '%d',
+    //             '%d',
+    //             '%d'
+    //         ) 
+    //     );
 
-        $qid = $wpdb->insert_id;
+    //     $qid = $wpdb->insert_id;
 
-        foreach( $answers as $k => $v )
-        {
-            $wpdb->insert( 
-                $wpdb->gutenbergtemplateblock_options, 
-                array( 
-                    'qid' => $qid, 
-                    'option' => $v,
-                    'votes' => 0
-                ), 
-                array( 
-                    '%d', 
-                    '%s',
-                    '%d'
-                ) 
-            );
-        }
+    //     foreach( $answers as $k => $v )
+    //     {
+    //         $wpdb->insert( 
+    //             $wpdb->gutenbergtemplateblock_options, 
+    //             array( 
+    //                 'qid' => $qid, 
+    //                 'option' => $v,
+    //                 'votes' => 0
+    //             ), 
+    //             array( 
+    //                 '%d', 
+    //                 '%s',
+    //                 '%d'
+    //             ) 
+    //         );
+    //     }
 
-        if ( $wpdb->last_error !== '' )
-        {
-            $outcome = 'fail';
-        }
+    //     if ( $wpdb->last_error !== '' )
+    //     {
+    //         $outcome = 'fail';
+    //     }
         
-        return $outcome;
-    }
+    //     return $outcome;
+    // }
 
-    public function setNewPoll()
-    {
-        // $qid = $wpdb->insert_id;
-    }
+    // public function getFirstPollAnswers()
+    // {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
 
-    public function getAllPollQuestions()
-    {
-        global $wpdb;
-        $wpdb->show_errors();
+    //     $result = $wpdb->get_results('
+    //         SELECT oid, qid, `option`
+    //         FROM ' . $wpdb->gutenbergtemplateblock_options . '
+    //         WHERE qid = (SELECT MIN(qid) FROM ' . $wpdb->gutenbergtemplateblock_questions . ')
+    //     ');
 
-        $result = $wpdb->get_results('
-            SELECT qid AS value, question AS label
-            FROM ' . $wpdb->gutenbergtemplateblock_questions . '
-        ');
+    //     return $result;
+    // }
 
-        return $result;
-    }
+    // public function getFirstPollQid()
+    // {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
 
-    public function getFirstPollAnswers()
-    {
-        global $wpdb;
-        $wpdb->show_errors();
+    //     $result = $wpdb->get_results('
+    //         SELECT MIN(qid) as qid
+    //         FROM ' . $wpdb->gutenbergtemplateblock_questions
+    //     );
 
-        $result = $wpdb->get_results('
-            SELECT oid, qid, `option`
-            FROM ' . $wpdb->gutenbergtemplateblock_options . '
-            WHERE qid = (SELECT MIN(qid) FROM ' . $wpdb->gutenbergtemplateblock_questions . ')
-        ');
+    //     return $result;
+    // }
 
-        return $result;
-    }
-
-    public function getFirstPollQid()
-    {
-        global $wpdb;
-        $wpdb->show_errors();
-
-        $result = $wpdb->get_results('
-            SELECT MIN(qid) as qid
-            FROM ' . $wpdb->gutenbergtemplateblock_questions
-        );
-
-        return $result;
-    }
-
-    public function deleteAnswersById( $oids )
-    {
-        global $wpdb;
-        $wpdb->show_errors();
-        $outcome = 'success';
+    // public function deleteAnswersById( $oids )
+    // {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
+    //     $outcome = 'success';
         
-        foreach( $oids as $o )
-        {
-            $wpdb->query(
-                $wpdb->prepare(
-                    "DELETE FROM $wpdb->gutenbergtemplateblock_options
-                    WHERE oid = %d",
-                    $o
-                )
-            );
-        }
+    //     foreach( $oids as $o )
+    //     {
+    //         $wpdb->query(
+    //             $wpdb->prepare(
+    //                 "DELETE FROM $wpdb->gutenbergtemplateblock_options
+    //                 WHERE oid = %d",
+    //                 $o
+    //             )
+    //         );
+    //     }
 
-        if ( $wpdb->last_error !== '' )
-        {
-            $outcome = 'fail';
-        }
+    //     if ( $wpdb->last_error !== '' )
+    //     {
+    //         $outcome = 'fail';
+    //     }
         
-        return $outcome;
-    }
+    //     return $outcome;
+    // }
 
-    public function deleteQuestionById( $qid )
-    {
-        global $wpdb;
-        $wpdb->show_errors();
-        $outcome = 'success';
+    // public function deleteQuestionById( $qid )
+    // {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
+    //     $outcome = 'success';
 
-        $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM $wpdb->gutenbergtemplateblock_questions
-                WHERE qid = %d",
-                $qid
-            )
-        );
+    //     $wpdb->query(
+    //         $wpdb->prepare(
+    //             "DELETE FROM $wpdb->gutenbergtemplateblock_questions
+    //             WHERE qid = %d",
+    //             $qid
+    //         )
+    //     );
 
-        if ( $wpdb->last_error !== '' )
-        {
-            $outcome = 'fail';
-        }
+    //     if ( $wpdb->last_error !== '' )
+    //     {
+    //         $outcome = 'fail';
+    //     }
         
-        return $outcome;
-    }
+    //     return $outcome;
+    // }
 
-    public function setOptionVoteById( $oid )
-    {
-        global $wpdb;
-        $wpdb->show_errors();
-        $outcome = 'success';
-
-        $wpdb->query(
-            $wpdb->prepare( 
-                "
-                UPDATE $wpdb->gutenbergtemplateblock_options 
-                SET votes = votes + 1
-                WHERE oid = %d
-                ",
-                $oid
-            )
-        );
-
-        if ( $wpdb->last_error !== '' )
-        {
-            $outcome = 'fail';
-        }
+    // public function getSumOfVotesById( $qid )
+    // {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
         
-        return $outcome;
-    }
-
-    public function getSumOfVotesById( $qid )
-    {
-        global $wpdb;
-        $wpdb->show_errors();
-        
-        /*return $wpdb->query(
-            $wpdb->prepare( 
-                "
-                SELECT SUM(votes) as sumofvotes
-                FROM $wpdb->gutenbergtemplateblock_options 
-                WHERE qid = %d
-                ",
-                $qid
-            )
-        );*/
-
-        /*return $wpdb->query(
-            $wpdb->prepare( 
-                "
-                SELECT *
-                FROM $wpdb->gutenbergtemplateblock_options 
-                WHERE qid = %d
-                ",
-                $qid
-            )
-        );*/
-
-        return $wpdb->get_results(
-            'SELECT SUM(votes) AS sumofvotes FROM ' . $wpdb->gutenbergtemplateblock_options . ' WHERE qid = ' . $qid
-        );
-
-        /*return $wpdb->query(
-            $wpdb->prepare( 
-                "SELECT SUM(votes) AS sumofvotes FROM " . $wpdb->gutenbergtemplateblock_options . " WHERE qid = %d", $qid
-            )
-        );*/
-
-        /*$results = $wpdb->query(
-            $wpdb->prepare(
-                "SELECT * FROM " . $wpdb->gutenbergtemplateblock_options . " WHERE qid = %s",
-                $qid
-            )
-        );*/
-
-        #echo '<pre>';
-        #print_r( $results );
-        #exit;
-
-        #return $results;
-    }
+    //     return $wpdb->get_results(
+    //         'SELECT SUM(votes) AS sumofvotes FROM ' . $wpdb->gutenbergtemplateblock_options . ' WHERE qid = ' . $qid
+    //     );
+    // }
 
     /* EXAMPLES */
 
-    public function getOtherDataExample()
-    {
-        $mydb = new wpdb( 'username', 'password', 'my_database', 'localhost' );
+    // public function getOtherDataExample()
+    // {
+    //     $mydb = new wpdb( 'username', 'password', 'my_database', 'localhost' );
 
-        $mydb->query('DELETE FROM external_table WHERE id = 1');
+    //     $mydb->query('DELETE FROM external_table WHERE id = 1');
 
-        /* Switch to another database with same credentials */
-        $wpdb->select('my_database');
-    }
+    //     /* Switch to another database with same credentials */
+    //     $wpdb->select('my_database');
+    // }
 
-    public function getPotdDataExample()
-    {
-        $link = mysqli_connect( "localhost", "root", "", "wordpressdb" );
-        $results = [];
+    // public function getPotdDataExample()
+    // {
+    //     $link = mysqli_connect( "localhost", "root", "", "wordpressdb" );
+    //     $results = [];
 
-        # check connection
-        if ( mysqli_connect_errno() )
-        {
-            printf( "Connect failed: %s\n", mysqli_connect_error() );
-            exit();
-        }
+    //     # check connection
+    //     if ( mysqli_connect_errno() )
+    //     {
+    //         printf( "Connect failed: %s\n", mysqli_connect_error() );
+    //         exit();
+    //     }
 
-        $sql = 'SELECT post_content FROM wordpressdb.wp_posts WHERE post_name = "hello-world"';
+    //     $sql = 'SELECT post_content FROM wordpressdb.wp_posts WHERE post_name = "hello-world"';
 
-        #echo $sql;
-        #exit;
+    //     #echo $sql;
+    //     #exit;
 
-        if ( $result = mysqli_query( $link, $sql ) )
-        {
-            while ( $row = mysqli_fetch_assoc( $result ) )
-            {
-                $results = $row[ 'post_content' ];
-            }
+    //     if ( $result = mysqli_query( $link, $sql ) )
+    //     {
+    //         while ( $row = mysqli_fetch_assoc( $result ) )
+    //         {
+    //             $results = $row[ 'post_content' ];
+    //         }
 
-            mysqli_free_result( $result );
-        }
+    //         mysqli_free_result( $result );
+    //     }
 
-        mysqli_close( $link );
-        #print_r($results[ 'post_content' ]);
-        return $results;
-    }
+    //     mysqli_close( $link );
+    //     #print_r($results[ 'post_content' ]);
+    //     return $results;
+    // }
 
-    public function getPotdWpDataExample()
-    {
-        global $wpdb;
-        $wpdb->show_errors();
-        #print_r( $wpdb->queries );
+    // public function getPotdWpDataExample()
+    // {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
+    //     #print_r( $wpdb->queries );
 
-        $result = $wpdb->get_results('SELECT post_content FROM ' . $wpdb->posts . ' WHERE post_name = "hello-world"');
+    //     $result = $wpdb->get_results('SELECT post_content FROM ' . $wpdb->posts . ' WHERE post_name = "hello-world"');
 
-        #echo '<pre>';
-        #print_r( $wpdb->queries );
+    //     #echo '<pre>';
+    //     #print_r( $wpdb->queries );
 
-        return $result[0]->post_content;
-    }
+    //     return $result[0]->post_content;
+    // }
 
-    public function postPotdDataExample()
-    {
-        global $wpdb;
-        $wpdb->show_errors();
-        #echo '<pre>';
-        #print_r( $wpdb->queries );
+    // public function postPotdDataExample()
+    // {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
+    //     #echo '<pre>';
+    //     #print_r( $wpdb->queries );
 
-        /*$post_id    = $_POST['post_id'];
-        $meta_key   = $_POST['meta_key'];
-        $meta_value = $_POST['meta_value'];*/
+    //     /*$post_id    = $_POST['post_id'];
+    //     $meta_key   = $_POST['meta_key'];
+    //     $meta_value = $_POST['meta_value'];*/
         
-        /*$wpdb->insert(
-            $wpdb->postmeta,
-            array(
-                'post_id'    => $_POST['post_id'],
-                'meta_key'   => $_POST['meta_key'],
-                'meta_value' => $_POST['meta_value']
-            )
-        );*/
+    //     /*$wpdb->insert(
+    //         $wpdb->postmeta,
+    //         array(
+    //             'post_id'    => $_POST['post_id'],
+    //             'meta_key'   => $_POST['meta_key'],
+    //             'meta_value' => $_POST['meta_value']
+    //         )
+    //     );*/
 
-        $wpdb->insert(
-            $wpdb->posts,
-            array(
-                'post_content' => 'PotD Description',
-                'post_title' => 'PotD Title',
-                'post_status' => 'draft',
-                'comment_status' => 'closed',
-                'post_name' => 'potd',
-                'post_parent' => 0,
-                'post_status' => 'draft',
-                'post_type' => 'potd'
-            )
-        );
-        #echo '<pre>';
-        #print_r($wpdb->post);
-    }
+    //     $wpdb->insert(
+    //         $wpdb->posts,
+    //         array(
+    //             'post_content' => 'PotD Description',
+    //             'post_title' => 'PotD Title',
+    //             'post_status' => 'draft',
+    //             'comment_status' => 'closed',
+    //             'post_name' => 'potd',
+    //             'post_parent' => 0,
+    //             'post_status' => 'draft',
+    //             'post_type' => 'potd'
+    //         )
+    //     );
+    //     #echo '<pre>';
+    //     #print_r($wpdb->post);
+    // }
 
-    public function deletePotdData()
-    {
-        global $wpdb;
-        $wpdb->show_errors();
+    // public function deletePotdData()
+    // {
+    //     global $wpdb;
+    //     $wpdb->show_errors();
 
-        $post_id = $_POST['post_id'];
-        $key = $_POST['meta_key'];
+    //     $post_id = $_POST['post_id'];
+    //     $key = $_POST['meta_key'];
         
-        $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM $wpdb->postmeta
-                WHERE post_id = %d
-                AND meta_key = %s",
-                $post_id,
-                $key
-            )
-        );
-    }
+    //     $wpdb->query(
+    //         $wpdb->prepare(
+    //             "DELETE FROM $wpdb->postmeta
+    //             WHERE post_id = %d
+    //             AND meta_key = %s",
+    //             $post_id,
+    //             $key
+    //         )
+    //     );
+    // }
 
-    function prefix_create_table()
-    {
-        #during plugin install?
-        #register_activation_hook( __FILE__, 'prefix_create_table' );
+    // function prefix_create_table()
+    // {
+    //     #during plugin install?
+    //     #register_activation_hook( __FILE__, 'prefix_create_table' );
 
-        global $wpdb;
+    //     global $wpdb;
 
-        $charset_collate = $wpdb->get_charset_collate();
+    //     $charset_collate = $wpdb->get_charset_collate();
 
-        $sql = "CREATE TABLE my_custom_table (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            first_name varchar(55) NOT NULL,
-            last_name varchar(55) NOT NULL,
-            email varchar(55) NOT NULL,
-            UNIQUE KEY id (id)
-        ) $charset_collate;";
+    //     $sql = "CREATE TABLE my_custom_table (
+    //         id mediumint(9) NOT NULL AUTO_INCREMENT,
+    //         first_name varchar(55) NOT NULL,
+    //         last_name varchar(55) NOT NULL,
+    //         email varchar(55) NOT NULL,
+    //         UNIQUE KEY id (id)
+    //     ) $charset_collate;";
 
-        if ( ! function_exists( 'dbDelta' ) ) {
-            require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-        }
+    //     if ( ! function_exists( 'dbDelta' ) ) {
+    //         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    //     }
 
-        dbDelta( $sql );
-    }
+    //     dbDelta( $sql );
+    // }
 }
