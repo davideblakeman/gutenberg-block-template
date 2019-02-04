@@ -30,7 +30,9 @@ export default class PotdAnswer extends React.Component {
     }
 
     handleDeleteAnswerClick( event ) {
-        this.props.onDeleteAnswerClick( this.getAnswerKey( event.target.value ) );
+        let index = this.getAnswerKey( event.target.value );
+        let oid = event.target.value;
+        this.props.onDeleteAnswerClick( index, oid );
     }
 
     getAnswerKey( oid ) {

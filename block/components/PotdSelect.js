@@ -50,9 +50,20 @@ export default class PotdSelect extends React.Component {
         });
     }
 
-    handleSelectInputChange( event ) { this.props.onSelectInputChange( event, this.state.selectedKey ) }
-    handleDeleteQuestionClick() { this.props.onDeleteQuestionClick( this.getSelectedKey() ) }
-    handleDeleteAnswerClick( event ) { this.props.onDeleteAnswerClick( event ) }
+    handleDeleteQuestionClick( event ) {
+        let qid = event.target.value;
+        this.props.onDeleteQuestionClick( this.getSelectedKey(), qid );
+    }
+
+    handleDeleteAnswerClick( index, oid ) {
+        this.props.onDeleteAnswerClick( index, oid );
+    }
+
+    handleSelectInputChange( event ) {
+        let index = this.props.inNewQuestion ? 0 : this.state.selectedKey;
+        this.props.onSelectInputChange( event, index );
+    }
+
     handleCancelClick() { this.props.onCancelClick() }
     handleSaveClick( event ) { this.props.onSaveClick( event.target.value ) }
     handleInputChange( event, name ) { this.props.onInputChange( event, name ) }
@@ -88,14 +99,14 @@ export default class PotdSelect extends React.Component {
                                 className = "gutenbergtemplateblock-cancel button button-large"
                                 onClick = { this.handleCancelClick }
                             >
-                                Cancel
+                                Select Poll
                             </Button>
                         }
                     </div>
                 }
                 { ( !editable || !editing ) &&
                     <SelectControl
-                        label={ 'Select a question to edit:' }
+                        label={ editable ? 'Select a poll to edit:' : 'Select a poll:' }
                         options={
                             editable ? [
                                 ...questions,

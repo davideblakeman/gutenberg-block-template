@@ -202,6 +202,73 @@ class GutenbergtemplateblockWpdb
         return $outcome;
     }
 
+    public function deleteQuestionById( $qid )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM $wpdb->gutenbergtemplateblock_questions
+                WHERE qid = %d",
+                $qid
+            )
+        );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            $outcome = 'fail';
+        } else {
+            $outcome = $this->deleteAllAnswersById( $qid );
+        }
+        
+        return $outcome;
+    }
+
+    public function deleteAllAnswersById( $qid )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM $wpdb->gutenbergtemplateblock_options
+                WHERE qid = %d",
+                $qid
+            )
+        );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            $outcome = 'fail';
+        }
+        
+        return $outcome;
+    }
+
+    public function deleteAnswerById( $oid ) {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM $wpdb->gutenbergtemplateblock_options
+                WHERE oid = %d",
+                $oid
+            )
+        );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            $outcome = 'fail';
+        }
+        
+        return $outcome;
+    }
+
     // public function getPollById( $qid )
     // {
     //     global $wpdb;
@@ -345,28 +412,6 @@ class GutenbergtemplateblockWpdb
     //             )
     //         );
     //     }
-
-    //     if ( $wpdb->last_error !== '' )
-    //     {
-    //         $outcome = 'fail';
-    //     }
-        
-    //     return $outcome;
-    // }
-
-    // public function deleteQuestionById( $qid )
-    // {
-    //     global $wpdb;
-    //     $wpdb->show_errors();
-    //     $outcome = 'success';
-
-    //     $wpdb->query(
-    //         $wpdb->prepare(
-    //             "DELETE FROM $wpdb->gutenbergtemplateblock_questions
-    //             WHERE qid = %d",
-    //             $qid
-    //         )
-    //     );
 
     //     if ( $wpdb->last_error !== '' )
     //     {

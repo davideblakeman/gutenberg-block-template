@@ -94,6 +94,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
             this.handleCancelClick = this.handleCancelClick.bind( this );
             this.handleSaveClick = this.handleSaveClick.bind( this );
+            this.deleteQuestionById = this.deleteQuestionById.bind( this );
+            this.deleteAnswerById = this.deleteAnswerById.bind( this );
             this.setPoll = this.setPoll.bind( this );
             this.setAnswers = this.setAnswers.bind( this );
 
@@ -105,7 +107,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             });
         }
 
-        /** componentDidMount()
+        /**
+         * componentDidMount()
          * Invoked immediately after a component is mounted (inserted into the tree).
          * Initialization that requires DOM nodes should go here. If you need to load
          * data from a remote endpoint, this is a good place to instantiate the network
@@ -169,7 +172,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             });
         }
         
-        /** https://medium.freecodecamp.org/handling-state-in-react-four-immutable-approaches-to-consider-d1f5c00249d5
+        /** 
+         * https://medium.freecodecamp.org/handling-state-in-react-four-immutable-approaches-to-consider-d1f5c00249d5
          * let user = this.state.user; // this is a reference, not a copy...
          * Never mutate this.state directly, as calling setState() afterwards may 
          * replace the mutation you made. Treat this.state as if it were immutable.
@@ -208,9 +212,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.setState({ questions: newQuestions });
         }
 
-        // https://stackoverflow.com/questions/29527385/removing-element-from-array-in-component-state
-        handleDeleteQuestionClick( index ) {
-            if ( confirm( 'Are you sure you wish to delete this poll question?' ) ) {
+        /**
+         * https://stackoverflow.com/questions/29527385/removing-element-from-array-in-component-state
+         */
+        handleDeleteQuestionClick( index, qid ) {
+            if ( confirm( 'Are you sure you wish to PERMANENTLY delete this poll?' ) ) {
                 let newQuestions = [
                     ...this.state.questions.slice( 0, index ),
                     ...this.state.questions.slice( index + 1 ) 
@@ -219,40 +225,45 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 this.setState({
                     questions: newQuestions,
                     editing: false
-                });
+                }, () => this.deleteQuestionById( qid ) );
             }
         }
 
-        handleDeleteAnswerClick( index ) {
-            if ( confirm( 'Are you sure you wish to delete this poll answer?' ) ) {
+        handleDeleteAnswerClick( index, oid ) {
+            if ( confirm( 'Are you sure you wish to PERMANENTLY delete this poll answer?' ) ) {
                 let newAnswers = [
                     ...this.state.answers.slice( 0, index ),
                     ...this.state.answers.slice( index + 1 ) 
                 ];
 
-                this.setState({ answers: newAnswers });
+                this.setState({ answers: newAnswers }, () => {
+                    this.deleteAnswerById( oid );
+                });
             }
         }
 
         handleCancelClick() {
-            this.handleTabChange();
+            if ( confirm( 'Selecting another poll will cancel all unsaved text changes.' ) ) {
+                this.handleTabChange();
+            }
         }
 
         handleSaveClick( event ) {
             if ( confirm( 'Are you sure you wish to save changes?' ) ) {
 
-                /** https://codeburst.io/learn-understand-javascripts-reduce-function-b2b0406efbdc
+                /** 
+                 * https://codeburst.io/learn-understand-javascripts-reduce-function-b2b0406efbdc
                  * reduce( callback( accumulator, value, index, array ), initialValue )
                  * accumulator — the accumulator accumulates all of the callbacks returned values.
                  * val — the current value being processed
                  * index — the current index of the value being processed
                  * arr — the original array
                  * 
-                 * reduce( callback( result, value, key, original ), initialValue )
+                 * reduce( callback( accumulator, val, index, arr ), initialValue )
                  */
 
                 // Return edited question and answers
-                let saveQuestion = this.state.questions.reduce( ( result, value  ) => {
+                let saveQuestion = this.state.questions.reduce( ( result, value ) => {
                     if ( value.edited ) {
                         result.push({
                             value: this.isNumeric( value.value ) ? value.value : 'new',
@@ -295,8 +306,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         return response.json();
                     })
                     .then(
-                        ( results ) => {
-                            if ( results && answers ) {
+                        ( result ) => {
+                            if ( result && answers ) {
                                 let qid = result;
                                 this.setAnswers( qid, answers );
                             }
@@ -400,7 +411,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         const pollOptions = results.map( ( object, key ) => {
                             answersByOid.push({
                                 oid: object.oid,
-                                option: object.option
+                                option: decodeURIComponent( object.option )
                             });
                             return [
                                 <p>
@@ -409,7 +420,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                         name="options"
                                         value={ object.oid }
                                     />
-                                    { object.option }
+                                    { decodeURIComponent( object.option ) }
                                 </p>
                             ];
                         });
@@ -444,10 +455,32 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( result ) => {
-                        result.map( ( object, key ) => {
-                            object.option = decodeURIComponent( object.option );
+                        // result.map( ( object, key ) => {
+                        //     object.option = decodeURIComponent( object.option );
+                        // });
+
+                        let answersByOid = [];
+                        const pollOptions = result.map( ( object, key ) => {
+                            answersByOid.push({
+                                oid: object.oid,
+                                option: decodeURIComponent( object.option )
+                            });
+                            return [
+                                <p>
+                                    <input
+                                        type="radio"
+                                        name="options"
+                                        value={ object.oid }
+                                    />
+                                    { decodeURIComponent( object.option ) }
+                                </p>
+                            ];
                         });
-                        self.setState({ answers: result });
+
+                        self.setState({ answers: answersByOid }, () => {
+                            self.setSavePoll( pollOptions );
+                            self.setSavePollTitle( result[0].question );
+                        });
                     },
                     ( error ) => {
                         self.setState({
@@ -458,7 +491,58 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 )
         }
 
-        /** https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+        deleteQuestionById( qid ) {
+            var self = this;
+            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                      '?action=gutenbergtemplateblock_deleteQuestionById' + 
+                      '&qid=' + qid +
+                      '&security=' + gutenbergtemplateblock_ajax_object.security;
+    
+            fetch( url )
+                .then( response => {
+                    return response.json();
+                })
+                .then(
+                    ( result ) => {
+                        console.log( result );
+                        // self.setState({ answers: result });
+                    },
+                    ( error ) => {
+                        self.setState({
+                            isLoaded: true,
+                            error
+                        });
+                    }
+                )
+        }
+
+        deleteAnswerById( oid ) {
+            var self = this;
+            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                      '?action=gutenbergtemplateblock_deleteAnswerById' + 
+                      '&oid=' + oid +
+                      '&security=' + gutenbergtemplateblock_ajax_object.security;
+    
+            fetch( url )
+                .then( response => {
+                    return response.json();
+                })
+                .then(
+                    ( result ) => {
+                        console.log( result );
+                        // self.setState({ answers: result });
+                    },
+                    ( error ) => {
+                        self.setState({
+                            isLoaded: true,
+                            error
+                        });
+                    }
+                )
+        }
+
+        /** 
+         * https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
          *  Solution that uses ES6 and the crypto API
          */
         uuidv4() {
@@ -496,8 +580,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             }  = this.state;
 
             return [
-                <Inspector {...{ setAttributes, ...this.props }} />,
-                <Controls {...{ setAttributes, ...this.props }} />,
+                <Inspector { ...{ setAttributes, ...this.props }} />,
+                <Controls { ...{ setAttributes, ...this.props }} />,
                 <div className = { classes }>
                     <div className = { classes }>
                         <ColorPalette
@@ -550,7 +634,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             },
                             {
                                 name: 'tab2',
-                                title: 'Add / Edit / Delete',
+                                title: 'Edit',
                                 className: 'tab-two'
                             },
                             {
