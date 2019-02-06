@@ -56,6 +56,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
     edit: class extends Component {
         constructor( props ) {
             super( ...arguments );
+            
             const {
                 attributes: {
                     styleToggle,
@@ -63,14 +64,16 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 className, 
                 setAttributes
             } = props;
+
             this.state = {
                 isLoaded: false,
+                isLoadedAnswers: true,
                 error: null,
                 questions: [],
-                answers: [{ 
+                answers: [{
                     qid: '',
-                    oid: '', 
-                    option: '' 
+                    oid: '',
+                    option: ''
                 }],
                 tabChange: null,
                 selectChange: null,
@@ -233,7 +236,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             if ( confirm( 'Are you sure you wish to PERMANENTLY delete this poll answer?' ) ) {
                 let newAnswers = [
                     ...this.state.answers.slice( 0, index ),
-                    ...this.state.answers.slice( index + 1 ) 
+                    ...this.state.answers.slice( index + 1 )
                 ];
 
                 this.setState({ answers: newAnswers }, () => {
@@ -330,7 +333,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             var self = this;
 
             for ( let i = 0; i < answers.length; i++ ) {
-                let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                let url = gutenbergtemplateblock_ajax_object.ajax_url +
                           '?action=gutenbergtemplateblock_setPollAnswerById' +
                           '&qid=' + qid +
                           '&' + answers[i] +
@@ -443,12 +446,16 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         getPollAnswersById( qid ) {
+            console.log( 'getPollAnswersById' );
+            console.log( qid );
+            this.setState({ isLoadedAnswers: false });
+
             var self = this;
-            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
-                      '?action=gutenbergtemplateblock_getPollAnswersById' + 
+            let url = gutenbergtemplateblock_ajax_object.ajax_url +
+                      '?action=gutenbergtemplateblock_getPollAnswersById' +
                       '&qid=' + qid +
                       '&security=' + gutenbergtemplateblock_ajax_object.security;
-    
+            
             fetch( url )
                 .then( response => {
                     return response.json();
@@ -477,9 +484,13 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             ];
                         });
 
-                        self.setState({ answers: answersByOid }, () => {
+                        self.setState({
+                            answers: answersByOid,
+                            isLoadedAnswers: true
+                        }, () => {
                             self.setSavePoll( pollOptions );
-                            self.setSavePollTitle( result[0].question );
+                            // self.setSavePollTitle( result[0].question );
+                            self.setSavePollTitle( result.length > 0 ? result[0].question : '' );
                         });
                     },
                     ( error ) => {
@@ -573,6 +584,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             
             const {
                 isLoaded,
+                isLoadedAnswers,
                 questions,
                 answers,
                 editing,
@@ -655,6 +667,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     questions={ questions }
                                                     answers={ answers }
                                                     editable={ false }
+                                                    isLoadedAnswers={ isLoadedAnswers }
                                                 />
                                                 :
                                                 <div>Loading...</div>

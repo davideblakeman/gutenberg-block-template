@@ -79,7 +79,14 @@ export default class PotdSelect extends React.Component {
     };
 
     render() {
-        const { questions, answers, editable, editing, inNewQuestion } = this.props;
+        const {
+            questions,
+            answers,
+            editable,
+            editing,
+            inNewQuestion,
+            isLoadedAnswers
+        } = this.props;
         const { selectedValue } = this.state;
         const selectedKey = this.getSelectedKey();
         const editTitleText = questions[ selectedKey ].label;
@@ -146,6 +153,7 @@ export default class PotdSelect extends React.Component {
                         editable={ editable }
                         onInputChange={ this.handleInputChange }
                         onDeleteAnswerClick={ this.handleDeleteAnswerClick }
+                        isLoadedAnswers={ isLoadedAnswers }
                     />
                 }
                 { ( editable && editing ) &&

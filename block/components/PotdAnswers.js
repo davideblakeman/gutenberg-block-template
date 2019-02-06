@@ -44,38 +44,44 @@ export default class PotdAnswer extends React.Component {
     }
 
     render() {
-        const { answers, editable } = this.props;
+        const { answers, editable, isLoadedAnswers } = this.props;
 
-        return (
-            <div class="grid">
-                { answers.map( ( object, key ) => 
-                    <div class="inline-flex">
-                        { editable ? 
-                            <TextControl
-                                name={ key }
-                                value={ object.option }
-                                onChange={ this.handleChange( key ) }
-                            />
-                            :
-                            <TextControl
-                                key={ key }
-                                value={ object.option }
-                                disabled
-                            />
-                        }
-                        { editable &&
-                            <Button
-                                className = "gutenbergtemplateblock-delete-answer button button-large"
-                                onClick = { this.handleDeleteAnswerClick }
-                                value={ object.oid }
-                            > 
-                                Delete
-                            </Button>
-                        }
-                    </div>
-                )}
+        return [
+            <div>
+            { isLoadedAnswers ? 
+                <div class="grid">
+                    { answers.map( ( object, key ) => 
+                        <div class="inline-flex">
+                            { editable ? 
+                                <TextControl
+                                    name={ key }
+                                    value={ object.option }
+                                    onChange={ this.handleChange( key ) }
+                                />
+                                :
+                                <TextControl
+                                    key={ key }
+                                    value={ object.option }
+                                    disabled
+                                />
+                            }
+                            { editable &&
+                                <Button
+                                    className = "gutenbergtemplateblock-delete-answer button button-large"
+                                    onClick = { this.handleDeleteAnswerClick }
+                                    value={ object.oid }
+                                > 
+                                    Delete
+                                </Button>
+                            }
+                        </div>
+                    )}
+                </div>
+                :
+                <div>Loading...</div>
+            }
             </div>
-        );
+        ];
     }
 
 }
