@@ -183,7 +183,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
          * Warning: Watch Out For Nested Objects!
          */
         handleAddAnswerClick( event ) {
-            console.log( 'handleAddAnswerClick', event );
             let answer = [
                 {
                     'qid': event,
@@ -233,10 +232,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         handleDeleteAnswerClick( index, oid ) {
-            // console.log( 'index.js index: ', index );
-            // console.log( 'index.js oid: ', oid );
-            // console.log( 'index.js this.state.answers', this.state.answers );
-            
             if ( confirm( 'Are you sure you wish to PERMANENTLY delete this poll answer?' ) ) {
                 let newAnswers = [
                     ...this.state.answers.slice( 0, index ),
@@ -260,16 +255,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
                 /** 
                  * https://codeburst.io/learn-understand-javascripts-reduce-function-b2b0406efbdc
-                 * reduce( callback( accumulator, value, index, array ), initialValue )
-                 * accumulator — the accumulator accumulates all of the callbacks returned values.
-                 * val — the current value being processed
-                 * index — the current index of the value being processed
-                 * arr — the original array
-                 * 
                  * reduce( callback( accumulator, val, index, arr ), initialValue )
                  */
 
-                // Return edited question and answers
                 let saveQuestion = this.state.questions.reduce( ( result, value ) => {
                     if ( value.edited ) {
                         result.push({
@@ -450,8 +438,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         getPollAnswersById( qid ) {
-            console.log( 'getPollAnswersById' );
-            console.log( qid );
             this.setState({ isLoadedAnswers: false });
 
             var self = this;
@@ -466,10 +452,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( result ) => {
-                        // result.map( ( object, key ) => {
-                        //     object.option = decodeURIComponent( object.option );
-                        // });
-
                         let answersByOid = [];
                         const pollOptions = result.map( ( object, key ) => {
                             answersByOid.push({
@@ -493,7 +475,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             isLoadedAnswers: true
                         }, () => {
                             self.setSavePoll( pollOptions );
-                            // self.setSavePollTitle( result[0].question );
                             self.setSavePollTitle( result.length > 0 ? result[0].question : '' );
                         });
                     },
@@ -520,7 +501,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 .then(
                     ( result ) => {
                         console.log( result );
-                        // self.setState({ answers: result });
                     },
                     ( error ) => {
                         self.setState({
@@ -559,7 +539,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         /** 
          * https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
-         *  Solution that uses ES6 and the crypto API
+         *  ES6 and the crypto API
          */
         uuidv4() {
             return ( [1e7]+-1e3+-4e3+-8e3+-1e11 ).replace( /[018]/g, c =>
