@@ -30,14 +30,17 @@ export default class PotdAnswer extends React.Component {
     }
 
     handleDeleteAnswerClick( event ) {
+        // console.log( 'PotDAnswers delete event: ', event.target );
         let index = this.getAnswerKey( event.target.value );
+        // console.log( 'PotDAnswers delete index: ', index );
+        // console.log( 'PotDAnswers props: ', this.props.answers );
         let oid = event.target.value;
         this.props.onDeleteAnswerClick( index, oid );
     }
 
     getAnswerKey( oid ) {
         for ( let i = 0; i < this.props.answers.length; i++ ) {
-            if ( parseInt( this.props.answers[i].oid ) == parseInt( oid ) ) {
+            if ( this.props.answers[i].oid.trim() == oid.trim() ) {
                 return i;
             }
         } return 0;

@@ -219,7 +219,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
          * https://stackoverflow.com/questions/29527385/removing-element-from-array-in-component-state
          */
         handleDeleteQuestionClick( index, qid ) {
-            if ( confirm( 'Are you sure you wish to PERMANENTLY delete this poll?' ) ) {
+            if ( confirm( `Are you sure you wish to PERMANENTLY delete this poll and all it's answers?` ) ) {
                 let newQuestions = [
                     ...this.state.questions.slice( 0, index ),
                     ...this.state.questions.slice( index + 1 ) 
@@ -233,6 +233,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         handleDeleteAnswerClick( index, oid ) {
+            // console.log( 'index.js index: ', index );
+            // console.log( 'index.js oid: ', oid );
+            // console.log( 'index.js this.state.answers', this.state.answers );
+            
             if ( confirm( 'Are you sure you wish to PERMANENTLY delete this poll answer?' ) ) {
                 let newAnswers = [
                     ...this.state.answers.slice( 0, index ),
@@ -528,28 +532,29 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         deleteAnswerById( oid ) {
-            var self = this;
-            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
-                      '?action=gutenbergtemplateblock_deleteAnswerById' + 
-                      '&oid=' + oid +
-                      '&security=' + gutenbergtemplateblock_ajax_object.security;
-    
-            fetch( url )
-                .then( response => {
-                    return response.json();
-                })
-                .then(
-                    ( result ) => {
-                        console.log( result );
-                        // self.setState({ answers: result });
-                    },
-                    ( error ) => {
-                        self.setState({
-                            isLoaded: true,
-                            error
-                        });
-                    }
-                )
+            if ( this.isNumeric( oid ) ) {
+                var self = this;
+                let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                          '?action=gutenbergtemplateblock_deleteAnswerById' + 
+                          '&oid=' + oid +
+                          '&security=' + gutenbergtemplateblock_ajax_object.security;
+        
+                fetch( url )
+                    .then( response => {
+                        return response.json();
+                    })
+                    .then(
+                        ( result ) => {
+                            console.log( 'deleteAnswerById: ', result );
+                        },
+                        ( error ) => {
+                            self.setState({
+                                isLoaded: true,
+                                error
+                            });
+                        }
+                    )
+            }
         }
 
         /** 
@@ -641,7 +646,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         tabs={[
                             {
                                 name: 'tab1',
-                                title: 'Select Poll',
+                                title: 'Select',
                                 className: 'tab-one'
                             },
                             {
@@ -684,6 +689,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     answers={ answers }
                                                     editable={ true }
                                                     editing={ editing }
+                                                    isLoadedAnswers={ isLoadedAnswers }
                                                     inNewQuestion={ newQuestion }
                                                     onAddQuestionClick={ this.handleAddQuestionClick }
                                                     onAddAnswerClick={ this.handleAddAnswerClick }
