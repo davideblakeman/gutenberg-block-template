@@ -5,11 +5,12 @@ import "./i18n.js";
  */
 import classnames from 'classnames';
 import icons from './icons';
-import Inspector from "./inspector";
-import Controls from "./controls";
-import attributes from "./attributes";
-import colourAttributes from "./colours";
-import PotdSelect from "./components/PotdSelect";
+import Inspector from './inspector';
+import Controls from './controls';
+import attributes from './attributes';
+import colourAttributes from './colours';
+import PotdSelect from './components/PotdSelect';
+import PotDSettings from './components/PotdSettings';
 import './style.scss';
 import './editor.scss';
 
@@ -27,7 +28,8 @@ const {
     ColorPalette
 } = wp.editor;
 const { 
-    TabPanel
+    TabPanel,
+    Spinner
 } = wp.components;
 const { Component } = wp.element;
 
@@ -218,6 +220,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
          * https://stackoverflow.com/questions/29527385/removing-element-from-array-in-component-state
          */
         handleDeleteQuestionClick( index, qid ) {
+            // Change to <Notice/> ?
             if ( confirm( `Are you sure you wish to PERMANENTLY delete this poll and all it's answers?` ) ) {
                 let newQuestions = [
                     ...this.state.questions.slice( 0, index ),
@@ -232,6 +235,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         handleDeleteAnswerClick( index, oid ) {
+            // Change to <Notice/> ?
             if ( confirm( 'Are you sure you wish to PERMANENTLY delete this poll answer?' ) ) {
                 let newAnswers = [
                     ...this.state.answers.slice( 0, index ),
@@ -245,12 +249,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         handleCancelClick() {
+            // Change to <Notice/> ?
             if ( confirm( 'Selecting another poll will cancel all unsaved text changes.' ) ) {
                 this.handleTabChange();
             }
         }
 
         handleSaveClick( event ) {
+            // Change to <Notice/> ?
             if ( confirm( 'Are you sure you wish to save changes?' ) ) {
 
                 /** 
@@ -655,7 +661,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     isLoadedAnswers={ isLoadedAnswers }
                                                 />
                                                 :
-                                                <div>Loading...</div>
+                                                <div>
+                                                    <Spinner/>
+                                                    <div>Loading...</div>
+                                                </div>
                                             }
                                         </div>
                                     ];
@@ -681,14 +690,17 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     onSaveClick={ this.handleSaveClick }
                                                 />
                                                 :
-                                                <div>Loading...</div>
+                                                <div>
+                                                    <Spinner />
+                                                    <div>Loading...</div>
+                                                </div>
                                             }
                                         </div>
                                     ];
                                 } else if ( tab.name === 'tab3' ) {
                                     return [
                                         <div className={ className }>
-                                            <p>{ tab.name }</p>
+                                            <PotDSettings/>
                                         </div>
                                     ];
                                 }

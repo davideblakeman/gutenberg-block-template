@@ -1,6 +1,7 @@
 const {
     Button,
-    TextControl
+    TextControl,
+    Spinner
 } = wp.components;
 
 export default class PotdAnswer extends React.Component {
@@ -78,7 +79,10 @@ export default class PotdAnswer extends React.Component {
                     )}
                 </div>
                 :
-                <div>Loading...</div>
+                <div>
+                    <Spinner/>
+                    <div>Loading...</div>
+                </div>
             }
             </div>
         ];
