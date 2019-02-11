@@ -1,52 +1,111 @@
-// import PotdAnswers from "./PotdAnswers";
 const {
-    // SelectControl,
-    // Button,
-    // TextControl
     RadioControl,
     CheckboxControl
 } = wp.components;
-const { withSelect } = wp.data;
 
 export default class PotdSettings extends React.Component {
 
     constructor( props ) {
         super( props );
-        // this.componentDidMount = this.componentDidMount.bind( this );
+        this.componentDidMount = this.componentDidMount.bind( this );
         this.handleRadioChange = this.handleRadioChange.bind( this );
         this.handleCheckboxChange = this.handleCheckboxChange.bind( this );
+        this.getOptions = this.getOptions.bind( this );
+        this.setOption = this.setOption.bind( this );
+        this.initRadio = this.initRadio.bind( this );
+        this.initCheckbox = this.initCheckbox.bind( this );
 
         this.state = {
             selectedRadio: null,
-            blockingWarning: false,
-            pollRotate: false
+            pollRotate: false,
+            blockingWarning: false
         };
     }
 
     componentDidMount() {
         console.log( 'componentDidMount' );
-
-        const result = withSelect( select => {
-            // return {
-                // posts: select( 'core' ).getEntityRecords( 'postType', 'post', { per_page: 3 } )
-            // };
-            return '~test!~';
-        } );
-
-        console.log( 'result: ', result );
-        // ( ( { posts, className, isSelected, setAttributes } ) => {
-            
-        // });
+        this.getOptions();
     }
 
-    handleRadioChange( event ) {
+    getOptions() {
+        var self = this;
+        let url = gutenbergtemplateblock_ajax_object.ajax_url +
+                  '?action=gutenbergtemplateblock_getOptions' +
+                  '&security=' + gutenbergtemplateblock_ajax_object.security;
+        
+        fetch( url )
+            .then( response => {
+                return response.json();
+            })
+            .then(
+                ( result ) => {
+                    console.log( result );
+
+                    this.initRadio( result.gutenbergtemplateblock_limit_by.option_value );
+                    this.initCheckbox( result.gutenbergtemplateblock_rotate_daily.option_value );
+                },
+                ( error ) => {
+                    console.log( error );
+                }
+            )
+    }
+
+    setOption( optionName, value ) {
+        let ajaxCall = 'gutenbergtemplateblock_setOption_';
+        let validCalls = [
+            'limit_by',
+            'rotate_daily'
+        ];
+
+        if ( validCalls.indexOf( optionName ) !== -1 ) {
+            ajaxCall += optionName
+
+            var self = this;
+            let url = gutenbergtemplateblock_ajax_object.ajax_url +
+                      '?action=' + ajaxCall +
+                      '&v=' + value +
+                      '&security=' + gutenbergtemplateblock_ajax_object.security;
+            
+            fetch( url )
+                .then( response => {
+                    return response.json();
+                })
+                .then(
+                    ( result ) => {
+                        console.log( result );
+                    },
+                    ( error ) => {
+                        console.log( error );
+                    }
+                )
+        }
+    }
+
+    initRadio( event ) {
         this.setState({
             selectedRadio: event,
             blockingWarning: event === 'none' ? true : false
         });
     }
 
-    handleCheckboxChange( event ) { this.setState({ pollRotate: event }) }
+    initCheckbox( event ) {
+        this.setState({
+            pollRotate: event === 'true' ? true : false
+        });
+    }
+
+    handleRadioChange( event ) {
+        this.setState({
+            selectedRadio: event,
+            blockingWarning: event === 'none' ? true : false
+        }, () => this.setOption( 'limit_by', event ) );
+    }
+
+    handleCheckboxChange( event ) {
+        this.setState({
+            pollRotate: event
+        }, () => this.setOption( 'rotate_daily', event ) );
+    }
 
     render() {
         const {

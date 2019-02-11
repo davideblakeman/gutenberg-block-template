@@ -269,6 +269,20 @@ class GutenbergtemplateblockWpdb
         return $outcome;
     }
 
+    public function getOptions()
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+
+        $result = $wpdb->get_results('
+            SELECT option_name, option_value
+            FROM ' . $wpdb->options . '
+            WHERE option_name LIKE "gutenbergtemplateblock_%"
+        ', OBJECT_K);
+        
+        return $result;
+    }
+
     // public function getPollById( $qid )
     // {
     //     global $wpdb;

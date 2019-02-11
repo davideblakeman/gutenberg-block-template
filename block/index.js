@@ -99,6 +99,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
             this.handleCancelClick = this.handleCancelClick.bind( this );
             this.handleSaveClick = this.handleSaveClick.bind( this );
+            // this.handleSettingsRadioClick = this.handleSettingsRadioClick.bind( this );
             this.deleteQuestionById = this.deleteQuestionById.bind( this );
             this.deleteAnswerById = this.deleteAnswerById.bind( this );
             this.setPoll = this.setPoll.bind( this );
@@ -292,6 +293,16 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 this.setPoll( qid, q, a );
             }
         }
+
+        // handleSettingsRadioClick( event ) {
+        //     console.log( 'handleSettingsRadioClick' );
+        //     console.log( event );
+        // }
+
+        // handleSettingsCheckboxClick( event ) {
+        //     console.log( 'handleSettingsCheckboxClick' );
+        //     console.log( event );
+        // }
 
         setPoll( qid, question, answers ) {
             if ( qid && question ) {
@@ -700,7 +711,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                 } else if ( tab.name === 'tab3' ) {
                                     return [
                                         <div className={ className }>
-                                            <PotDSettings/>
+                                            <PotDSettings
+                                                // onRadioClick={ this.handleSettingsRadioClick }
+                                                // onCheckboxClick={ this.handleSettingsCheckboxClick }
+                                            />
                                         </div>
                                     ];
                                 }

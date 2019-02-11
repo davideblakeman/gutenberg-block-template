@@ -16,6 +16,9 @@ class GutenbergtemplateblockEnqueue
 
         // add actions for assets and ajax
         $this->add_actions();
+
+        // add custom plugin options on first initialisation
+        $this->add_plugin_options();
     }
 
     public function enqueue_block_editor_assets()
@@ -66,10 +69,35 @@ class GutenbergtemplateblockEnqueue
         add_action( 'wp_ajax_gutenbergtemplateblock_setPollAnswerById', [ __CLASS__, 'gutenbergtemplateblock_setPollAnswerById'] );
         add_action( 'wp_ajax_gutenbergtemplateblock_deleteQuestionById', [ __CLASS__, 'gutenbergtemplateblock_deleteQuestionById'] );
         add_action( 'wp_ajax_gutenbergtemplateblock_deleteAnswerById', [ __CLASS__, 'gutenbergtemplateblock_deleteAnswerById'] );
-        
+        add_action( 'wp_ajax_gutenbergtemplateblock_getOptions', [ __CLASS__, 'gutenbergtemplateblock_getOptions'] );
+        add_action( 'wp_ajax_gutenbergtemplateblock_setOption_limit_by', [ __CLASS__, 'gutenbergtemplateblock_setOption_limit_by'] );
+        add_action( 'wp_ajax_gutenbergtemplateblock_setOption_rotate_daily', [ __CLASS__, 'gutenbergtemplateblock_setOption_rotate_daily'] );
 
         // AJAX - No Privilege - Frontend
         add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_setOptionVoteById', [ __CLASS__, 'gutenbergtemplateblock_setOptionVoteById'] );
+    }
+
+    public function add_plugin_options ()
+    {
+        if ( get_option( 'gutenbergtemplateblock_init' ) !== 'init-true' )
+        {
+            add_option( 'gutenbergtemplateblock_init', 'init-true' );
+            add_option( 'gutenbergtemplateblock_limit_by', 'false' );
+            add_option( 'gutenbergtemplateblock_cloudflare_ip_detect', 'false' );
+            add_option( 'gutenbergtemplateblock_rotate_daily', 'false' );
+            // add_option( 'gutenbergtemplateblock_change', 'false' );
+            add_option( 'gutenbergtemplateblock_style', '1' );
+            add_option( 'gutenbergtemplateblock_origindate', time() );
+            add_option( 'gutenbergtemplateblock_starttime', '00:00' );
+
+            // init
+            // limit_by_cookie
+            // cloudflare_ip_detect
+            // change
+            // style
+            // origindate
+            // starttime
+        }
     }
     
     /**
@@ -116,7 +144,7 @@ class GutenbergtemplateblockEnqueue
     
     }
 
-    // ajax actions
+    // AJAX actions
 
     public static function gutenbergtemplateblock_getFirstPoll()
     {
@@ -191,6 +219,55 @@ class GutenbergtemplateblockEnqueue
         
         $GTBWPDB = new GutenbergtemplateblockWpdb;
         echo json_encode( $GTBWPDB->deleteAnswerById( $oid ) );
+        wp_die();
+    }
+
+    public static function gutenbergtemplateblock_getOptions()
+    {
+        check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
+
+        // $oid = $_REQUEST[ 'oid' ];
+        
+        $GTBWPDB = new GutenbergtemplateblockWpdb;
+        echo json_encode( $GTBWPDB->getOptions() );
+        wp_die();
+    }
+
+    public static function gutenbergtemplateblock_setOption_limit_by()
+    {
+        check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
+
+        $value = $_REQUEST[ 'v' ];
+        $validOptions = [
+            'ip',
+            'cookie',
+            'both',
+            'none'
+        ];
+        $success = 'fail';
+
+        if ( in_array( $value, $validOptions ) )
+        {
+            $success = update_option( 'gutenbergtemplateblock_limit_by', $value ) ? 'success' : 'fail';
+        }
+
+        echo json_encode( $success );
+        wp_die();
+    }
+
+    public static function gutenbergtemplateblock_setOption_rotate_daily()
+    {
+        check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
+
+        $value = $_REQUEST[ 'v' ];
+        $success = 'fail';
+
+        if ( $value === 'true' || $value === 'false' )
+        {
+            $success = update_option( 'gutenbergtemplateblock_rotate_daily', $value ) ? 'success' : 'fail';
+        }
+
+        echo json_encode( $success );
         wp_die();
     }
 
