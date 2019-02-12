@@ -283,6 +283,20 @@ class GutenbergtemplateblockWpdb
         return $result;
     }
 
+    public function votedToday( $clientIp )
+    {
+        // global $wpdb;
+        // $wpdb->show_errors();
+
+        // $result = $wpdb->get_results('
+        //     SELECT ip
+        //     FROM ' . $wpdb->gutenbergtemplateblock_iplog . '
+        //     WHERE ip = ' . $clientIp
+        // );
+        
+        // return $result;
+    }
+
     // public function getPollById( $qid )
     // {
     //     global $wpdb;

@@ -767,6 +767,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 </div>
                 { pollTitle }
                 { poll }
+                <button class="potd-vote-btn">Vote!</button>
+                <div class="potd-result"></div>
             </div>
         );
     },

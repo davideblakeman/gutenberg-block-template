@@ -1,6 +1,7 @@
 const {
     RadioControl,
-    CheckboxControl
+    CheckboxControl,
+    Spinner
 } = wp.components;
 
 export default class PotdSettings extends React.Component {
@@ -18,12 +19,13 @@ export default class PotdSettings extends React.Component {
         this.state = {
             selectedRadio: null,
             pollRotate: false,
-            blockingWarning: false
+            blockingWarning: false,
+            isLoaded: false
         };
     }
 
     componentDidMount() {
-        console.log( 'componentDidMount' );
+        // console.log( 'componentDidMount' );
         this.getOptions();
     }
 
@@ -39,10 +41,13 @@ export default class PotdSettings extends React.Component {
             })
             .then(
                 ( result ) => {
-                    console.log( result );
+                    // console.log( result );
 
                     this.initRadio( result.gutenbergtemplateblock_limit_by.option_value );
                     this.initCheckbox( result.gutenbergtemplateblock_rotate_daily.option_value );
+                    this.setState({
+                        isLoaded: true
+                    });
                 },
                 ( error ) => {
                     console.log( error );
@@ -72,7 +77,7 @@ export default class PotdSettings extends React.Component {
                 })
                 .then(
                     ( result ) => {
-                        console.log( result );
+                        // console.log( result );
                     },
                     ( error ) => {
                         console.log( error );
@@ -114,35 +119,45 @@ export default class PotdSettings extends React.Component {
         const {
             selectedRadio,
             blockingWarning,
-            pollRotate
+            pollRotate,
+            isLoaded
         } = this.state;
 
         return (
             <div>
-                <div>
-                    <RadioControl
-                        label="How would you like to limit the votes per day?"
-                        selected={ selectedRadio }
-                        options={[
-                            { label: 'Block by IP', value: 'ip' },
-                            { label: 'Block by cookie', value: 'cookie' },
-                            { label: 'Block by IP & cookie', value: 'both' },
-                            { label: 'No blocking', value: 'none' },
-                        ]}
-                        onChange={ this.handleRadioChange }
-                    />
-                    { blockingWarning &&
-                        <p>Warning! If no blocking option is selected unlimited daily voting is enabled.</p>
-                    }
-                </div>
-                <div className={ className }>
-                    <CheckboxControl
-                        heading="Rotate poll question each day?"
-                        label={ pollRotate ? 'Yes' : 'No' }
-                        checked={ pollRotate }
-                        onChange={ this.handleCheckboxChange }
-                    />
-                </div>
+                { isLoaded ?
+                    <div>
+                        <div>
+                            <RadioControl
+                                label="How would you like to limit the votes per day?"
+                                selected={ selectedRadio }
+                                options={[
+                                    { label: 'Block by IP', value: 'ip' },
+                                    { label: 'Block by cookie', value: 'cookie' },
+                                    { label: 'Block by IP & cookie', value: 'both' },
+                                    { label: 'No blocking', value: 'none' },
+                                ]}
+                                onChange={ this.handleRadioChange }
+                            />
+                            { blockingWarning &&
+                                <p>Warning! If no blocking option is selected unlimited daily voting is enabled.</p>
+                            }
+                        </div>
+                        <div className={ className }>
+                            <CheckboxControl
+                                heading="Rotate poll question each day?"
+                                label={ pollRotate ? 'Yes' : 'No' }
+                                checked={ pollRotate }
+                                onChange={ this.handleCheckboxChange }
+                            />
+                        </div>
+                    </div>
+                    :
+                    <div>
+                        <Spinner/>
+                        <div>Loading...</div>
+                    </div>
+                }
             </div>
         );
     }

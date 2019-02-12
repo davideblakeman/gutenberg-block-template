@@ -7,11 +7,12 @@ window.addEventListener( "load", function( event ) {
 
     for ( let element of elements ) {
         element.addEventListener( 'click', function( event ) {
-            // console.log( element );
-            for ( let element of this.parentNode.childNodes ) {
-                if ( element.tagName === 'P' & element.firstChild.checked ) {
-                    // console.log( element );
-                    oid = element.firstChild.value;
+            console.log( event.target.parentNode.childNodes );
+            for ( let el of event.target.parentNode.childNodes ) {
+                // console.log( element );
+                if ( el.tagName === 'P' && el.firstChild.checked ) {
+                    // console.log( el );
+                    oid = el.firstChild.value;
                     if ( oid ) {
                         registerVote( oid, event );
                     }
@@ -46,7 +47,7 @@ const registerVote = ( oid, event ) => {
     // console.log( event.parentNode.childNodes );
     console.log( event );
     let resultElement = null;
-    for ( let element of event.target.parentNode.parentNode.childNodes ) {
+    for ( let element of event.target.parentNode.childNodes ) {
         if ( element.classList.value === 'potd-result' ) {
             resultElement = element;
         }
