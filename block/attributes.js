@@ -95,6 +95,10 @@ const attributes = {
         type: 'string',
         default: null
     },
+    answersQid: {
+        type: 'string',
+        default: null
+    },
     firstPollId: {
         type: 'string',
         default: null

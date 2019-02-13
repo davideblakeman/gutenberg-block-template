@@ -79,8 +79,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 }],
                 tabChange: null,
                 selectChange: null,
-                answersQid: null,
-                firstQid: null,
+                // answersQid: null,
+                // firstQid: null,
                 editing: false,
                 newQuestion: false
             };
@@ -89,6 +89,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.onChangeContent = this.onChangeContent.bind( this );
             this.setSavePoll = this.setSavePoll.bind( this );
             this.setSavePollTitle = this.setSavePollTitle.bind( this );
+            this.setSaveQid = this.setSaveQid.bind( this );
             this.handleSelectChange = this.handleSelectChange.bind( this );
             this.handleTabChange = this.handleTabChange.bind( this );
             this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
@@ -129,6 +130,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         onChangeContent( content ) { this.props.setAttributes( { content } ) }
         setSavePoll( poll ) { this.props.setAttributes( { poll } ) }
         setSavePollTitle( pollTitle ) { this.props.setAttributes( { pollTitle } ) }
+        setSaveQid( answersQid ) { this.props.setAttributes( { answersQid } ) }
 
         // Handle Events \\
         handleSelectChange( event, editable = null ) {
@@ -438,7 +440,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         });
                         
                         self.setSavePoll( pollOptions );
-                        self.setSavePollTitle( results[0].question );
+                        self.setSavePollTitle( results.length > 0 ? results[0].question : '' );
+                        self.setSaveQid( results.length > 0 ? results[0].qid : '' );
 
                         self.setState({
                             isLoaded: true,
@@ -493,6 +496,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         }, () => {
                             self.setSavePoll( pollOptions );
                             self.setSavePollTitle( result.length > 0 ? result[0].question : '' );
+                            self.setSaveQid( result.length > 0 ? result[0].qid : '' );
                         });
                     },
                     ( error ) => {
@@ -711,10 +715,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                 } else if ( tab.name === 'tab3' ) {
                                     return [
                                         <div className={ className }>
-                                            <PotDSettings
-                                                // onRadioClick={ this.handleSettingsRadioClick }
-                                                // onCheckboxClick={ this.handleSettingsCheckboxClick }
-                                            />
+                                            <PotDSettings/>
                                         </div>
                                     ];
                                 }
@@ -737,7 +738,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 titleColour,
                 contentColour,
                 pollTitle,
-                poll
+                poll,
+                answersQid
             }
         } = props;
 
@@ -767,7 +769,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 </div>
                 { pollTitle }
                 { poll }
-                <button class="potd-vote-btn">Vote!</button>
+                <button class="potd-vote-btn" value={ answersQid }>Vote!</button>
                 <div class="potd-result"></div>
             </div>
         );

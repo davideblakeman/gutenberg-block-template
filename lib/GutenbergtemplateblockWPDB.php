@@ -25,12 +25,9 @@ class GutenbergtemplateblockWpdb
         global $wpdb;
         $wpdb->show_errors();
 
-        $result = $wpdb->get_results(
-            "
-                SELECT option_id AS value, option_name AS label
-                FROM " . $wpdb->prefix . "options
-                LIMIT 10
-            "
+        $result = $wpdb->get_results('
+            SELECT option_id AS value, option_name AS label
+            FROM ' . $wpdb->gutenbergtemplateblock_options
         );
 
         return $result;
@@ -41,10 +38,13 @@ class GutenbergtemplateblockWpdb
         global $wpdb;
         $wpdb->show_errors();
 
-        $results = $wpdb->get_results('
-            SELECT oid, qid, `option` 
-            FROM ' . $wpdb->gutenbergtemplateblock_options . ' 
-            WHERE qid = ' . $qid
+        $results = $wpdb->get_results(
+            $wpdb->prepare('
+                SELECT oid, qid, `option` 
+                FROM ' . $wpdb->gutenbergtemplateblock_options . ' 
+                WHERE qid = %d',
+                $qid
+            )
         );
 
         return $results;
@@ -52,8 +52,6 @@ class GutenbergtemplateblockWpdb
 
     public function setPollQuestionById( $qid, $question )
     {
-        // print_r( $answers );
-        // wp_die();
         global $wpdb;
         $wpdb->show_errors();
         $outcome = null;
@@ -77,12 +75,10 @@ class GutenbergtemplateblockWpdb
         {
             // UPDATE question text
             $wpdb->query(
-                $wpdb->prepare(
-                    "
-                    UPDATE $wpdb->gutenbergtemplateblock_questions 
+                $wpdb->prepare('
+                    UPDATE ' . $wpdb->gutenbergtemplateblock_questions . '
                     SET question = %s
-                    WHERE qid = %d
-                    ",
+                    WHERE qid = %d',
                     $question,
                     $qid
                 )
@@ -134,12 +130,10 @@ class GutenbergtemplateblockWpdb
         {
             // UPDATE question text
             $wpdb->query(
-                $wpdb->prepare(
-                    "
-                    UPDATE $wpdb->gutenbergtemplateblock_options 
+                $wpdb->prepare('
+                    UPDATE ' . $wpdb->gutenbergtemplateblock_options . '
                     SET option = %s
-                    WHERE oid = %d
-                    ",
+                    WHERE oid = %d',
                     $answer,
                     $oid
                 )
@@ -171,8 +165,8 @@ class GutenbergtemplateblockWpdb
 
         $result = $wpdb->get_results('
             SELECT qid AS value, question AS label
-            FROM ' . $wpdb->gutenbergtemplateblock_questions . '
-        ');
+            FROM ' . $wpdb->gutenbergtemplateblock_questions
+        );
 
         return $result;
     }
@@ -184,12 +178,10 @@ class GutenbergtemplateblockWpdb
         $outcome = 'success';
 
         $wpdb->query(
-            $wpdb->prepare( 
-                "
-                UPDATE $wpdb->gutenbergtemplateblock_options 
+            $wpdb->prepare('
+                UPDATE ' . $wpdb->gutenbergtemplateblock_options . '
                 SET votes = votes + 1
-                WHERE oid = %d
-                ",
+                WHERE oid = %d',
                 $oid
             )
         );
@@ -209,9 +201,9 @@ class GutenbergtemplateblockWpdb
         $outcome = 'success';
 
         $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM $wpdb->gutenbergtemplateblock_questions
-                WHERE qid = %d",
+            $wpdb->prepare('
+                DELETE FROM ' . $wpdb->gutenbergtemplateblock_questions . '
+                WHERE qid = %d',
                 $qid
             )
         );
@@ -233,9 +225,9 @@ class GutenbergtemplateblockWpdb
         $outcome = 'success';
 
         $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM $wpdb->gutenbergtemplateblock_options
-                WHERE qid = %d",
+            $wpdb->prepare('
+                DELETE FROM ' . $wpdb->gutenbergtemplateblock_options . '
+                WHERE qid = %d',
                 $qid
             )
         );
@@ -254,9 +246,9 @@ class GutenbergtemplateblockWpdb
         $outcome = 'success';
 
         $wpdb->query(
-            $wpdb->prepare(
-                "DELETE FROM $wpdb->gutenbergtemplateblock_options
-                WHERE oid = %d",
+            $wpdb->prepare('
+                DELETE FROM ' . $wpdb->gutenbergtemplateblock_options . '
+                WHERE oid = %d',
                 $oid
             )
         );
@@ -277,24 +269,58 @@ class GutenbergtemplateblockWpdb
         $result = $wpdb->get_results('
             SELECT option_name, option_value
             FROM ' . $wpdb->options . '
-            WHERE option_name LIKE "gutenbergtemplateblock_%"
-        ', OBJECT_K);
+            WHERE option_name LIKE "gutenbergtemplateblock_%"',
+            OBJECT_K
+        );
         
         return $result;
     }
 
-    public function votedToday( $clientIp )
+    public function votedToday( $clientIp, $qid )
     {
-        // global $wpdb;
-        // $wpdb->show_errors();
+        global $wpdb;
+        $wpdb->show_errors();
 
-        // $result = $wpdb->get_results('
-        //     SELECT ip
-        //     FROM ' . $wpdb->gutenbergtemplateblock_iplog . '
-        //     WHERE ip = ' . $clientIp
-        // );
-        
-        // return $result;
+        // https://stackoverflow.com/questions/8154564/retrieve-rows-less-than-a-day-old
+        $results = $wpdb->get_results(
+            $wpdb->prepare('
+                SELECT lid 
+                FROM ' . $wpdb->gutenbergtemplateblock_iplog . '
+                WHERE 
+                    `date` > timestampadd( day, -1, NOW() ) 
+                AND
+                    ip = %s
+                AND
+                    qid = %d',
+                $clientIp,
+                $qid
+            )
+        );
+
+        if ( empty( $results ) )
+        {
+            $wpdb->insert(
+                $wpdb->gutenbergtemplateblock_iplog, 
+                array(
+                    'ip' => $clientIp,
+                    'qid' => $qid,
+                    'userid' => get_current_user_id(),
+                    'date' => current_time( 'mysql' )
+                ),
+                array(
+                    '%s',
+                    '%d',
+                    '%d',
+                    '%s',
+                )
+            );
+
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     // public function getPollById( $qid )

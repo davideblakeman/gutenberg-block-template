@@ -76,6 +76,8 @@ class GutenbergtemplateblockEnqueue
         // AJAX - No Privilege - Frontend
         add_action( 'wp_ajax_gutenbergtemplateblock_setOptionVoteById', [ __CLASS__, 'gutenbergtemplateblock_setOptionVoteById'] );
         add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_setOptionVoteById', [ __CLASS__, 'gutenbergtemplateblock_setOptionVoteById'] );
+        add_action( 'wp_ajax_gutenbergtemplateblock_getLimitByOption', [ __CLASS__, 'gutenbergtemplateblock_getLimitByOption'] );
+        add_action( 'wp_ajax_nopriv_gutenbergtemplateblock_getLimitByOption', [ __CLASS__, 'gutenbergtemplateblock_getLimitByOption'] );
     }
 
     public function add_plugin_options ()
@@ -280,20 +282,44 @@ class GutenbergtemplateblockEnqueue
         // exit;
         check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
 
-        // Need to add Cloudflare support for obtaining IP addresses
         $clientIp = self::getIp();
-        // var_dump( $clientIp );
+        $qid = $_REQUEST[ 'qid' ];
         $GTBWPDB = new GutenbergtemplateblockWpdb;
+        $result = 'success';
 
-        var_dump( $GTBWPDB->votedToday( $clientIp ) );
+        $limitByIp = [
+            'ip',
+            'both'
+        ];
 
-        // if ( !$GTBWPDB->votedToday( $clientIp ) )
-        // {
-        //     $oid = $_REQUEST[ 'oid' ];
-            
-        //     echo json_encode( $GTBWPDB->setOptionVoteById( $oid ) );
-        // }
+        // var_dump( $GTBWPDB->votedToday( $clientIp, $qid ) );
 
+        if ( in_array( get_option( 'gutenbergtemplateblock_limit_by' ), $limitBy ) )
+        {
+            if ( !$GTBWPDB->votedToday( $clientIp, $qid ) )
+            {
+                $oid = $_REQUEST[ 'oid' ];
+                $result = $GTBWPDB->setOptionVoteById( $oid );
+            }
+            else
+            {
+                $result = 'alreadyVoted';
+            }
+        }
+        else
+        {
+            $result = $GTBWPDB->setOptionVoteById( $oid );
+        }
+
+        echo json_encode( $result );
+
+        wp_die();
+    }
+
+    public static function gutenbergtemplateblock_getLimitByOption()
+    {
+        check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
+        echo json_encode( get_option( 'gutenbergtemplateblock_limit_by' ) );
         wp_die();
     }
 
@@ -309,7 +335,7 @@ class GutenbergtemplateblockEnqueue
             if ( !filter_var( $ip, FILTER_VALIDATE_IP ) )
             {
                 $ip = isset( $_SERVER[ 'HTTP_CLIENT_IP' ] ) ? $_SERVER[ 'HTTP_CLIENT_IP' ] : '';
-            } 
+            }
 
             if ( !filter_var( $ip, FILTER_VALIDATE_IP ) )
             {
@@ -328,9 +354,21 @@ class GutenbergtemplateblockEnqueue
         
         $ip = $ip === '::1' ? '127.0.0.1' : $ip;
 
-		if( !filter_var( $ip, FILTER_VALIDATE_IP ) ) $ip = 'no_IP__'. rand(1,999999);
+		if ( !filter_var( $ip, FILTER_VALIDATE_IP ) ) $ip = 'no_IP__'. self::uuidv4();
 
 		return $ip;
+    }
+
+    // https://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid
+    function uuidv4()
+    {
+        $data = openssl_random_pseudo_bytes(16);
+        assert( strlen( $data ) == 16 );
+    
+        $data[6] = chr( ord( $data[6] ) & 0x0f | 0x40 );
+        $data[8] = chr( ord( $data[8] ) & 0x3f | 0x80 );
+    
+        return vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split( bin2hex( $data ), 4 ) );
     }
 
     // public static function gutenbergtemplateblock_getPollById()
