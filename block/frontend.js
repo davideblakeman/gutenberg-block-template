@@ -65,51 +65,57 @@ const registerVote = ( oid, event ) => {
         })
         .then(
             ( result ) => {
-                // console.log( 'result: ', result );
-                if ( result === 'cookie' ) {
+                console.log( 'result: ', result );
+                if ( result === 'cookie' || result === 'both' ) {
 
                     // document.cookie = 'gutenbergtemplateblock=;path=/;expires=Thu, 01 Jan 1970 00:00:01 GMT';
                     // document.cookie = 'steamystats.com_cookie_consent_adsense=1;path=/;max-age=31540000';
                     // if ( !document.cookie.indexOf( 'steamystats.com_cookie_consent=1' ) >= 0 )
 
-                    // resultElement.innerHTML = 'Thank you for your vote!';
-                } else if ( result === 'ip' ) {
-                    // resultElement.innerHTML = 'You have already voted today.';
-                } else if ( result === 'both' ) {
-                    // resultElement.innerHTML = 'Sorry! We encountered a problem :(';
-                } else {
+                    if ( !document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) >= 0 ) {
+                        vote( oid, qid );
+                        document.cookie = 'gutenbergtemplateblock_limit_cookie=1;path=/;max-age=86400'; // 1 day cookie
+                        // resultElement.innerHTML = 'Thank you for your vote!';
+                    } else {
+                        resultElement.innerHTML = 'You have already voted today.';
+                    }
 
+                    
+                } else {
+                    vote( oid, qid );
                 }
             },
             ( err ) => {
                 console.log( 'error: ' + error );
             }
         )
-
-    // let url = gutenbergtemplateblock_ajax_object.ajax_url +
-    //             '?action=gutenbergtemplateblock_setOptionVoteById' +
-    //             '&oid=' + oid +
-    //             '&qid=' + qid +
-    //             '&security=' + gutenbergtemplateblock_ajax_object.security;
-
-    // fetch( url )
-    //     .then( response => {
-    //         return response.json();
-    //     })
-    //     .then(
-    //         ( result ) => {
-    //             // console.log('result:');
-    //             // console.log( result );
-    //             if ( result === 'success' ) {
-    //                 resultElement.innerHTML = 'Thank you for your vote!';
-    //             } else if ( result === 'alreadyVoted' ) {
-    //                 resultElement.innerHTML = 'You have already voted today.';
-    //             } else {
-    //                 resultElement.innerHTML = 'Sorry! We encountered a problem :(';
-    //             }
-    //         },
-    //         ( err ) => {
-    //             console.log( 'error: ' + error );
-    //         }
-    //     )
 };
+
+const vote = ( oid, qid ) => {
+    let url = gutenbergtemplateblock_ajax_object.ajax_url +
+                '?action=gutenbergtemplateblock_setOptionVoteById' +
+                '&oid=' + oid +
+                '&qid=' + qid +
+                '&security=' + gutenbergtemplateblock_ajax_object.security;
+
+    fetch( url )
+        .then( response => {
+            return response.json();
+        })
+        .then(
+            ( result ) => {
+                // console.log('result:');
+                // console.log( result );
+                if ( result === 'success' ) {
+                    resultElement.innerHTML = 'Thank you for your vote!';
+                } else if ( result === 'alreadyVoted' ) {
+                    resultElement.innerHTML = 'You have already voted today.';
+                } else {
+                    resultElement.innerHTML = 'Sorry! We encountered a problem :(';
+                }
+            },
+            ( err ) => {
+                console.log( 'error: ' + error );
+            }
+        )
+}
