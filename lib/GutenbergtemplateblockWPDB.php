@@ -281,21 +281,38 @@ class GutenbergtemplateblockWpdb
         global $wpdb;
         $wpdb->show_errors();
 
+        $userId = is_user_logged_in() ? get_current_user_id() : 0;
+
         // https://stackoverflow.com/questions/8154564/retrieve-rows-less-than-a-day-old
-        $results = $wpdb->get_results(
-            $wpdb->prepare('
-                SELECT lid 
-                FROM ' . $wpdb->gutenbergtemplateblock_iplog . '
-                WHERE 
-                    `date` > timestampadd( day, -1, NOW() ) 
-                AND
-                    ip = %s
-                AND
-                    qid = %d',
-                $clientIp,
-                $qid
-            )
-        );
+        if ( get_option( 'gutenbergtemplateblock_limit_by' ) === 'user' )
+        {
+            $clientIp = '';
+            $results = $wpdb->get_results(
+                $wpdb->prepare('
+                    SELECT lid 
+                    FROM ' . $wpdb->gutenbergtemplateblock_iplog . '
+                    WHERE `date` > timestampadd( day, -1, NOW() )
+                    AND userid = %d
+                    AND qid = %d',
+                    $userId,
+                    $qid
+                )
+            );
+        }
+        else
+        {
+            $results = $wpdb->get_results(
+                $wpdb->prepare('
+                    SELECT lid 
+                    FROM ' . $wpdb->gutenbergtemplateblock_iplog . '
+                    WHERE `date` > timestampadd( day, -1, NOW() )
+                    AND ip = %s
+                    AND qid = %d',
+                    $clientIp,
+                    $qid
+                )
+            );
+        }
 
         if ( empty( $results ) )
         {
@@ -304,7 +321,7 @@ class GutenbergtemplateblockWpdb
                 array(
                     'ip' => $clientIp,
                     'qid' => $qid,
-                    'userid' => get_current_user_id(),
+                    'userid' => $userId,
                     'date' => current_time( 'mysql' )
                 ),
                 array(

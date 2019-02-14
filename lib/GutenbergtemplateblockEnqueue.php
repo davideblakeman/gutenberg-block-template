@@ -85,7 +85,7 @@ class GutenbergtemplateblockEnqueue
         if ( get_option( 'gutenbergtemplateblock_init' ) !== 'init-true' )
         {
             add_option( 'gutenbergtemplateblock_init', 'init-true' );
-            add_option( 'gutenbergtemplateblock_limit_by', 'false' );
+            add_option( 'gutenbergtemplateblock_limit_by', 'none' );
             add_option( 'gutenbergtemplateblock_cloudflare_ip_detect', 'false' );
             add_option( 'gutenbergtemplateblock_rotate_daily', 'false' );
             // add_option( 'gutenbergtemplateblock_change', 'false' );
@@ -244,7 +244,8 @@ class GutenbergtemplateblockEnqueue
         $validOptions = [
             'ip',
             'cookie',
-            'both',
+            'ipcookie',
+            'user',
             'none'
         ];
         $success = 'fail';
@@ -282,23 +283,40 @@ class GutenbergtemplateblockEnqueue
         // exit;
         check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
 
-        $clientIp = self::getIp();
+        // var_dump( is_user_logged_in() );
+        $selectedLimit = get_option( 'gutenbergtemplateblock_limit_by' );
+        $clientIp = '';
+
+        if ( $selectedLimit === 'ip' || $selectedLimit === 'ipcookie' )
+        {
+            $clientIp = self::getIp();
+        }
+
+        $oid = $_REQUEST[ 'oid' ];
         $qid = $_REQUEST[ 'qid' ];
         $GTBWPDB = new GutenbergtemplateblockWpdb;
         $result = 'success';
 
-        $limitByIp = [
+        $limitByOptions = [
             'ip',
-            'both'
+            'ipcookie',
+            'user'
         ];
+        
 
         // var_dump( $GTBWPDB->votedToday( $clientIp, $qid ) );
+        // var_dump( in_array( get_option( 'gutenbergtemplateblock_limit_by' ), $limitByIpOptions ) );
 
-        if ( in_array( get_option( 'gutenbergtemplateblock_limit_by' ), $limitBy ) )
+        if ( in_array( $selectedLimit, $limitByOptions ) )
         {
-            if ( !$GTBWPDB->votedToday( $clientIp, $qid ) )
+            // $voted = $GTBWPDB->votedToday( $clientIp, $qid );
+
+            if ( $selectedLimit === 'user' && !is_user_logged_in() )
             {
-                $oid = $_REQUEST[ 'oid' ];
+                $result = 'notLoggedIn';
+            }
+            else if ( !$GTBWPDB->votedToday( $clientIp, $qid ) )
+            {
                 $result = $GTBWPDB->setOptionVoteById( $oid );
             }
             else
@@ -322,6 +340,8 @@ class GutenbergtemplateblockEnqueue
         echo json_encode( get_option( 'gutenbergtemplateblock_limit_by' ) );
         wp_die();
     }
+
+    // Helpers
 
     public static function getIp()
     {

@@ -134,7 +134,8 @@ export default class PotdSettings extends React.Component {
                                 options={[
                                     { label: 'Block by IP', value: 'ip' },
                                     { label: 'Block by cookie', value: 'cookie' },
-                                    { label: 'Block by IP & cookie', value: 'both' },
+                                    { label: 'Block by IP & cookie', value: 'ipcookie' },
+                                    { label: 'Block by logged in user', value: 'user' },
                                     { label: 'No blocking', value: 'none' },
                                 ]}
                                 onChange={ this.handleRadioChange }
