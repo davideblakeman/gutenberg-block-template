@@ -40,12 +40,23 @@ class GutenbergtemplateblockWpdb
 
         $results = $wpdb->get_results(
             $wpdb->prepare('
-                SELECT oid, qid, `option` 
-                FROM ' . $wpdb->gutenbergtemplateblock_options . ' 
-                WHERE qid = %d',
+                SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
+                FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
+                JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
+                WHERE q.qid = %d
+                ORDER BY o.votes DESC',
                 $qid
             )
         );
+
+        // $results = $wpdb->get_results(
+        //     $wpdb->prepare('
+        //         SELECT oid, qid, `option` 
+        //         FROM ' . $wpdb->gutenbergtemplateblock_options . ' 
+        //         WHERE qid = %d',
+        //         $qid
+        //     )
+        // );
 
         return $results;
     }

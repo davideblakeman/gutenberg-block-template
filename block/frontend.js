@@ -1,6 +1,5 @@
 console.log( 'Frontend Block JS' );
 window.addEventListener( "load", function( event ) {
-
     var elements = document.getElementsByClassName( 'potd-vote-btn' );
     let oid = null;
 
@@ -39,15 +38,7 @@ const registerVote = ( oid, event ) => {
             ( result ) => {
                 console.log( 'result: ', result );
                 if ( result === 'cookie' || result === 'ipcookie' || result === 'user' ) {
-
-                    // document.cookie = 'gutenbergtemplateblock=;path=/;expires=Thu, 01 Jan 1970 00:00:01 GMT';
-                    // document.cookie = 'steamystats.com_cookie_consent_adsense=1;path=/;max-age=31540000';
-                    // if ( !document.cookie.indexOf( 'steamystats.com_cookie_consent=1' ) >= 0 )
-
-                    // console.log( !document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) >= 0 );
-                    // console.log( document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) > -1 );
                     let liveCookie = document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) > -1;
-
                     if ( result === 'user' ) {
                         vote( oid, qid, resultElement );
                     } else if ( !liveCookie ) {

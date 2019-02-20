@@ -65,6 +65,7 @@ function enqueue_frontend_assets()
 	wp_enqueue_script(
 		$namespace . '-block-frontend',
 		_get_plugin_url() . $block_path,
+		// [ 'wp-dom-ready' ],
 		[],
 		filemtime( _get_plugin_directory() . $block_path )
 	);

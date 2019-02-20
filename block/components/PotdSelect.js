@@ -29,9 +29,10 @@ export default class PotdSelect extends React.Component {
     }
 
     componentDidMount() {
+        const { existingBlockQid } = this.props;
         let lastIndex = this.props.questions.length - 1;
         this.setState({
-            selectedValue: this.props.questions[0].value
+            selectedValue: existingBlockQid ? existingBlockQid : this.props.questions[0].value
         }, () => this.setState({
             selectedKey: this.getSelectedKey(),
             lastSelectableKey : lastIndex
@@ -124,7 +125,7 @@ export default class PotdSelect extends React.Component {
                             ] : questions
                         }
                         onChange={ this.handleChange }
-                        value={ editable ? 'last' : null }
+                        value={ editable ? 'last' : selectedValue }
                     />
                 }
                 { ( editable && editing ) &&

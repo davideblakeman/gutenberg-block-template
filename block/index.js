@@ -32,6 +32,7 @@ const {
     Spinner
 } = wp.components;
 const { Component } = wp.element;
+const { withSelect } = wp.data;
 
 // console.log( wp.components );
 
@@ -64,7 +65,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     styleToggle,
                 }, 
                 className, 
-                setAttributes
+                setAttributes,
+                answersQid
             } = props;
 
             this.state = {
@@ -122,6 +124,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
          * request.
          */
         componentDidMount() {
+            // console.log( 'componentDidMount' );
             this.getPollQuestions();
         }
         
@@ -378,6 +381,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         // Helpers \\
         getPollQuestions() {
+            const { answersQid } = this.props.attributes;
+            // console.log( 'answersQid:', answersQid );
+            
             if ( this.state.isLoaded ) {
                 this.setState({ isLoaded: false });
             }
@@ -386,15 +392,20 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             let url = gutenbergtemplateblock_ajax_object.ajax_url + 
                       '?action=gutenbergtemplateblock_getPollQuestions&security=' + 
                       gutenbergtemplateblock_ajax_object.security;
-    
+            
             fetch( url )
                 .then( response => {
                     return response.json();
                 })
                 .then(
                     ( results ) => {
-                        self.setState({ questions: results });
-                        self.getFirstPoll();
+                        self.setState({ questions: results }, () => {
+                            if ( this.isNumeric( answersQid ) ) {
+                                this.getPollAnswersById( answersQid );
+                            } else {
+                                self.getFirstPoll();
+                            }
+                        });
                     },
                     ( error ) => {
                         self.setState({
@@ -472,6 +483,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( result ) => {
+                        // console.log( 'result: ', result );
                         let answersByOid = [];
                         const pollOptions = result.map( ( object, key ) => {
                             answersByOid.push({
@@ -492,7 +504,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
                         self.setState({
                             answers: answersByOid,
-                            isLoadedAnswers: true
+                            isLoadedAnswers: true,
+                            isLoaded: true
                         }, () => {
                             self.setSavePoll( pollOptions );
                             self.setSavePollTitle( result.length > 0 ? result[0].question : '' );
@@ -521,7 +534,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( result ) => {
-                        console.log( result );
+                        console.log( 'deleteQuestionById: ', result );
                     },
                     ( error ) => {
                         self.setState({
@@ -585,7 +598,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     contentColour,
                     textAlignment,
                     title,
-                    content
+                    content,
+                    answersQid
             }} = this.props;
             
             const {
@@ -674,6 +688,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     answers={ answers }
                                                     editable={ false }
                                                     isLoadedAnswers={ isLoadedAnswers }
+                                                    existingBlockQid={ answersQid }
                                                 />
                                                 :
                                                 <div>
