@@ -112,6 +112,7 @@ class GutenbergtemplateblockCustomTables
         $wpdb->gutenbergtemplateblock_questions = $wpdb->prefix .'gutenbergtemplateblock_questions';
         $wpdb->gutenbergtemplateblock_options = $wpdb->prefix .'gutenbergtemplateblock_options';
         $wpdb->gutenbergtemplateblock_iplog = $wpdb->prefix .'gutenbergtemplateblock_iplog';
+        $wpdb->gutenbergtemplateblock_polls = $wpdb->prefix .'gutenbergtemplateblock_polls';
     }
 
     /**
@@ -165,6 +166,17 @@ class GutenbergtemplateblockCustomTables
                 KEY ip (ip,qid),
                 KEY qid (qid),
                 KEY userid (userid)
+            ) $charset_collate;
+
+            CREATE TABLE $wpdb->gutenbergtemplateblock_polls (
+                pid      BIGINT(20)   unsigned NOT NULL auto_increment,
+                uuid     VARCHAR(36)           NOT NULL default '',
+                userid   BIGINT(20)   unsigned NOT NULL default 0,
+                date     DATETIME              NOT NULL default '0000-00-00 00:00:00',
+                PRIMARY KEY  (pid),
+                KEY uuid (uuid),
+                KEY userid (userid),
+                KEY date (date)
             ) $charset_collate;
         ";
     }

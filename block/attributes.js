@@ -106,6 +106,10 @@ const attributes = {
     classes: {
         type: 'string',
         default: null
+    },
+    uuid: {
+        type: 'string',
+        default: null
     }
 }
 

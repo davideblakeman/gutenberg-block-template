@@ -3,6 +3,9 @@ window.addEventListener( "load", function( event ) {
     var elements = document.getElementsByClassName( 'potd-vote-btn' );
     let oid = null;
 
+    const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
+    console.log( polls );
+
     for ( let element of elements ) {
         element.addEventListener( 'click', function( event ) {
             for ( let el of event.target.parentNode.childNodes ) {

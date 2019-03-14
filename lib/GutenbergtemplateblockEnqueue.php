@@ -72,6 +72,7 @@ class GutenbergtemplateblockEnqueue
         add_action( 'wp_ajax_gutenbergtemplateblock_getOptions', [ __CLASS__, 'gutenbergtemplateblock_getOptions'] );
         add_action( 'wp_ajax_gutenbergtemplateblock_setOption_limit_by', [ __CLASS__, 'gutenbergtemplateblock_setOption_limit_by'] );
         add_action( 'wp_ajax_gutenbergtemplateblock_setOption_rotate_daily', [ __CLASS__, 'gutenbergtemplateblock_setOption_rotate_daily'] );
+        add_action( 'wp_ajax_gutenbergtemplateblock_setPollByUUID', [ __CLASS__, 'gutenbergtemplateblock_setPollByUUID'] );
 
         // AJAX - No Privilege - Frontend
         add_action( 'wp_ajax_gutenbergtemplateblock_setOptionVoteById', [ __CLASS__, 'gutenbergtemplateblock_setOptionVoteById'] );
@@ -303,7 +304,6 @@ class GutenbergtemplateblockEnqueue
             'user'
         ];
         
-
         // var_dump( $GTBWPDB->votedToday( $clientIp, $qid ) );
         // var_dump( in_array( get_option( 'gutenbergtemplateblock_limit_by' ), $limitByIpOptions ) );
 
@@ -338,6 +338,17 @@ class GutenbergtemplateblockEnqueue
     {
         check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
         echo json_encode( get_option( 'gutenbergtemplateblock_limit_by' ) );
+        wp_die();
+    }
+
+    public static function gutenbergtemplateblock_setPollByUUID()
+    {
+        check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );   
+
+        $uuid = $_REQUEST[ 'uuid' ];
+
+        $GTBWPDB = new GutenbergtemplateblockWpdb;
+        echo json_encode( $GTBWPDB->setPollByUUID( $uuid ) );
         wp_die();
     }
 

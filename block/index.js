@@ -32,7 +32,7 @@ const {
     Spinner
 } = wp.components;
 const { Component } = wp.element;
-const { withSelect } = wp.data;
+// const { withSelect } = wp.data;
 
 // console.log( wp.components );
 
@@ -87,11 +87,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 newQuestion: false
             };
             
+            this.setSaveUUID( this.uuidv4() );
+
             this.onChangeTitle = this.onChangeTitle.bind( this );
             this.onChangeContent = this.onChangeContent.bind( this );
             this.setSavePoll = this.setSavePoll.bind( this );
             this.setSavePollTitle = this.setSavePollTitle.bind( this );
             this.setSaveQid = this.setSaveQid.bind( this );
+            this.setSaveUUID = this.setSaveUUID.bind( this );
             this.handleSelectChange = this.handleSelectChange.bind( this );
             this.handleTabChange = this.handleTabChange.bind( this );
             this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
@@ -134,6 +137,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         setSavePoll( poll ) { this.props.setAttributes( { poll } ) }
         setSavePollTitle( pollTitle ) { this.props.setAttributes( { pollTitle } ) }
         setSaveQid( answersQid ) { this.props.setAttributes( { answersQid } ) }
+        setSaveUUID( uuid ) { this.props.setAttributes( { uuid } ) }
 
         // Handle Events \\
         handleSelectChange( event, editable = null ) {
@@ -450,9 +454,12 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             ];
                         });
                         
+                        // const uuid = self.props.uuid ? self.props.uuid : self.uuidv4();
                         self.setSavePoll( pollOptions );
                         self.setSavePollTitle( results.length > 0 ? results[0].question : '' );
                         self.setSaveQid( results.length > 0 ? results[0].qid : '' );
+                        // self.setSaveUUID( uuid );
+                        // self.setPollStart( uuid );
 
                         self.setState({
                             isLoaded: true,
@@ -502,6 +509,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             ];
                         });
 
+                        // const uuid = self.props.uuid ? self.props.uuid : self.uuidv4();
+
                         self.setState({
                             answers: answersByOid,
                             isLoadedAnswers: true,
@@ -510,6 +519,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             self.setSavePoll( pollOptions );
                             self.setSavePollTitle( result.length > 0 ? result[0].question : '' );
                             self.setSaveQid( result.length > 0 ? result[0].qid : '' );
+                            // self.setSaveUUID( uuid );
+                            // self.setPollStart( uuid );
                         });
                     },
                     ( error ) => {
@@ -754,7 +765,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 contentColour,
                 pollTitle,
                 poll,
-                answersQid
+                answersQid,
+                uuid
             }
         } = props;
 
@@ -762,9 +774,35 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             'wp-block-gutenbergtemplateblock-templateblock',
             { 'style-toggle': styleToggle },
         );
+
+        const setPollStart = ( uuid ) => {
+            var self = this;
+            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+                      '?action=gutenbergtemplateblock_setPollByUUID' + 
+                      '&uuid=' + uuid +
+                      '&security=' + gutenbergtemplateblock_ajax_object.security;
         
+            fetch( url )
+                .then( response => {
+                    return response.json();
+                })
+                .then(
+                    ( result ) => {
+                        console.log( 'setPollStart: ', result );
+                    },
+                    ( error ) => {
+                        self.setState({
+                            isLoaded: true,
+                            error
+                        });
+                    }
+                )
+        }
+
+        setPollStart( uuid );
+
         return (
-            <div className = { className }>
+            <div className = { className } value={ uuid }>
                 <h2 
                     className = { classnames(
                         `align${ blockAlignment }`,
@@ -788,5 +826,5 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 <div class="potd-result"></div>
             </div>
         );
-    },
+    }
 });

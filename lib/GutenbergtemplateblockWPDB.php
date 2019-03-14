@@ -351,6 +351,71 @@ class GutenbergtemplateblockWpdb
         }
     }
 
+    private function getUUIDExists( $uuid )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare('
+                SELECT uuid
+                FROM ' . $wpdb->gutenbergtemplateblock_polls . '
+                WHERE uuid = %s',
+                $uuid
+            )
+        );
+
+        return count( $results ) > 0 ? true : false;
+    }
+
+    public function setPollByUUID( $uuid )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $userId = is_user_logged_in() ? get_current_user_id() : 0;
+
+        if ( $this->getUUIDExists( $uuid ) )
+        {
+            $wpdb->query(
+                $wpdb->prepare('
+                    UPDATE ' . $wpdb->gutenbergtemplateblock_polls . '
+                    SET
+                        userid = %d,
+                        date = NOW()
+                    WHERE uuid = %s',
+                    $userId,
+                    $uuid
+                )
+            );
+        }
+        else
+        {
+            $wpdb->insert(
+                $wpdb->gutenbergtemplateblock_polls, 
+                array(
+                    'uuid' => $uuid,
+                    'userid' => $userId,
+                    'date' => current_time( 'mysql' )
+                ),
+                array(
+                    '%s',
+                    '%d',
+                    '%s'
+                )
+            );
+        }
+
+        if ( $wpdb->last_error !== '' )
+        {
+            $outcome = 'fail';
+        }
+        
+        return $outcome;
+    }
+
     // public function getPollById( $qid )
     // {
     //     global $wpdb;
