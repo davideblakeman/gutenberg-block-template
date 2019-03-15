@@ -32,9 +32,11 @@ const {
     Spinner
 } = wp.components;
 const { Component } = wp.element;
+const { select } = wp.data;
 // const { withSelect } = wp.data;
 
 // console.log( wp.components );
+// console.log( wp.data );
 
 registerBlockType( 'gutenbergtemplateblock/templateblock', 
 {
@@ -799,7 +801,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 )
         }
 
-        setPollStart( uuid );
+        // Set a new UUID if the update / publish button is clicked
+        if ( select( 'core/editor' ).isCurrentPostPublished() ) {
+            setPollStart( uuid );
+        }
 
         return (
             <div className = { className } value={ uuid }>
