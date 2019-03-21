@@ -1,17 +1,16 @@
 console.log( 'Frontend Block JS' );
 window.addEventListener( "load", function( event ) {
-
-    // console.log( document.getElementById( 'VoteBtn' ) );
     var elements = document.getElementsByClassName( 'potd-vote-btn' );
     let oid = null;
 
+    const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
+    console.log( polls );
+
     for ( let element of elements ) {
         element.addEventListener( 'click', function( event ) {
-            // console.log( element );
-            for ( let element of this.parentNode.childNodes ) {
-                if ( element.tagName === 'P' & element.firstChild.checked ) {
-                    // console.log( element );
-                    oid = element.firstChild.value;
+            for ( let el of event.target.parentNode.childNodes ) {
+                if ( el.tagName === 'P' && el.firstChild.checked ) {
+                    oid = el.firstChild.value;
                     if ( oid ) {
                         registerVote( oid, event );
                     }
@@ -19,42 +18,54 @@ window.addEventListener( "load", function( event ) {
             }
         });
     }
-    // document.getElementById( 'VoteBtn' ).addEventListener( 'click', function( event ) {
-    //     // console.log( 'VoteBtn clicked' );
-    //     // console.log( this );
-    //     // console.log( event );
-    //     // console.log( this.parentNode.childNodes );
-    //     let oid = null;
-
-    //     for ( let node of this.parentNode.childNodes ) {
-    //         if ( node.tagName === 'P' && node.firstChild.checked ) {
-    //             // console.log( node.firstChild.value )
-    //             oid = node.firstChild.value;
-    //         }
-    //     }
-
-    //     if ( oid ) {
-    //         registerVote( oid );
-    //     }
-    // });
 });
 
 const registerVote = ( oid, event ) => {
-    console.log( 'registerVote' );
-    // console.log( oid )
-    // var self = this;
-    // console.log( event.parentNode.childNodes );
-    console.log( event );
+    let qid = event.target.value;
     let resultElement = null;
-    for ( let element of event.target.parentNode.parentNode.childNodes ) {
+    for ( let element of event.target.parentNode.childNodes ) {
         if ( element.classList.value === 'potd-result' ) {
             resultElement = element;
         }
     }
 
+    let limitByCheckUrl = gutenbergtemplateblock_ajax_object.ajax_url +
+                '?action=gutenbergtemplateblock_getLimitByOption' +
+                '&security=' + gutenbergtemplateblock_ajax_object.security;
+
+    fetch( limitByCheckUrl )
+        .then( response => {
+            return response.json();
+        })
+        .then(
+            ( result ) => {
+                console.log( 'result: ', result );
+                if ( result === 'cookie' || result === 'ipcookie' || result === 'user' ) {
+                    let liveCookie = document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) > -1;
+                    if ( result === 'user' ) {
+                        vote( oid, qid, resultElement );
+                    } else if ( !liveCookie ) {
+                        vote( oid, qid, resultElement );
+                        document.cookie = 'gutenbergtemplateblock_limit_cookie=1;path=/;max-age=86400'; // 1 day cookie
+                    } else {
+                        resultElement.innerHTML = 'You have already voted today.';
+                    }
+                } else {
+                    vote( oid, qid, resultElement );
+                }
+            },
+            ( error ) => {
+                console.log( 'error: ' + error );
+            }
+        )
+};
+
+const vote = ( oid, qid, resultElement ) => {
+    // console.log( 'vote' );
     let url = gutenbergtemplateblock_ajax_object.ajax_url +
                 '?action=gutenbergtemplateblock_setOptionVoteById' +
                 '&oid=' + oid +
+                '&qid=' + qid +
                 '&security=' + gutenbergtemplateblock_ajax_object.security;
 
     fetch( url )
@@ -63,16 +74,18 @@ const registerVote = ( oid, event ) => {
         })
         .then(
             ( result ) => {
-                // console.log('result:');
-                // console.log( result );
                 if ( result === 'success' ) {
                     resultElement.innerHTML = 'Thank you for your vote!';
+                } else if ( result === 'alreadyVoted' ) {
+                    resultElement.innerHTML = 'You have already voted today.';
+                } else if ( result === 'notLoggedIn' ) {
+                    resultElement.innerHTML = 'You have to login to vote.';
                 } else {
                     resultElement.innerHTML = 'Sorry! We encountered a problem :(';
                 }
             },
-            ( err ) => {
+            ( error ) => {
                 console.log( 'error: ' + error );
             }
         )
-};
+}
