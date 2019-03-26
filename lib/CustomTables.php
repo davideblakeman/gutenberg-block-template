@@ -172,6 +172,7 @@ class GutenbergtemplateblockCustomTables
                 pid      BIGINT(20)   unsigned NOT NULL auto_increment,
                 uuid     VARCHAR(36)           NOT NULL default '',
                 userid   BIGINT(20)   unsigned NOT NULL default 0,
+                postid   BIGINT(20)   unsigned NOT NULL default 0,
                 date     DATETIME              NOT NULL default '0000-00-00 00:00:00',
                 PRIMARY KEY  (pid),
                 KEY uuid (uuid),

@@ -777,11 +777,12 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             { 'style-toggle': styleToggle },
         );
 
-        const setPollStart = ( uuid ) => {
+        const setPollStart = ( uuid, postId ) => {
             var self = this;
             let url = gutenbergtemplateblock_ajax_object.ajax_url + 
                       '?action=gutenbergtemplateblock_setPollByUUID' + 
                       '&uuid=' + uuid +
+                      '&postId=' + postId +
                       '&security=' + gutenbergtemplateblock_ajax_object.security;
         
             fetch( url )
@@ -803,7 +804,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         // Set a new UUID if the update / publish button is clicked
         if ( select( 'core/editor' ).isCurrentPostPublished() ) {
-            setPollStart( uuid );
+            // console.log( 'getCurrentPostId: ', select( 'core/editor' ).getCurrentPostId() );
+            let postId = select( 'core/editor' ).getCurrentPostId();
+            setPollStart( uuid, postId );
         }
 
         return (

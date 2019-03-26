@@ -4,7 +4,17 @@ window.addEventListener( "load", function( event ) {
     let oid = null;
 
     const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
+    let uuids = [];
+
     console.log( polls );
+    // console.log( polls[0].attributes.value.nodeValue );
+
+    for ( let poll of polls ) {
+        uuids.push( poll.attributes.value.nodeValue );
+    }
+    // console.log( 'uuids: ', JSON.stringify( uuids ) );
+    // setRotation( JSON.stringify( uuids ) );
+    setRotation( uuids );
 
     for ( let element of elements ) {
         element.addEventListener( 'click', function( event ) {
@@ -19,6 +29,30 @@ window.addEventListener( "load", function( event ) {
         });
     }
 });
+
+const setRotation = ( uuids ) => {
+    console.log( 'setRotation' );
+
+    // console.log( 'post_id: ', gutenbergtemplateblock_ajax_object );
+
+    let setRotationUrl = gutenbergtemplateblock_ajax_object.ajax_url +
+    '?action=gutenbergtemplateblock_setRotation' +
+    '&uuids=' + uuids +
+    '&security=' + gutenbergtemplateblock_ajax_object.security;
+
+    fetch( setRotationUrl )
+        .then( response => {
+            return response.json();
+        })
+        .then( 
+            ( result ) => {
+                console.log( 'result: ', result );
+            },
+            ( error ) => {
+                console.log( 'error: ' + error );
+            }
+        )
+}
 
 const registerVote = ( oid, event ) => {
     let qid = event.target.value;

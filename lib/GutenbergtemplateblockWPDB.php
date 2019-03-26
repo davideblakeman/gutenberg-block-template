@@ -369,7 +369,7 @@ class GutenbergtemplateblockWpdb
         return count( $results ) > 0 ? true : false;
     }
 
-    public function setPollByUUID( $uuid )
+    public function setPollByUUID( $uuid, $postId = null )
     {
         global $wpdb;
         $wpdb->show_errors();
@@ -398,6 +398,7 @@ class GutenbergtemplateblockWpdb
                 array(
                     'uuid' => $uuid,
                     'userid' => $userId,
+                    'postid' => $postId,
                     'date' => current_time( 'mysql' )
                 ),
                 array(
@@ -414,6 +415,74 @@ class GutenbergtemplateblockWpdb
         }
         
         return $outcome;
+    }
+
+    public function setRotationByUUIDs( $uuids )
+    {
+        // return $uuids;
+        // return get_the_ID();
+
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+        // $updates = [];
+
+        foreach( $uuids as $uuid )
+        {
+            // Check if poll with uuid is older than or equal to 1 day
+            $results = $wpdb->get_results(
+                $wpdb->prepare('
+                    SELECT 
+                        uuid,
+                        postid
+                    FROM ' . $wpdb->gutenbergtemplateblock_polls . '
+                    WHERE
+                        uuid = %s
+                    AND
+                        `date` <= timestampadd(day, -1, NOW())',
+                    $uuid
+                )
+            );
+
+            if ( !empty( $results ) )
+            {
+                $outcome = setRotationByUUID( $uuid, $results[0]->postid );
+            }
+        }
+
+        if ( $wpdb->last_error !== '' )
+        {
+            $outcome = 'fail';
+        }
+
+        return $outcome;
+    }
+
+    public function setRotationByUUID( $uuid, $postId )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare('
+                SELECT 
+                    post_content
+                FROM ' . $wpdb->posts . '
+                WHERE
+                    ID = %d',
+                $postId
+            )
+        );
+
+        // $dom = new DOMDocument();
+        // $dom = new domDocument;
+        $dom->loadHTML( $results[0]->post_content );
+        // $template = $dom->loadHTML( $results[0]->post_content );
+        // $template = $dom->getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
+
+        return $results[0]->post_content;
+        // return $template;
     }
 
     // public function getPollById( $qid )
