@@ -2,6 +2,11 @@
 
 namespace Gutenberg\Template_Block;
 
+use DOMDocument;
+use DOMXPath;
+// use WP_Block_Parser_Block;
+// use WP_REST_Posts_Controller;
+
 class GutenbergtemplateblockWpdb
 {
     public function getFirstPoll()
@@ -475,14 +480,86 @@ class GutenbergtemplateblockWpdb
             )
         );
 
-        // $dom = new DOMDocument();
-        // $dom = new domDocument;
-        $dom->loadHTML( $results[0]->post_content );
-        // $template = $dom->loadHTML( $results[0]->post_content );
-        // $template = $dom->getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
+        $matches = [];
+        $success = preg_match_all('/<!-- wp:gutenbergtemplateblock\/templateblock(.*?)<!-- \/wp:gutenbergtemplateblock\/templateblock -->/s', $results[0]->post_content, $matches );
 
-        return $results[0]->post_content;
-        // return $template;
+        $poll = parse_blocks( $matches[0][0] );
+        // $pollHTML = $poll[0]['innerHTML'];
+
+        // $pollHTML = '<div class="wp-block-gutenbergtemplateblock-templateblock" value="f26edb85-3f8e-4c9d-8d2c-ff17cbfeec20"><h2 class="alignwide gutenbergtemplateblock-title" style="color:#000000"></h2><div class="alignwide gutenbergtemplateblock-content" style="color:#000000"></div>Are you right or left handed?<p><input type="radio" name="options" value="22"/>Ambidextrous</p><p><input type="radio" name="options" value="20"/>Right handed</p><p><input type="radio" name="options" value="21"/>Left handed</p><button class="potd-vote-btn" value="1">Vote!</button><div class="potd-result"></div></div>';
+        $pollHTML = '<div class="test" value="123321"><a href="#test">linktest</a></div>';
+
+        $doc = new \DOMDocument();
+        $doc->loadHTML($pollHTML);
+      
+        // all links in document
+        $links = [];
+        // $arr = $doc->getElementsByTagName("a"); // DOMNodeList Object
+        $arr = $doc->getElementsByTagName("div"); // DOMNodeList Object
+        foreach($arr as $item) { // DOMElement Object
+          $href =  $item->getAttribute("value");
+          $text = trim(preg_replace("/[\r\n]+/", " ", $item->nodeValue));
+          $links[] = [
+            'href' => $href,
+            'text' => $text
+          ];
+        }
+
+        return $links;
+
+        // $dom = new DOMDocument();
+        // $doc->preserveWhiteSpace = false;
+        // $dom->loadHTML( $pollHTML );
+        // $xpath = new DOMXPath( $dom );
+
+        // $nodes = $xpath->query("//div[contains(@class, 'test')]");
+
+        // return $nodes;
+
+        // $contents = $xpath->query("div[@class='wp-block-gutenbergtemplateblock-templateblock']");
+        // $contents = $xpath->query("div[@class='test']");
+
+        // $values = [];
+
+        // if ( !is_null( $contents ) )
+        // {
+        //     foreach ( $contents as $i => $node )
+        //     {
+        //         $values[] = $node->nodeValue;
+        //     }
+        // }
+
+        // return $xpath;
+        // return $dom;
+        // return $contents;
+        // return $values;
+        // return json_decode($pollHTML);
+        // return $pollHTML;
+        // return $poll1[0]['innerHTML'];
+        // return parse_blocks( $matches[0][0] );
+        // return $matches;
+        // var_dump($matches);
+
+        // $content = parse_blocks( $results[0]->post_content );
+        // $b = has_blocks($content);
+        
+        // $r = $block[0];
+        // $r = $block[0]['blockName'];
+        // $r = array_search( 'gutenbergtemplateblock/templateblock', array_column( $block, 'blockName' ) );
+        // $r = array_column( $block, 'gutenbergtemplateblock/templateblock' );
+        // gutenbergtemplateblock/templateblock
+
+        // $a = $this->array_find_deep( $r, 'gutenbergtemplateblock/templateblock' );
+
+        // return $matches;
+        // return $r;
+        // return $a;
+        // innerBlocks -> [0] -> innerBlocks -> [0] -> blockName: gutenbergtemplateblock/templateblock
+        // innerBlocks -> [1] -> innerBlocks -> [0] -> blockName: gutenbergtemplateblock/templateblock
+
+        // $parser = new WP_Block_Parser_Block;
+        // $block = parse_blocks($results[0]->post_content);
+        // return $block;
     }
 
     // public function getPollById( $qid )
