@@ -432,7 +432,7 @@ class GutenbergtemplateblockWpdb
         $outcome = 'success';
         // $updates = [];
 
-        foreach( $uuids as $uuid )
+        foreach( $uuids as $uuid => $qid )
         {
             // Check if poll with uuid is older than or equal to 1 day
             $results = $wpdb->get_results(
@@ -451,7 +451,7 @@ class GutenbergtemplateblockWpdb
 
             if ( !empty( $results ) )
             {
-                $outcome = setRotationByUUID( $uuid, $results[0]->postid );
+                $outcome = $this->setRotationByUUID( $uuid, $qid, $results[0]->postid );
             }
         }
 
@@ -463,12 +463,17 @@ class GutenbergtemplateblockWpdb
         return $outcome;
     }
 
-    public function setRotationByUUID( $uuid, $postId )
+    public function setRotationByUUID( $uuid, $qid, $postId )
     {
         global $wpdb;
         $wpdb->show_errors();
         $outcome = 'success';
 
+        // Get next poll question and answers from question table by qid.
+        // If last question in table return first question with answers
+        $nextPoll = $this->getNextPoll( $qid );
+
+        // get post_content by postId
         $results = $wpdb->get_results(
             $wpdb->prepare('
                 SELECT 
@@ -480,87 +485,117 @@ class GutenbergtemplateblockWpdb
             )
         );
 
+        $content = $results[0]->post_content;
+        // return $content;
         $matches = [];
-        $success = preg_match_all('/<!-- wp:gutenbergtemplateblock\/templateblock(.*?)<!-- \/wp:gutenbergtemplateblock\/templateblock -->/s', $results[0]->post_content, $matches );
+        $regexStr = '/<!-- wp:gutenbergtemplateblock\/templateblock(.*?)<!-- \/wp:gutenbergtemplateblock\/templateblock -->/s';
 
-        $poll = parse_blocks( $matches[0][0] );
-        // $pollHTML = $poll[0]['innerHTML'];
+        $success = preg_match_all( $regexStr, $content, $matches );
+        $matchCount = sizeof( $matches );
 
-        // $pollHTML = '<div class="wp-block-gutenbergtemplateblock-templateblock" value="f26edb85-3f8e-4c9d-8d2c-ff17cbfeec20"><h2 class="alignwide gutenbergtemplateblock-title" style="color:#000000"></h2><div class="alignwide gutenbergtemplateblock-content" style="color:#000000"></div>Are you right or left handed?<p><input type="radio" name="options" value="22"/>Ambidextrous</p><p><input type="radio" name="options" value="20"/>Right handed</p><p><input type="radio" name="options" value="21"/>Left handed</p><button class="potd-vote-btn" value="1">Vote!</button><div class="potd-result"></div></div>';
-        $pollHTML = '<div class="test" value="123321"><a href="#test">linktest</a></div>';
+        $length1 = strlen( $matches[0][0] );
+        $length2 = strlen( $matches[0][1] );
+        $start1 = strpos( $content, $matches[0][0] );
 
-        $doc = new \DOMDocument();
-        $doc->loadHTML($pollHTML);
-      
-        // all links in document
-        $links = [];
-        // $arr = $doc->getElementsByTagName("a"); // DOMNodeList Object
-        $arr = $doc->getElementsByTagName("div"); // DOMNodeList Object
-        foreach($arr as $item) { // DOMElement Object
-          $href =  $item->getAttribute("value");
-          $text = trim(preg_replace("/[\r\n]+/", " ", $item->nodeValue));
-          $links[] = [
-            'href' => $href,
-            'text' => $text
-          ];
-        }
-
-        return $links;
-
-        // $dom = new DOMDocument();
-        // $doc->preserveWhiteSpace = false;
-        // $dom->loadHTML( $pollHTML );
-        // $xpath = new DOMXPath( $dom );
-
-        // $nodes = $xpath->query("//div[contains(@class, 'test')]");
-
-        // return $nodes;
-
-        // $contents = $xpath->query("div[@class='wp-block-gutenbergtemplateblock-templateblock']");
-        // $contents = $xpath->query("div[@class='test']");
-
-        // $values = [];
-
-        // if ( !is_null( $contents ) )
-        // {
-        //     foreach ( $contents as $i => $node )
-        //     {
-        //         $values[] = $node->nodeValue;
-        //     }
-        // }
-
-        // return $xpath;
-        // return $dom;
-        // return $contents;
-        // return $values;
-        // return json_decode($pollHTML);
-        // return $pollHTML;
-        // return $poll1[0]['innerHTML'];
-        // return parse_blocks( $matches[0][0] );
-        // return $matches;
-        // var_dump($matches);
-
-        // $content = parse_blocks( $results[0]->post_content );
-        // $b = has_blocks($content);
+        // Create new poll HTML content
+        $newUUID = $this->uuidv4();
+        $html = '
+            <div class="wp-block-gutenbergtemplateblock-templateblock" value="' . $newUUID . '">
+                <h2 class="alignwide gutenbergtemplateblock-title" style="color:#000000"></h2>
+                <div class="alignwide gutenbergtemplateblock-content" style="color:#000000"></div>' . $nextPoll[0]->question;
         
-        // $r = $block[0];
-        // $r = $block[0]['blockName'];
-        // $r = array_search( 'gutenbergtemplateblock/templateblock', array_column( $block, 'blockName' ) );
-        // $r = array_column( $block, 'gutenbergtemplateblock/templateblock' );
-        // gutenbergtemplateblock/templateblock
+        $options = '';
 
-        // $a = $this->array_find_deep( $r, 'gutenbergtemplateblock/templateblock' );
+        foreach( $nextPoll as $o )
+        {
+            $options .= '
+                <p>
+                    <input type="radio" name="options" value="' . $o->oid . '"/>' . $o->option . '
+                </p>
+            ';
+        }
+        
+        $html .= $options;
+        $html .= '
+                <button class="potd-vote-btn" value="' . $nextPoll[0]->qid . '">Vote!</button>
+                <div class="potd-result"></div>
+            </div>
+        ';
 
-        // return $matches;
-        // return $r;
-        // return $a;
-        // innerBlocks -> [0] -> innerBlocks -> [0] -> blockName: gutenbergtemplateblock/templateblock
-        // innerBlocks -> [1] -> innerBlocks -> [0] -> blockName: gutenbergtemplateblock/templateblock
+        $newContent = substr_replace( $content, $html, $start1, $length1 );
 
-        // $parser = new WP_Block_Parser_Block;
-        // $block = parse_blocks($results[0]->post_content);
-        // return $block;
+        // $start2 = strpos( $newContent, $matches[0][1] );
+        // $newContent2 = substr_replace( $newContent, '===replacement string===', $start2, $length2 );
+
+        return $newContent;
+        // return $newContent2;
     }
+
+    public function getNextPoll( $qid )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare('
+                SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes
+                FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q
+                JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
+                WHERE (
+                    q.qid = IFNULL(
+                        (
+                            SELECT MIN(qid) 
+                            FROM ' . $wpdb->gutenbergtemplateblock_questions . ' 
+                            WHERE qid > %d
+                        ),
+                        (
+                            SELECT MIN(qid)
+                            FROM ' . $wpdb->gutenbergtemplateblock_questions . '
+                        )
+                    )
+                )',
+                $qid
+            )
+        );
+
+        return $results;
+    }
+
+    // HELPERS
+
+    // https://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid
+    function uuidv4()
+    {
+        $data = openssl_random_pseudo_bytes(16);
+        assert( strlen( $data ) == 16 );
+    
+        $data[6] = chr( ord( $data[6] ) & 0x0f | 0x40 );
+        $data[8] = chr( ord( $data[8] ) & 0x3f | 0x80 );
+    
+        return vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split( bin2hex( $data ), 4 ) );
+    }
+
+    // function array_find_deep( $array, $search, $keys = array() )
+    // {
+    //     foreach( $array as $key => $value )
+    //     {
+    //         if ( is_array( $value ) )
+    //         {
+    //             $sub = array_find_deep( $value, $search, array_merge( $keys, array( $key ) ) );
+    //             if ( count( $sub ) )
+    //             {
+    //                 return $sub;
+    //             }
+    //         } 
+    //         elseif ( $value === $search )
+    //         {
+    //             return array_merge( $keys, array( $key ) );
+    //         }
+    //     }
+
+    //     return array();
+    // }
 
     // public function getPollById( $qid )
     // {

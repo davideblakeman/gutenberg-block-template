@@ -4,16 +4,23 @@ window.addEventListener( "load", function( event ) {
     let oid = null;
 
     const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
-    let uuids = [];
+    let uuids = {};
 
     console.log( polls );
     // console.log( polls[0].attributes.value.nodeValue );
 
     for ( let poll of polls ) {
-        uuids.push( poll.attributes.value.nodeValue );
+        for ( let child of poll.children ) {
+            if ( child.className === 'potd-vote-btn' ) {
+                uuids[ poll.attributes.value.nodeValue ] = child.value;
+            }
+        }
+        
+        // uuids.push( poll.attributes.value.nodeValue );
     }
     // console.log( 'uuids: ', JSON.stringify( uuids ) );
     // setRotation( JSON.stringify( uuids ) );
+    // console.log( 'uuids: ', uuids );
     setRotation( uuids );
 
     for ( let element of elements ) {
@@ -31,13 +38,13 @@ window.addEventListener( "load", function( event ) {
 });
 
 const setRotation = ( uuids ) => {
-    console.log( 'setRotation' );
-
+    // console.log( 'setRotation' );
+    // console.log( 'JSON.stringify( uuids ): ', JSON.stringify( uuids ) );
     // console.log( 'post_id: ', gutenbergtemplateblock_ajax_object );
 
     let setRotationUrl = gutenbergtemplateblock_ajax_object.ajax_url +
     '?action=gutenbergtemplateblock_setRotation' +
-    '&uuids=' + uuids +
+    '&uuids=' + JSON.stringify( uuids ) +
     '&security=' + gutenbergtemplateblock_ajax_object.security;
 
     fetch( setRotationUrl )
