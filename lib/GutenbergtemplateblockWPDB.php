@@ -2,8 +2,8 @@
 
 namespace Gutenberg\Template_Block;
 
-use DOMDocument;
-use DOMXPath;
+// use DOMDocument;
+// use DOMXPath;
 // use WP_Block_Parser_Block;
 // use WP_REST_Posts_Controller;
 
@@ -19,7 +19,7 @@ class GutenbergtemplateblockWpdb
             FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
             JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
             WHERE q.qid = (SELECT MIN(qid) FROM ' . $wpdb->gutenbergtemplateblock_questions . ')
-            ORDER BY o.votes DESC'
+            ORDER BY o.oid DESC'
         );
 
         return $result;
@@ -465,71 +465,118 @@ class GutenbergtemplateblockWpdb
 
     public function setRotationByUUID( $uuid, $qid, $postId )
     {
-        global $wpdb;
-        $wpdb->show_errors();
-        $outcome = 'success';
-
         // Get next poll question and answers from question table by qid.
         // If last question in table return first question with answers
         $nextPoll = $this->getNextPoll( $qid );
+        $postContent = $this->getPostContentByPostId( $postId );
+        $blockMatches = [];
+        $blockPattern = '/<!-- wp:gutenbergtemplateblock\/templateblock(.*?)<!-- \/wp:gutenbergtemplateblock\/templateblock -->/s';
+        preg_match_all( $blockPattern, $postContent, $blockMatches );
+        $blockMatchLength = null;
+        $jsonLength = null;
+        $blockMatchStart = null;
+        $jsonPattern = '/\{(?:[^{}]|(?R))*\}/x';
 
-        // get post_content by postId
-        $results = $wpdb->get_results(
-            $wpdb->prepare('
-                SELECT 
-                    post_content
-                FROM ' . $wpdb->posts . '
-                WHERE
-                    ID = %d',
-                $postId
-            )
-        );
+        foreach( $blockMatches[0] as $match )
+        {
+            if ( strpos( $match, $uuid ) !== false )
+            {
+                $blockMatchLength = strlen( $match );
+                $blockMatchStart = strpos( $postContent, $match );
 
-        $content = $results[0]->post_content;
-        // return $content;
-        $matches = [];
-        $regexStr = '/<!-- wp:gutenbergtemplateblock\/templateblock(.*?)<!-- \/wp:gutenbergtemplateblock\/templateblock -->/s';
+                // preg_match_all( $jsonPattern, $match, $jsonMatches );
+                // $jsonLength = strlen( $jsonMatches[0][0] );
+                // $jsonStart = strpos( $match, $jsonMatches[0][0] );
+            }
+        }
 
-        $success = preg_match_all( $regexStr, $content, $matches );
-        $matchCount = sizeof( $matches );
+        // return $jsonMatches;
 
-        $length1 = strlen( $matches[0][0] );
-        $length2 = strlen( $matches[0][1] );
-        $start1 = strpos( $content, $matches[0][0] );
+        // TODO: what if json is not valid?
+        // if ( !$this->isValidJSON( $jsonMatches[0][0] ) )
+        // {
+        //     $oucome = 'fail';
+        // }
 
         // Create new poll HTML content
+
+        // TODO: insert new uuid into wpdb
         $newUUID = $this->uuidv4();
-        $html = '
-            <div class="wp-block-gutenbergtemplateblock-templateblock" value="' . $newUUID . '">
-                <h2 class="alignwide gutenbergtemplateblock-title" style="color:#000000"></h2>
-                <div class="alignwide gutenbergtemplateblock-content" style="color:#000000"></div>' . $nextPoll[0]->question;
-        
+
+        $json = $this->buildJson( $nextPoll, $newUUID );
+        $html = '<!-- wp:gutenbergtemplateblock/templateblock ';
+        $html .= json_encode( $json );
+        $html .= ' -->';
+
+        // return $html;
+
+        // TODO: include style values
+        $html .= '<div class="wp-block-gutenbergtemplateblock-templateblock" value="' . $newUUID . '"><h2 class="alignwide gutenbergtemplateblock-title" style="color:#000000"></h2><div class="alignwide gutenbergtemplateblock-content" style="color:#000000"></div>' . $nextPoll[0]->question;        
         $options = '';
 
         foreach( $nextPoll as $o )
         {
-            $options .= '
-                <p>
-                    <input type="radio" name="options" value="' . $o->oid . '"/>' . $o->option . '
-                </p>
-            ';
+            $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . urldecode( $o->option ) . '</p>';
         }
         
         $html .= $options;
-        $html .= '
-                <button class="potd-vote-btn" value="' . $nextPoll[0]->qid . '">Vote!</button>
-                <div class="potd-result"></div>
-            </div>
-        ';
+        $html .= '<button class="potd-vote-btn" value="' . $nextPoll[0]->qid . '">Vote!</button><div class="potd-result"></div></div>';
+        $html .= '<!-- /wp:gutenbergtemplateblock/templateblock -->';
+        // return $html;
 
-        $newContent = substr_replace( $content, $html, $start1, $length1 );
+        $newContent = substr_replace( $postContent, $html, $blockMatchStart, $blockMatchLength );
 
-        // $start2 = strpos( $newContent, $matches[0][1] );
-        // $newContent2 = substr_replace( $newContent, '===replacement string===', $start2, $length2 );
+        $outcome = $this->setPostContentByPostId( $postId, $newContent );
+        return $outcome;
+        // TODO: update poll table with new uuid, delete old uuid
 
-        return $newContent;
-        // return $newContent2;
+        // return $nextPoll;
+        // return parse_blocks($newContent);
+        // return $json;
+        // return $newContent;
     }
+
+    // Create new JSON
+    // $json = array(
+    //     'attrs' => array(
+    //         'poll' => array(
+    //             array(  // each option
+    //                 array(
+    //                     'type' => 'p',
+    //                     'key' => null,
+    //                     'ref' => null,
+    //                     'props' => array(
+    //                         'children' => array(
+    //                             array(
+    //                                 'type' => 'input',
+    //                                 'key' => null,
+    //                                 'ref' => null,
+    //                                 'props' => array(
+    //                                     'type' => 'radio',
+    //                                     'name' => 'options',
+    //                                     'value' => ''   // oid
+    //                                 ),
+    //                                 '_owner' => null
+    //                             ),
+    //                             array(
+    //                                 ''  // option name
+    //                             )
+    //                         )
+    //                     )
+    //                 )
+    //             )
+    //         ),
+    //         'pollTitle' => '', // Poll question
+    //         'answerQid' => 1, // qid
+    //         'classes' => 'wp-block-gutenbergtemplateblock-templateblock',
+    //         'uuid' => '' // newUUID
+    //     ),
+    //     'innerBlocks' => array(),
+    //     'innerHTML' => '', // block HTML
+    //     'innerContent' => array(
+    //         '' // block HTML
+    //     )
+    // );
 
     public function getNextPoll( $qid )
     {
@@ -562,10 +609,98 @@ class GutenbergtemplateblockWpdb
         return $results;
     }
 
+    public function getPostContentByPostId( $postId )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare('
+                SELECT 
+                    post_content
+                FROM ' . $wpdb->posts . '
+                WHERE
+                    ID = %d',
+                $postId
+            )
+        );
+
+        return $results[0]->post_content;
+    }
+
+    public function setPostContentByPostId( $postId, $postContent )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        // TODO: update datetime modified fields
+        $wpdb->query(
+            $wpdb->prepare('
+                UPDATE ' . $wpdb->posts . '
+                SET post_content = %s
+                WHERE ID = %d',
+                $postContent,
+                $postId
+            )
+        );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            $outcome = 'fail';
+        }
+
+        return $outcome;
+    }
+
+    public function buildJson( $nextPoll, $uuid )
+    {
+        $jsonOptions;
+        $i = 0;
+
+        foreach( $nextPoll as $option )
+        {
+            $jsonOptions[ 'poll' ][ $i ] = array(
+                array(
+                    'type' => 'p',
+                    'key' => null,
+                    'ref' => null,
+                    'props' => array(
+                        'children' => array(
+                            array(
+                                'type' => 'input',
+                                'key' => null,
+                                'ref' => null,
+                                'props' => array(
+                                    'type' => 'radio',
+                                    'name' => 'options',
+                                    'value' => $option->oid
+                                ),
+                                '_owner' => null
+                            ),
+                            $option->option
+                        )
+                    )
+                )
+            );
+            $i++;
+        }
+
+        $jsonAttrs = array(
+            'pollTitle' => $nextPoll[0]->question,
+            'answerQid' => $nextPoll[0]->qid,
+            'classes' => 'wp-block-gutenbergtemplateblock-templateblock',
+            'uuid' => $uuid
+        );
+
+        return $json[ 'attrs' ] = array_merge( $jsonOptions, $jsonAttrs );
+    }
+
     // HELPERS
 
     // https://stackoverflow.com/questions/2040240/php-function-to-generate-v4-uuid
-    function uuidv4()
+    public function uuidv4()
     {
         $data = openssl_random_pseudo_bytes(16);
         assert( strlen( $data ) == 16 );
@@ -574,6 +709,12 @@ class GutenbergtemplateblockWpdb
         $data[8] = chr( ord( $data[8] ) & 0x3f | 0x80 );
     
         return vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split( bin2hex( $data ), 4 ) );
+    }
+
+    function isValidJSON( $string )
+    {
+        json_decode( $string );
+        return ( json_last_error() == JSON_ERROR_NONE );
     }
 
     // function array_find_deep( $array, $search, $keys = array() )

@@ -376,10 +376,11 @@ class GutenbergtemplateblockEnqueue
 
         // echo json_encode( $GTBWPDB->setRotationByUUID( 'f26edb85-3f8e-4c9d-8d2c-ff17cbfeec20', 20 ) );
         $test = new stdClass();
-        $test->{ 'f26edb85-3f8e-4c9d-8d2c-ff17cbfeec20' } = 3;
+        // $test->{ 'f26edb85-3f8e-4c9d-8d2c-ff17cbfeec20' } = 3;
+        $test->{ '15240150-b769-4890-91c4-c027579856b6' } = 4;
         // var_dump($test);
 
-        echo json_encode( $GTBWPDB->setRotationByUUIDs( $test ) );
+        // echo json_encode( $GTBWPDB->setRotationByUUIDs( $test ) );
         
         wp_die();
     }
