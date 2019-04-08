@@ -1,46 +1,39 @@
 console.log( 'Frontend Block JS' );
-window.addEventListener( "load", function( event ) {
-    var elements = document.getElementsByClassName( 'potd-vote-btn' );
-    let oid = null;
+
+window.addEventListener( "load", function() {
 
     const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
-    let uuids = {};
 
-    console.log( polls );
-    // console.log( polls[0].attributes.value.nodeValue );
-
-    for ( let poll of polls ) {
-        for ( let child of poll.children ) {
-            if ( child.className === 'potd-vote-btn' ) {
-                uuids[ poll.attributes.value.nodeValue ] = child.value;
-            }
-        }
-        
-        // uuids.push( poll.attributes.value.nodeValue );
-    }
-    // console.log( 'uuids: ', JSON.stringify( uuids ) );
-    // setRotation( JSON.stringify( uuids ) );
-    // console.log( 'uuids: ', uuids );
-    setRotation( uuids );
-
-    for ( let element of elements ) {
-        element.addEventListener( 'click', function( event ) {
-            for ( let el of event.target.parentNode.childNodes ) {
-                if ( el.tagName === 'P' && el.firstChild.checked ) {
-                    oid = el.firstChild.value;
-                    if ( oid ) {
-                        registerVote( oid, event );
-                    }
+    if ( polls.length ) {
+        var elements = document.getElementsByClassName( 'potd-vote-btn' );
+        let oid = null;
+        let uuids = {};
+        for ( let poll of polls ) {
+            for ( let child of poll.children ) {
+                if ( child.className === 'potd-vote-btn' ) {
+                    uuids[ poll.attributes.value.nodeValue ] = child.value;
                 }
             }
-        });
+        }
+    
+        setRotation( uuids );
+    
+        for ( let element of elements ) {
+            element.addEventListener( 'click', function( event ) {
+                for ( let el of event.target.parentNode.childNodes ) {
+                    if ( el.tagName === 'P' && el.firstChild.checked ) {
+                        oid = el.firstChild.value;
+                        if ( oid ) {
+                            registerVote( oid, event );
+                        }
+                    }
+                }
+            });
+        }
     }
 });
 
 const setRotation = ( uuids ) => {
-    // console.log( 'setRotation' );
-    // console.log( 'JSON.stringify( uuids ): ', JSON.stringify( uuids ) );
-    // console.log( 'post_id: ', gutenbergtemplateblock_ajax_object );
 
     let setRotationUrl = gutenbergtemplateblock_ajax_object.ajax_url +
     '?action=gutenbergtemplateblock_setRotation' +
@@ -53,7 +46,7 @@ const setRotation = ( uuids ) => {
         })
         .then( 
             ( result ) => {
-                console.log( 'result: ', result );
+                console.log( 'setRotation: ', result );
             },
             ( error ) => {
                 console.log( 'error: ' + error );
@@ -62,6 +55,7 @@ const setRotation = ( uuids ) => {
 }
 
 const registerVote = ( oid, event ) => {
+
     let qid = event.target.value;
     let resultElement = null;
     for ( let element of event.target.parentNode.childNodes ) {
@@ -80,7 +74,7 @@ const registerVote = ( oid, event ) => {
         })
         .then(
             ( result ) => {
-                console.log( 'result: ', result );
+                // console.log( 'result: ', result );
                 if ( result === 'cookie' || result === 'ipcookie' || result === 'user' ) {
                     let liveCookie = document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) > -1;
                     if ( result === 'user' ) {
@@ -102,7 +96,7 @@ const registerVote = ( oid, event ) => {
 };
 
 const vote = ( oid, qid, resultElement ) => {
-    // console.log( 'vote' );
+    
     let url = gutenbergtemplateblock_ajax_object.ajax_url +
                 '?action=gutenbergtemplateblock_setOptionVoteById' +
                 '&oid=' + oid +

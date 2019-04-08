@@ -8,7 +8,7 @@ import icons from './icons';
 import Inspector from './inspector';
 import Controls from './controls';
 import attributes from './attributes';
-import colourAttributes from './colours';
+// import colourAttributes from './colours';
 import PotdSelect from './components/PotdSelect';
 import PotDSettings from './components/PotdSettings';
 import './style.scss';
@@ -23,10 +23,10 @@ import './editor.scss';
  */
 const { __ } = wp.i18n;
 const { registerBlockType } = wp.blocks;
-const { 
-    RichText,
-    ColorPalette
-} = wp.editor;
+// const {
+//     RichText,
+//     ColorPalette
+// } = wp.editor;
 const { 
     TabPanel,
     Spinner
@@ -37,6 +37,43 @@ const { select } = wp.data;
 
 // console.log( wp.components );
 // console.log( wp.data );
+
+const setPollStart = ( uuid, postId ) => {
+    var self = this;
+    let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+              '?action=gutenbergtemplateblock_setPollByUUID' + 
+              '&uuid=' + uuid +
+              '&postId=' + postId +
+              '&security=' + gutenbergtemplateblock_ajax_object.security;
+
+    fetch( url )
+        .then( response => {
+            return response.json();
+        })
+        .then(
+            ( result ) => {
+                console.log( 'setPollStart: ', result );
+            },
+            ( error ) => {
+                self.setState({
+                    isLoaded: true,
+                    error
+                });
+            }
+        )
+};
+
+window.addEventListener( "load", function( event ) {
+    var publishBtn = document.querySelector( '.editor-post-publish-button' );
+    publishBtn.addEventListener( 'click', () => {
+        const postId = select( 'core/editor' ).getCurrentPostId();
+        const blocks = document.querySelectorAll( '.wp-block-gutenbergtemplateblock-templateblock-editor-block' );
+        for ( let block of blocks ) {
+            let uuid = block.attributes.value.nodeValue;
+            setPollStart( uuid, postId );
+        }
+    });
+});
 
 registerBlockType( 'gutenbergtemplateblock/templateblock', 
 {
@@ -61,14 +98,15 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
     edit: class extends Component {
         constructor( props ) {
             super( ...arguments );
-            
+            // console.log( 'constructor' );
             const {
                 attributes: {
                     styleToggle,
                 }, 
                 className, 
                 setAttributes,
-                answersQid
+                // answersQid,
+                // uuid
             } = props;
 
             this.state = {
@@ -89,7 +127,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 newQuestion: false
             };
             
-            this.setSaveUUID( this.uuidv4() );
+            if ( typeof this.props.attributes.uuid === undefined || this.props.attributes.uuid === null ) {
+                this.setSaveUUID( this.uuidv4() );
+            }
 
             this.onChangeTitle = this.onChangeTitle.bind( this );
             this.onChangeContent = this.onChangeContent.bind( this );
@@ -130,6 +170,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
          */
         componentDidMount() {
             // console.log( 'componentDidMount' );
+            // console.log( this.props );
+            // console.log( this.props.attributes );
             this.getPollQuestions();
         }
         
@@ -446,12 +488,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             });
                             return [
                                 <p>
-                                    <input
-                                        type="radio"
-                                        name="options"
-                                        value={ object.oid }
-                                    />
-                                    { decodeURIComponent( object.option ) }
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="options"
+                                            value={ object.oid }
+                                        />
+                                        { decodeURIComponent( object.option ) }
+                                    </label>
                                 </p>
                             ];
                         });
@@ -501,12 +545,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             });
                             return [
                                 <p>
-                                    <input
-                                        type="radio"
-                                        name="options"
-                                        value={ object.oid }
-                                    />
-                                    { decodeURIComponent( object.option ) }
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="options"
+                                            value={ object.oid }
+                                        />
+                                        { decodeURIComponent( object.option ) }
+                                    </label>
                                 </p>
                             ];
                         });
@@ -612,7 +658,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     textAlignment,
                     title,
                     content,
-                    answersQid
+                    answersQid,
+                    uuid
             }} = this.props;
             
             const {
@@ -627,8 +674,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             return [
                 <Inspector { ...{ setAttributes, ...this.props }} />,
                 <Controls { ...{ setAttributes, ...this.props }} />,
-                <div className = { classes }>
-                    <div className = { classes }>
+                <div className = { classes + '-editor-block' } value={ uuid }>
+                    {/* <div className = { classes }>
                         <ColorPalette
                             colors = { colourAttributes.colours }
                             value = { titleColour }
@@ -645,8 +692,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             onChange = { this.onChangeTitle }
                             value = { title }
                         />
-                    </div>
-                    <div className = { classes }>
+                    </div> */}
+                    {/* <div className = { classes }>
                         <ColorPalette
                             colors = { colourAttributes.colours }
                             value = { contentColour }
@@ -666,7 +713,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                 value = { content }
                             />
                         </div>
-                    </div>
+                    </div> */}
                     <TabPanel
                         className="my-tab-panel"
                         activeClass="active-tab"
@@ -761,10 +808,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 textAlignment, 
                 blockAlignment, 
                 styleToggle, 
-                title, 
-                content,
-                titleColour,
-                contentColour,
+                // title,
+                // content,
+                // titleColour,
+                // contentColour,
                 pollTitle,
                 poll,
                 answersQid,
@@ -777,41 +824,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             { 'style-toggle': styleToggle },
         );
 
-        const setPollStart = ( uuid, postId ) => {
-            var self = this;
-            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
-                      '?action=gutenbergtemplateblock_setPollByUUID' + 
-                      '&uuid=' + uuid +
-                      '&postId=' + postId +
-                      '&security=' + gutenbergtemplateblock_ajax_object.security;
-        
-            fetch( url )
-                .then( response => {
-                    return response.json();
-                })
-                .then(
-                    ( result ) => {
-                        console.log( 'setPollStart: ', result );
-                    },
-                    ( error ) => {
-                        self.setState({
-                            isLoaded: true,
-                            error
-                        });
-                    }
-                )
-        }
-
-        // Set a new UUID if the update / publish button is clicked
-        if ( select( 'core/editor' ).isCurrentPostPublished() ) {
-            // console.log( 'getCurrentPostId: ', select( 'core/editor' ).getCurrentPostId() );
-            let postId = select( 'core/editor' ).getCurrentPostId();
-            setPollStart( uuid, postId );
-        }
-
         return (
             <div className = { className } value={ uuid }>
-                <h2 
+                {/* <h2 
                     className = { classnames(
                         `align${ blockAlignment }`,
                         'gutenbergtemplateblock-title'
@@ -827,8 +842,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     style = { { textAlign: textAlignment, color: contentColour } }
                 >
                     { content }
-                </div>
-                { pollTitle }
+                </div> */}
+                <h3>{ pollTitle }</h3>
                 { poll }
                 <button class="potd-vote-btn" value={ answersQid }>Vote!</button>
                 <div class="potd-result"></div>
