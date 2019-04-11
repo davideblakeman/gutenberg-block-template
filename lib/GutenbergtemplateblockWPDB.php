@@ -25,6 +25,22 @@ class GutenbergtemplateblockWpdb
         return $result;
     }
 
+    public function getPollById( $qid )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+
+        $result = $wpdb->get_results('
+            SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
+            FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
+            JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
+            WHERE q.qid = ' . $qid . '
+            ORDER BY o.oid DESC'
+        );
+        
+        return $result;
+    }
+
     public function getPollQuestions()
     {
         global $wpdb;
@@ -195,7 +211,8 @@ class GutenbergtemplateblockWpdb
         $result = $wpdb->get_results('
             SELECT qid
             FROM ' . $wpdb->gutenbergtemplateblock_questions . '
-            ORDER BY qid ASC'
+            ORDER BY qid ASC',
+            ARRAY_A
         );
 
         return $result;
@@ -403,7 +420,7 @@ class GutenbergtemplateblockWpdb
                     UPDATE ' . $wpdb->gutenbergtemplateblock_polls . '
                     SET
                         userid = %d,
-                        date = ' . date( 'Y-m-d', current_time( 'timestamp' ) ) . ' 00:00:00
+                        `date` = "' . date( 'Y-m-d', current_time( 'timestamp' ) ) . ' 00:00:00"
                     WHERE uuid = %s',
                     $userId,
                     $uuid
@@ -457,7 +474,9 @@ class GutenbergtemplateblockWpdb
 
             if ( !empty( $results ) )
             {
-                $days = round( ( time() - strtotime( $results[0]->date ) ) / ( 60 * 60 * 24 ) );
+                $days = floor( ( time() - strtotime( $results[0]->date ) ) / ( 60 * 60 * 24 ) );
+                // return $days;
+                // return $qid;
                 $outcome = $this->setRotationByUUID( $uuid, $qid, $results[0]->postid, $days );
             }
         }
@@ -474,6 +493,7 @@ class GutenbergtemplateblockWpdb
     {
         // Get next poll question and answers from question table by qid.
         // If last question in table return first question with answers
+        
         $nextPoll = $this->getNextPoll( $qid, $days );
         $postContent = $this->getPostContentByPostId( $postId );
         $blockMatches = [];
@@ -506,7 +526,7 @@ class GutenbergtemplateblockWpdb
 
         // TODO: include style values
         // $html .= '<div class="wp-block-gutenbergtemplateblock-templateblock" value="' . $uuid . '"><h2 class="alignwide gutenbergtemplateblock-title" style="color:#000000"></h2><div class="alignwide gutenbergtemplateblock-content" style="color:#000000"></div>' . $nextPoll[0]->question;
-        $html .= '<div class="wp-block-gutenbergtemplateblock-templateblock" value="' . $uuid . '">' . $nextPoll[0]->question;
+        $html .= '<div class="wp-block-gutenbergtemplateblock-templateblock" value="' . $uuid . '"><h3>' . $nextPoll[0]->question . '</h3>';
         $options = '';
 
         foreach( $nextPoll as $o )
@@ -540,36 +560,12 @@ class GutenbergtemplateblockWpdb
         // get all qids as values with sequential keys
         // use modulo % to choose qid depending on days past
 
-        // $allQids = $this->getAllQids();
+        $allQids = $this->getAllQids();
+        $pollCount = count( $allQids );
+        $modulo = $days % $pollCount;
+        $nextQid = intval( $allQids[ $modulo ][ 'qid' ] );
 
-        // $count = count( $allQids );
-        // $modulo = $days % $count;
-
-        // $allQids[$modulo]->qid;
-
-        $results = $wpdb->get_results(
-            $wpdb->prepare('
-                SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes
-                FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q
-                JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
-                WHERE (
-                    q.qid = IFNULL(
-                        (
-                            SELECT MIN(qid) 
-                            FROM ' . $wpdb->gutenbergtemplateblock_questions . ' 
-                            WHERE qid > %d
-                        ),
-                        (
-                            SELECT MIN(qid)
-                            FROM ' . $wpdb->gutenbergtemplateblock_questions . '
-                        )
-                    )
-                )',
-                $qid
-            )
-        );
-
-        return $results;
+        return $this->getPollById( $nextQid );
     }
 
     private function getPostContentByPostId( $postId )
@@ -631,7 +627,7 @@ class GutenbergtemplateblockWpdb
         $wpdb->query(
             $wpdb->prepare('
                 UPDATE ' . $wpdb->gutenbergtemplateblock_polls . '
-                SET `date` = ' . date( 'Y-m-d', current_time( 'timestamp' ) ) . ' 00:00:00
+                SET `date` = "' . date( 'Y-m-d', current_time( 'timestamp' ) ) . ' 00:00:00"
                 WHERE uuid = %s',
                 $uuid
             )
@@ -727,22 +723,6 @@ class GutenbergtemplateblockWpdb
     //     }
 
     //     return array();
-    // }
-
-    // public function getPollById( $qid )
-    // {
-    //     global $wpdb;
-    //     $wpdb->show_errors();
-
-    //     $result = $wpdb->get_results('
-    //         SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
-    //         FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
-    //         JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
-    //         WHERE q.qid = ' . $qid . '
-    //         ORDER BY o.votes DESC'
-    //     );
-        
-    //     return $result;
     // }
 
     // public function setAnswerById( $answers ) {
