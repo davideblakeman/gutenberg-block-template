@@ -150,7 +150,7 @@ class GutenbergtemplateblockWpdb
                 $wpdb->gutenbergtemplateblock_options, 
                 array(
                     'qid' => $qid,
-                    'option' => $answer
+                    'option' => urldecode( $answer )
                 ),
                 array(
                     '%d',
@@ -166,7 +166,7 @@ class GutenbergtemplateblockWpdb
                     UPDATE ' . $wpdb->gutenbergtemplateblock_options . '
                     SET option = %s
                     WHERE oid = %d',
-                    $answer,
+                    urldecode( $answer ),
                     $oid
                 )
             );
@@ -474,9 +474,10 @@ class GutenbergtemplateblockWpdb
 
             if ( !empty( $results ) )
             {
-                $days = floor( ( time() - strtotime( $results[0]->date ) ) / ( 60 * 60 * 24 ) );
-                // return $days;
+                $days = intval( floor( ( time() - strtotime( $results[0]->date ) ) / ( 60 * 60 * 24 ) ) );
+                // echo $days;
                 // return $qid;
+                // echo $qid;
                 $outcome = $this->setRotationByUUID( $uuid, $qid, $results[0]->postid, $days );
             }
         }
@@ -491,16 +492,25 @@ class GutenbergtemplateblockWpdb
 
     public function setRotationByUUID( $uuid, $qid, $postId, $days )
     {
+        // echo '<pre>';
+        // echo var_dump( $uuid, $qid, $postId, $days );
+        // return;
+
         // Get next poll question and answers from question table by qid.
         // If last question in table return first question with answers
         
         $nextPoll = $this->getNextPoll( $qid, $days );
+        // echo var_dump( $nextPoll );
+
         $postContent = $this->getPostContentByPostId( $postId );
         $blockMatches = [];
         $blockPattern = '/<!-- wp:gutenbergtemplateblock\/templateblock(.*?)<!-- \/wp:gutenbergtemplateblock\/templateblock -->/s';
         preg_match_all( $blockPattern, $postContent, $blockMatches );
         $blockMatchLength = null;
         $blockMatchStart = null;
+
+        // return var_dump( $blockMatches );
+        // return var_dump($nextPoll);
 
         foreach( $blockMatches[0] as $match )
         {
@@ -511,8 +521,11 @@ class GutenbergtemplateblockWpdb
             }
         }
 
+        // echo var_dump( $blockMatchLength, $blockMatchStart );
+
         // Create new poll HTML content
         $json = $this->buildJson( $nextPoll, $uuid );
+        // echo var_dump( $json );
 
         // TODO: what if json is not valid?
         // if ( !$this->isValidJSON( $jsonMatches[0][0] ) )
@@ -531,7 +544,8 @@ class GutenbergtemplateblockWpdb
 
         foreach( $nextPoll as $o )
         {
-            $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . urldecode( $o->option ) . '</p>';
+            // $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . urldecode( $o->option ) . '</p>';
+            $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . $o->option . '</p>';
         }
         
         $html .= $options;
@@ -562,7 +576,17 @@ class GutenbergtemplateblockWpdb
 
         $allQids = $this->getAllQids();
         $pollCount = count( $allQids );
-        $modulo = $days % $pollCount;
+        $i = 0;
+
+        foreach ( $allQids as $k => $q )
+        {
+            if ( $q[ 'qid' ] == $qid )
+            {
+                $i = $k;
+            }
+        }
+
+        $modulo = ( $days + $i ) % $pollCount;
         $nextQid = intval( $allQids[ $modulo ][ 'qid' ] );
 
         return $this->getPollById( $nextQid );
@@ -676,7 +700,7 @@ class GutenbergtemplateblockWpdb
 
         $jsonAttrs = array(
             'pollTitle' => $nextPoll[0]->question,
-            'answerQid' => $nextPoll[0]->qid,
+            'answersQid' => $nextPoll[0]->qid,
             'classes' => 'wp-block-gutenbergtemplateblock-templateblock',
             'uuid' => $uuid
         );

@@ -322,7 +322,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     if ( value.edited ) {
                         result.push({
                             value: this.isNumeric( value.value ) ? value.value : 'new',
-                            label: encodeURIComponent( value.label )
+                            // label: encodeURIComponent( value.label )
+                            label: value.label
                         });
                     } return result;
                 }, [] );
@@ -331,7 +332,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     if ( value.edited ) {
                         result.push({
                             oid: this.isNumeric( value.oid ) ? value.oid : 'new',
-                            option: encodeURIComponent( value.option )
+                            // option: encodeURIComponent( value.option )
+                            option: value.option
                         });
                     } return result;
                 }, [] );
@@ -339,7 +341,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 let qid = saveQuestion.length > 0 ? saveQuestion[0].value : event;
                 let q = saveQuestion.length > 0 ? saveQuestion[0].label : null;
                 let a = saveAnswers.map( ( object, key ) => {
-                    return 'oid=' + object.oid + '&a=' + encodeURIComponent( object.option );
+                    // return 'oid=' + object.oid + '&a=' + encodeURIComponent( object.option );
+                    return 'oid=' + object.oid + '&a=' + object.option;
                 });
                 a = a.length > 0 ? a : null;
 
@@ -484,7 +487,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         const pollOptions = results.map( ( object, key ) => {
                             answersByOid.push({
                                 oid: object.oid,
-                                option: decodeURIComponent( object.option )
+                                option: decodeURIComponent( self.stripslashes( object.option ) )
+                                // option: object.option
                             });
                             return [
                                 <p>
@@ -494,7 +498,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                             name="options"
                                             value={ object.oid }
                                         />
-                                        { decodeURIComponent( object.option ) }
+                                        { decodeURIComponent( self.stripslashes( object.option ) ) }
+                                        {/* { object.option } */}
                                     </label>
                                 </p>
                             ];
@@ -541,7 +546,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         const pollOptions = result.map( ( object, key ) => {
                             answersByOid.push({
                                 oid: object.oid,
-                                option: decodeURIComponent( object.option )
+                                option: decodeURIComponent( self.stripslashes( object.option ) )
+                                // option: object.option
                             });
                             return [
                                 <p>
@@ -551,7 +557,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                             name="options"
                                             value={ object.oid }
                                         />
-                                        { decodeURIComponent( object.option ) }
+                                        { decodeURIComponent( self.stripslashes( object.option ) ) }
+                                        {/* { object.option } */}
                                     </label>
                                 </p>
                             ];
@@ -647,17 +654,36 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             return !isNaN( parseFloat( n ) ) && isFinite( n );
         }
 
+        /**
+         * http://locutus.io/php/strings/stripslashes/
+         */
+        stripslashes( str ) {
+            return ( str + '' )
+                .replace( /\\(.?)/g, ( s, n1 ) => {
+                    switch ( n1 ) {
+                        case '\\':
+                            return '\\'
+                        case '0':
+                            return '\u0000'
+                        case '':
+                            return ''
+                        default:
+                            return n1
+                    }
+                })
+        }
+
         render() {
             const { 
                 className, 
                 setAttributes,
                 attributes: {
                     classes,
-                    titleColour,
-                    contentColour,
-                    textAlignment,
-                    title,
-                    content,
+                    // titleColour,
+                    // contentColour,
+                    // textAlignment,
+                    // title,
+                    // content,
                     answersQid,
                     uuid
             }} = this.props;
@@ -675,45 +701,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 <Inspector { ...{ setAttributes, ...this.props }} />,
                 <Controls { ...{ setAttributes, ...this.props }} />,
                 <div className = { classes + '-editor-block' } value={ uuid }>
-                    {/* <div className = { classes }>
-                        <ColorPalette
-                            colors = { colourAttributes.colours }
-                            value = { titleColour }
-                            onChange = { titleColour => { setAttributes( { titleColour } ) } }
-                        />
-                        <div>
-                            { __( 'Title', 'gutenbergtemplateblock' ) }
-                        </div>
-                        <RichText
-                            tagName = "h2"
-                            multiline = "p"
-                            placeholder = { __( 'Add title here', 'gutenbergtemplateblock' ) }
-                            style = { { textAlign: textAlignment, color: titleColour } }
-                            onChange = { this.onChangeTitle }
-                            value = { title }
-                        />
-                    </div> */}
-                    {/* <div className = { classes }>
-                        <ColorPalette
-                            colors = { colourAttributes.colours }
-                            value = { contentColour }
-                            onChange = { contentColour => { setAttributes( { contentColour } ) } }
-                        />
-                        <div id = "GTBContentText">
-                            <div>
-                                { __( 'Content', 'gutenbergtemplateblock' ) }
-                            </div>
-                            <RichText
-                                class = "gutenbergtemplateblock-content"
-                                tagName = "div"
-                                multiline = "p"
-                                placeholder = { __( 'Add content here', 'gutenbergtemplateblock' ) }
-                                style = { { textAlign: textAlignment, color: contentColour } }
-                                onChange = { this.onChangeContent }
-                                value = { content }
-                            />
-                        </div>
-                    </div> */}
                     <TabPanel
                         className="my-tab-panel"
                         activeClass="active-tab"
@@ -805,13 +792,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
     save: props => {
         const { 
             attributes: { 
-                textAlignment, 
-                blockAlignment, 
-                styleToggle, 
-                // title,
-                // content,
-                // titleColour,
-                // contentColour,
+                // textAlignment, 
+                // blockAlignment,
+                styleToggle,
                 pollTitle,
                 poll,
                 answersQid,
@@ -826,23 +809,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         return (
             <div className = { className } value={ uuid }>
-                {/* <h2 
-                    className = { classnames(
-                        `align${ blockAlignment }`,
-                        'gutenbergtemplateblock-title'
-                    )}
-                    style = { { textAlign: textAlignment, color: titleColour } }
-                >
-                    { title }
-                </h2>
-                <div className = { classnames(
-                        `align${ blockAlignment }`,
-                        'gutenbergtemplateblock-content'
-                    )}
-                    style = { { textAlign: textAlignment, color: contentColour } }
-                >
-                    { content }
-                </div> */}
                 <h3>{ pollTitle }</h3>
                 { poll }
                 <button class="potd-vote-btn" value={ answersQid }>Vote!</button>
