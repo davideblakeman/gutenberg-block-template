@@ -15,11 +15,11 @@ class GutenbergtemplateblockWpdb
         $wpdb->show_errors();
 
         $result = $wpdb->get_results('
-            SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
+            SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes, o.optionorder
             FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
             JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
             WHERE q.qid = (SELECT MIN(qid) FROM ' . $wpdb->gutenbergtemplateblock_questions . ')
-            ORDER BY o.oid DESC'
+            ORDER BY o.optionorder ASC'
         );
 
         return $result;
@@ -31,11 +31,11 @@ class GutenbergtemplateblockWpdb
         $wpdb->show_errors();
 
         $result = $wpdb->get_results('
-            SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
+            SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes, o.optionorder
             FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
             JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
             WHERE q.qid = ' . $qid . '
-            ORDER BY o.oid DESC'
+            ORDER BY o.optionorder ASC'
         );
         
         return $result;
@@ -61,11 +61,11 @@ class GutenbergtemplateblockWpdb
 
         $results = $wpdb->get_results(
             $wpdb->prepare('
-                SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes 
+                SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes, o.optionorder
                 FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
                 JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
                 WHERE q.qid = %d
-                ORDER BY o.votes DESC',
+                ORDER BY o.optionorder ASC',
                 $qid
             )
         );
@@ -137,7 +137,7 @@ class GutenbergtemplateblockWpdb
         }
     }
 
-    public function setPollAnswerById( $oid, $qid, $answer )
+    public function setPollAnswerById( $oid, $qid, $answer, $order )
     {
         global $wpdb;
         $wpdb->show_errors();
@@ -150,11 +150,13 @@ class GutenbergtemplateblockWpdb
                 $wpdb->gutenbergtemplateblock_options, 
                 array(
                     'qid' => $qid,
-                    'option' => urldecode( $answer )
+                    'option' => urldecode( $answer ),
+                    'optionorder' => $order
                 ),
                 array(
                     '%d',
-                    '%s'
+                    '%s',
+                    '%d'
                 )
             );
         }
@@ -164,9 +166,12 @@ class GutenbergtemplateblockWpdb
             $wpdb->query(
                 $wpdb->prepare('
                     UPDATE ' . $wpdb->gutenbergtemplateblock_options . '
-                    SET option = %s
+                    SET 
+                        option = %s,
+                        optionorder = %d
                     WHERE oid = %d',
                     urldecode( $answer ),
+                    $order,
                     $oid
                 )
             );
@@ -500,7 +505,9 @@ class GutenbergtemplateblockWpdb
         // If last question in table return first question with answers
         
         $nextPoll = $this->getNextPoll( $qid, $days );
+        // echo '<pre>';
         // echo var_dump( $nextPoll );
+        // return;
 
         $postContent = $this->getPostContentByPostId( $postId );
         $blockMatches = [];
@@ -514,7 +521,7 @@ class GutenbergtemplateblockWpdb
 
         foreach( $blockMatches[0] as $match )
         {
-            if ( strpos( $match, $uuid ) !== false )
+            if ( strpos( $match, $uuid ) )
             {
                 $blockMatchLength = strlen( $match );
                 $blockMatchStart = strpos( $postContent, $match );
@@ -545,7 +552,7 @@ class GutenbergtemplateblockWpdb
         foreach( $nextPoll as $o )
         {
             // $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . urldecode( $o->option ) . '</p>';
-            $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . $o->option . '</p>';
+            $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . stripslashes( $o->option ) . '</p>';
         }
         
         $html .= $options;
@@ -573,6 +580,7 @@ class GutenbergtemplateblockWpdb
 
         // get all qids as values with sequential keys
         // use modulo % to choose qid depending on days past
+        // plus offset by qid key value
 
         $allQids = $this->getAllQids();
         $pollCount = count( $allQids );
@@ -582,11 +590,13 @@ class GutenbergtemplateblockWpdb
         {
             if ( $q[ 'qid' ] == $qid )
             {
+                // echo $q[ 'qid' ];
                 $i = $k;
             }
         }
 
-        $modulo = ( $days + $i ) % $pollCount;
+        $offset = $days + $i;
+        $modulo = $offset % $pollCount;
         $nextQid = intval( $allQids[ $modulo ][ 'qid' ] );
 
         return $this->getPollById( $nextQid );
@@ -690,7 +700,7 @@ class GutenbergtemplateblockWpdb
                                 ),
                                 '_owner' => null
                             ),
-                            $option->option
+                            stripslashes( $option->option )
                         )
                     )
                 )
@@ -706,6 +716,78 @@ class GutenbergtemplateblockWpdb
         );
 
         return json_encode( $json[ 'attrs' ] = array_merge( $jsonOptions, $jsonAttrs ) );
+    }
+
+    public function getRotateOptionByUUID( $uuid )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        // $outcome = 'success';
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare('
+                SELECT 
+                    rotate
+                FROM ' . $wpdb->gutenbergtemplateblock_polls . '
+                WHERE
+                    uuid = %s',
+                $uuid
+            )
+        );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            return 'fail';
+        }
+
+        return $results[0]->rotate;
+    }
+
+    public function setRotateOptionByUUID( $uuid, $rotate, $postId )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+        $outcome = 'success';
+
+        $userId = is_user_logged_in() ? get_current_user_id() : 0;
+
+        if ( $this->getUUIDExists( $uuid ) )
+        {
+            $wpdb->query(
+                $wpdb->prepare('
+                    UPDATE ' . $wpdb->gutenbergtemplateblock_polls . '
+                    SET
+                        rotate = %s
+                    WHERE uuid = %s',
+                    $rotate,
+                    $uuid
+                )
+            );
+        }
+        else
+        {
+            $wpdb->insert(
+                $wpdb->gutenbergtemplateblock_polls, 
+                array(
+                    'uuid' => $uuid,
+                    'userid' => $userId,
+                    'postid' => $postId,
+                    'date' => date( 'Y-m-d', current_time( 'timestamp' ) ) . ' 00:00:00'
+                ),
+                array(
+                    '%s',
+                    '%d',
+                    '%s'
+                )
+            );
+        }
+
+        if ( $wpdb->last_error !== '' )
+        {
+            $outcome = 'fail';
+        }
+
+        return $outcome;
     }
 
     // HELPERS

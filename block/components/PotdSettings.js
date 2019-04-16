@@ -1,6 +1,6 @@
 const {
     RadioControl,
-    CheckboxControl,
+    // CheckboxControl,
     Spinner
 } = wp.components;
 
@@ -10,15 +10,15 @@ export default class PotdSettings extends React.Component {
         super( props );
         this.componentDidMount = this.componentDidMount.bind( this );
         this.handleRadioChange = this.handleRadioChange.bind( this );
-        this.handleCheckboxChange = this.handleCheckboxChange.bind( this );
+        // this.handleCheckboxChange = this.handleCheckboxChange.bind( this );
         this.getOptions = this.getOptions.bind( this );
         this.setOption = this.setOption.bind( this );
         this.initRadio = this.initRadio.bind( this );
-        this.initCheckbox = this.initCheckbox.bind( this );
+        // this.initCheckbox = this.initCheckbox.bind( this );
 
         this.state = {
             selectedRadio: null,
-            pollRotate: false,
+            // pollRotate: false,
             blockingWarning: false,
             isLoaded: false
         };
@@ -43,9 +43,9 @@ export default class PotdSettings extends React.Component {
                 ( result ) => {
                     // console.log( result );
 
-                    this.initRadio( result.gutenbergtemplateblock_limit_by.option_value );
-                    this.initCheckbox( result.gutenbergtemplateblock_rotate_daily.option_value );
-                    this.setState({
+                    self.initRadio( result.gutenbergtemplateblock_limit_by.option_value );
+                    // this.initCheckbox( result.gutenbergtemplateblock_rotate_daily.option_value );
+                    self.setState({
                         isLoaded: true
                     });
                 },
@@ -93,11 +93,11 @@ export default class PotdSettings extends React.Component {
         });
     }
 
-    initCheckbox( event ) {
-        this.setState({
-            pollRotate: event === 'true' ? true : false
-        });
-    }
+    // initCheckbox( event ) {
+    //     this.setState({
+    //         pollRotate: event === 'true' ? true : false
+    //     });
+    // }
 
     handleRadioChange( event ) {
         this.setState({
@@ -106,11 +106,11 @@ export default class PotdSettings extends React.Component {
         }, () => this.setOption( 'limit_by', event ) );
     }
 
-    handleCheckboxChange( event ) {
-        this.setState({
-            pollRotate: event
-        }, () => this.setOption( 'rotate_daily', event ) );
-    }
+    // handleCheckboxChange( event ) {
+    //     this.setState({
+    //         pollRotate: event
+    //     }, () => this.setOption( 'rotate_daily', event ) );
+    // }
 
     render() {
         const {
@@ -119,7 +119,7 @@ export default class PotdSettings extends React.Component {
         const {
             selectedRadio,
             blockingWarning,
-            pollRotate,
+            // pollRotate,
             isLoaded
         } = this.state;
 
@@ -144,14 +144,14 @@ export default class PotdSettings extends React.Component {
                                 <p>Warning! If no blocking option is selected unlimited daily voting is enabled.</p>
                             }
                         </div>
-                        <div className={ className }>
+                        {/* <div className={ className }>
                             <CheckboxControl
                                 heading="Rotate poll question each day?"
                                 label={ pollRotate ? 'Yes' : 'No' }
                                 checked={ pollRotate }
                                 onChange={ this.handleCheckboxChange }
                             />
-                        </div>
+                        </div> */}
                     </div>
                     :
                     <div>

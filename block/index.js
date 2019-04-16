@@ -342,7 +342,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 let q = saveQuestion.length > 0 ? saveQuestion[0].label : null;
                 let a = saveAnswers.map( ( object, key ) => {
                     // return 'oid=' + object.oid + '&a=' + encodeURIComponent( object.option );
-                    return 'oid=' + object.oid + '&a=' + object.option;
+                    return 'oid=' + object.oid + '&a=' + object.option + '&optionorder=' + key;
                 });
                 a = a.length > 0 ? a : null;
 
@@ -396,6 +396,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         setAnswers( qid, answers ) {
             var self = this;
+            // console.log( answers );
+            // .sort( ( a, b ) => {
+            //     // console.log( 'a:', a.props.children[0].key );
+            //     // console.log( 'b:', b.props.children[0].key );
+            //     if ( a.props.children[0].key < b.props.children[0].key ) { return -1; }
+            //     if ( a.props.children[0].key > b.props.children[0].key ) { return 1; }
+            //     return 0;
+            // })
 
             for ( let i = 0; i < answers.length; i++ ) {
                 let url = gutenbergtemplateblock_ajax_object.ajax_url +
@@ -736,6 +744,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     editable={ false }
                                                     isLoadedAnswers={ isLoadedAnswers }
                                                     existingBlockQid={ answersQid }
+                                                    uuid={ uuid }
                                                 />
                                                 :
                                                 <div>

@@ -2,8 +2,10 @@ import PotdAnswers from "./PotdAnswers";
 const {
     SelectControl,
     Button,
-    TextControl
+    TextControl,
+    CheckboxControl
 } = wp.components;
+const { select } = wp.data;
 
 export default class PotdSelect extends React.Component {
 
@@ -19,18 +21,27 @@ export default class PotdSelect extends React.Component {
         this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
         this.handleCancelClick = this.handleCancelClick.bind( this );
         this.handleSaveClick = this.handleSaveClick.bind( this )
+        this.handleCheckboxChange = this.handleCheckboxChange.bind( this );
         this.getSelectedKey = this.getSelectedKey.bind( this );
 
         this.state = {
             selectedValue: null,
             selectedKey: null,
-            lastSelectableKey: null
+            lastSelectableKey: null,
+            pollRotate: false
         };
     }
 
     componentDidMount() {
-        const { existingBlockQid } = this.props;
-        let lastIndex = this.props.questions.length - 1;
+        const {
+            existingBlockQid,
+            questions,
+            uuid
+        } = this.props;
+
+        const lastIndex = questions.length - 1;
+        this.getRotateOptionByUUID( uuid );
+        
         this.setState({
             selectedValue: existingBlockQid ? existingBlockQid : this.props.questions[0].value
         }, () => this.setState({
@@ -79,6 +90,60 @@ export default class PotdSelect extends React.Component {
         } return 0;
     };
 
+    handleCheckboxChange( event ) {
+        const uuid = this.props.uuid;
+        var self = this;
+        const postId = select( 'core/editor' ).getCurrentPostId();
+
+        let url = gutenbergtemplateblock_ajax_object.ajax_url +
+                  '?action=gutenbergtemplateblock_setRotateOptionByUUID' +
+                  '&u=' + uuid +
+                  '&r=' + event.toString() +
+                  '&p=' + postId +
+                  '&security=' + gutenbergtemplateblock_ajax_object.security;
+        
+        fetch( url )
+            .then( response => {
+                return response.json();
+            })
+            .then(
+                ( result ) => {
+                    if ( result === 'success' )
+                    {
+                        self.setState({
+                            pollRotate: event
+                        });
+                    }
+                },
+                ( error ) => {
+                    console.log( error );
+                }
+            )
+    }
+
+    getRotateOptionByUUID( uuid ) {
+        var self = this;
+        let url = gutenbergtemplateblock_ajax_object.ajax_url +
+                  '?action=gutenbergtemplateblock_getRotateOptionByUUID' +
+                  '&u=' + uuid +
+                  '&security=' + gutenbergtemplateblock_ajax_object.security;
+        
+        fetch( url )
+            .then( response => {
+                return response.json();
+            })
+            .then(
+                ( result ) => {
+                    self.setState({
+                        pollRotate: result
+                    });
+                },
+                ( error ) => {
+                    console.log( error );
+                }
+            )
+    }
+
     render() {
         const {
             questions,
@@ -88,7 +153,10 @@ export default class PotdSelect extends React.Component {
             inNewQuestion,
             isLoadedAnswers
         } = this.props;
-        const { selectedValue } = this.state;
+        const {
+            selectedValue,
+            pollRotate
+        } = this.state;
         const selectedKey = this.getSelectedKey();
         const editTitleText = questions[ selectedKey ].label;
 
@@ -155,6 +223,14 @@ export default class PotdSelect extends React.Component {
                         onInputChange={ this.handleInputChange }
                         onDeleteAnswerClick={ this.handleDeleteAnswerClick }
                         isLoadedAnswers={ isLoadedAnswers }
+                    />
+                }
+                { !editable &&
+                    <CheckboxControl
+                        heading="Rotate poll question each day?"
+                        label={ pollRotate ? 'Yes' : 'No' }
+                        checked={ pollRotate }
+                        onChange={ this.handleCheckboxChange }
                     />
                 }
                 { ( editable && editing ) &&
