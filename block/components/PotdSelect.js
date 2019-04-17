@@ -135,7 +135,8 @@ export default class PotdSelect extends React.Component {
             .then(
                 ( result ) => {
                     self.setState({
-                        pollRotate: result
+                        // can also return 'fail' if db error
+                        pollRotate: result == 'true' ? true : false
                     });
                 },
                 ( error ) => {

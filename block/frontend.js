@@ -46,7 +46,16 @@ const setRotation = ( uuids ) => {
         })
         .then( 
             ( result ) => {
-                console.log( 'setRotation: ', result );
+                const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
+                for ( let u in uuids ) {
+                    for ( let p in polls ) {
+                        if ( u === p ) {
+                            let el = document.createElement("div");
+                            el.innerHTML = result[ u ].trim();
+                            p.parentNode.replaceChild( el, p );
+                        }
+                    }
+                }
             },
             ( error ) => {
                 console.log( 'error: ' + error );

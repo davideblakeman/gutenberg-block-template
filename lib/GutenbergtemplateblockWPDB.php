@@ -30,12 +30,15 @@ class GutenbergtemplateblockWpdb
         global $wpdb;
         $wpdb->show_errors();
 
-        $result = $wpdb->get_results('
-            SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes, o.optionorder
-            FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
-            JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
-            WHERE q.qid = ' . $qid . '
-            ORDER BY o.optionorder ASC'
+        $result = $wpdb->get_results(
+            $wpdb->prepare('
+                SELECT q.qid, q.question, q.vote_count, o.oid, o.`option`, o.votes, o.optionorder
+                FROM ' . $wpdb->gutenbergtemplateblock_questions . ' q 
+                JOIN ' . $wpdb->gutenbergtemplateblock_options . ' o ON q.qid = o.qid
+                WHERE q.qid = %d
+                ORDER BY o.optionorder ASC',
+                $qid
+            )
         );
         
         return $result;
@@ -187,12 +190,9 @@ class GutenbergtemplateblockWpdb
             // <code>$query</code></p>
             // </div>";
             $outcome = 'fail';
-            return $outcome;
         }
-        else
-        {
-            return $outcome;
-        }
+        
+        return $outcome;
     }
 
     public function getAllPollQuestions()
@@ -263,7 +263,9 @@ class GutenbergtemplateblockWpdb
         if ( $wpdb->last_error !== '' )
         {
             $outcome = 'fail';
-        } else {
+        }
+        else
+        {
             $outcome = $this->deleteAllAnswersById( $qid );
         }
         
@@ -292,7 +294,8 @@ class GutenbergtemplateblockWpdb
         return $outcome;
     }
 
-    public function deleteAnswerById( $oid ) {
+    public function deleteAnswerById( $oid )
+    {
         global $wpdb;
         $wpdb->show_errors();
         $outcome = 'success';
@@ -324,6 +327,11 @@ class GutenbergtemplateblockWpdb
             WHERE option_name LIKE "gutenbergtemplateblock_%"',
             OBJECT_K
         );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            return 'fail';
+        }
         
         return $result;
     }
@@ -445,6 +453,7 @@ class GutenbergtemplateblockWpdb
                 array(
                     '%s',
                     '%d',
+                    '%d',
                     '%s'
                 )
             );
@@ -463,16 +472,22 @@ class GutenbergtemplateblockWpdb
         global $wpdb;
         $wpdb->show_errors();
         $outcome = 'success';
+        $html = [];
 
         foreach( $uuids as $uuid => $qid )
         {
             // Check if poll with uuid is older than or equal to 1 day
             $results = $wpdb->get_results(
                 $wpdb->prepare('
-                    SELECT uuid, postid, `date`
+                    SELECT 
+                        uuid, 
+                        postid, 
+                        `date`
                     FROM ' . $wpdb->gutenbergtemplateblock_polls . '
-                    WHERE uuid = %s
-                    AND `date` <= timestampadd(day, -1, NOW())',
+                    WHERE 
+                        uuid = %s
+                        AND `date` <= timestampadd(day, -1, NOW())
+                        AND rotate = "true"',
                     $uuid
                 )
             );
@@ -480,91 +495,79 @@ class GutenbergtemplateblockWpdb
             if ( !empty( $results ) )
             {
                 $days = intval( floor( ( time() - strtotime( $results[0]->date ) ) / ( 60 * 60 * 24 ) ) );
-                // echo $days;
-                // return $qid;
-                // echo $qid;
                 $outcome = $this->setRotationByUUID( $uuid, $qid, $results[0]->postid, $days );
+
+                if ( $outcome !== 'fail' )
+                {
+                    $html[ $uuid ] = $outcome;
+                }
             }
         }
 
         if ( $wpdb->last_error !== '' )
         {
-            $outcome = 'fail';
+            return 'fail';
         }
 
-        return $outcome;
+        return $html;
     }
 
     public function setRotationByUUID( $uuid, $qid, $postId, $days )
     {
-        // echo '<pre>';
-        // echo var_dump( $uuid, $qid, $postId, $days );
-        // return;
-
         // Get next poll question and answers from question table by qid.
         // If last question in table return first question with answers
         
         $nextPoll = $this->getNextPoll( $qid, $days );
-        // echo '<pre>';
-        // echo var_dump( $nextPoll );
-        // return;
+        $html = '';
 
-        $postContent = $this->getPostContentByPostId( $postId );
-        $blockMatches = [];
-        $blockPattern = '/<!-- wp:gutenbergtemplateblock\/templateblock(.*?)<!-- \/wp:gutenbergtemplateblock\/templateblock -->/s';
-        preg_match_all( $blockPattern, $postContent, $blockMatches );
-        $blockMatchLength = null;
-        $blockMatchStart = null;
-
-        // return var_dump( $blockMatches );
-        // return var_dump($nextPoll);
-
-        foreach( $blockMatches[0] as $match )
+        if ( !empty( $nextPoll ) )
         {
-            if ( strpos( $match, $uuid ) )
+            $postContent = $this->getPostContentByPostId( $postId );
+            $blockMatches = [];
+            $blockPattern = '/<!-- wp:gutenbergtemplateblock\/templateblock(.*?)<!-- \/wp:gutenbergtemplateblock\/templateblock -->/s';
+            preg_match_all( $blockPattern, $postContent, $blockMatches );
+            $blockMatchLength = null;
+            $blockMatchStart = null;
+    
+            foreach( $blockMatches[0] as $match )
             {
-                $blockMatchLength = strlen( $match );
-                $blockMatchStart = strpos( $postContent, $match );
+                if ( strpos( $match, $uuid ) )
+                {
+                    $blockMatchLength = strlen( $match );
+                    $blockMatchStart = strpos( $postContent, $match );
+                }
             }
-        }
+    
+            // TODO: include style values
+            // Create new post_content content
+            $json = $this->buildJson( $nextPoll, $uuid );
+            $replacementContent = '<!-- wp:gutenbergtemplateblock/templateblock ';
+            $replacementContent .= $json;
+            $replacementContent .= ' -->';
+            $html = '<div class="wp-block-gutenbergtemplateblock-templateblock" value="' . $uuid . '"><h3>' . $nextPoll[0]->question . '</h3>';
+            $options = '';
+    
+            foreach( $nextPoll as $o )
+            {
+                $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . stripslashes( $o->option ) . '</p>';
+            }
+            
+            $html .= $options;
+            $html .= '<button class="potd-vote-btn" value="' . $nextPoll[0]->qid . '">Vote!</button><div class="potd-result"></div></div>';
+            $replacementContent .= $html;
+            $replacementContent .= '<!-- /wp:gutenbergtemplateblock/templateblock -->';
+            $newContent = substr_replace( $postContent, $replacementContent, $blockMatchStart, $blockMatchLength );
+            $outcome = $this->setPostContentByPostId( $postId, $newContent, $uuid );
+            $dateOutcome = $this->setPollDateByUUID( $uuid );
 
-        // echo var_dump( $blockMatchLength, $blockMatchStart );
-
-        // Create new poll HTML content
-        $json = $this->buildJson( $nextPoll, $uuid );
-        // echo var_dump( $json );
-
-        // TODO: what if json is not valid?
-        // if ( !$this->isValidJSON( $jsonMatches[0][0] ) )
-        // {
-        //     $oucome = 'fail';
-        // }
-
-        $html = '<!-- wp:gutenbergtemplateblock/templateblock ';
-        $html .= $json;
-        $html .= ' -->';
-
-        // TODO: include style values
-        // $html .= '<div class="wp-block-gutenbergtemplateblock-templateblock" value="' . $uuid . '"><h2 class="alignwide gutenbergtemplateblock-title" style="color:#000000"></h2><div class="alignwide gutenbergtemplateblock-content" style="color:#000000"></div>' . $nextPoll[0]->question;
-        $html .= '<div class="wp-block-gutenbergtemplateblock-templateblock" value="' . $uuid . '"><h3>' . $nextPoll[0]->question . '</h3>';
-        $options = '';
-
-        foreach( $nextPoll as $o )
-        {
-            // $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . urldecode( $o->option ) . '</p>';
-            $options .= '<p><input type="radio" name="options" value="' . $o->oid . '"/>' . stripslashes( $o->option ) . '</p>';
-        }
-        
-        $html .= $options;
-        $html .= '<button class="potd-vote-btn" value="' . $nextPoll[0]->qid . '">Vote!</button><div class="potd-result"></div></div>';
-        $html .= '<!-- /wp:gutenbergtemplateblock/templateblock -->';
-        $newContent = substr_replace( $postContent, $html, $blockMatchStart, $blockMatchLength );
-        $outcome = $this->setPostContentByPostId( $postId, $newContent, $uuid );
-        $dateOutcome = $this->setPollDateByUUID( $uuid );
-
-        if ( $outcome === 'success' && $dateOutcome === 'success' )
-        {
-            return $outcome;
+            if ( $outcome === 'success' && $dateOutcome === 'success' )
+            {
+                return $html;
+            }
+            else
+            {
+                return 'fail';
+            }
         }
         else
         {
@@ -606,7 +609,6 @@ class GutenbergtemplateblockWpdb
     {
         global $wpdb;
         $wpdb->show_errors();
-        $outcome = 'success';
 
         $results = $wpdb->get_results(
             $wpdb->prepare('
@@ -618,6 +620,11 @@ class GutenbergtemplateblockWpdb
                 $postId
             )
         );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            return 'fail';
+        }
 
         return $results[0]->post_content;
     }
@@ -646,7 +653,7 @@ class GutenbergtemplateblockWpdb
         }
         else
         {
-            $this->setPollByUUID( $uuid, $postId );
+            $outcome = $this->setPollByUUID( $uuid, $postId );
         }
 
         return $outcome;
@@ -722,7 +729,6 @@ class GutenbergtemplateblockWpdb
     {
         global $wpdb;
         $wpdb->show_errors();
-        // $outcome = 'success';
 
         $results = $wpdb->get_results(
             $wpdb->prepare('
@@ -772,11 +778,14 @@ class GutenbergtemplateblockWpdb
                     'uuid' => $uuid,
                     'userid' => $userId,
                     'postid' => $postId,
-                    'date' => date( 'Y-m-d', current_time( 'timestamp' ) ) . ' 00:00:00'
+                    'date' => date( 'Y-m-d', current_time( 'timestamp' ) ) . ' 00:00:00',
+                    'rotate' => $rotate
                 ),
                 array(
                     '%s',
                     '%d',
+                    '%d',
+                    '%s',
                     '%s'
                 )
             );
