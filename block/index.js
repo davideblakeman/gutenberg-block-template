@@ -150,7 +150,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
             this.handleCancelClick = this.handleCancelClick.bind( this );
             this.handleSaveClick = this.handleSaveClick.bind( this );
-            // this.handleSettingsRadioClick = this.handleSettingsRadioClick.bind( this );
             this.deleteQuestionById = this.deleteQuestionById.bind( this );
             this.deleteAnswerById = this.deleteAnswerById.bind( this );
             this.setPoll = this.setPoll.bind( this );
@@ -265,31 +264,15 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         handlePositionChange( positions ) {
-            // console.log( 'handlePositionChange' );
-            // console.log( event.target.parentNode.parentNode.parentNode.children );
-            // let options = event.target.parentNode.parentNode.parentNode.children;
-            // console.log( 'position', position );
-            // console.log( 'answers',this.state.answers );
-
             let newAnswers = this.state.answers.map( ( answer, id ) => {
-                // if ( name[0] !== id ) return answer;
                 let a;
                 positions.forEach( ( v, k, self ) => {
                     if ( id === k ) {
-                        console.log( 'v', v );
                         a = { ...answer, ...{ edited: true, optionorder: v } };
                     }
                 });
                 return a;
-
-                // if ( name !== id ) return answer;
-
-                // console.log( 'name', name, 'position', position, 'id', id );
-
-                // return { ...answer, ...{ edited: true, optionorder: position } };
             });
-
-            console.log( 'newAnswers:', newAnswers );
             
             this.setState({ answers: newAnswers });
         }
@@ -355,60 +338,40 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     if ( value.edited ) {
                         result.push({
                             value: this.isNumeric( value.value ) ? value.value : 'new',
-                            // label: encodeURIComponent( value.label )
                             label: value.label
                         });
                     } return result;
                 }, [] );
 
-                console.log( 'answers:', this.state.answers );
-
                 let saveAnswers = this.state.answers.reduce( ( result, value  ) => {
                     if ( value.edited ) {
-                        // console.log( 'value:', value );
                         result.push({
                             oid: this.isNumeric( value.oid ) ? value.oid : 'new',
-                            // option: encodeURIComponent( value.option )
                             option: value.option,
                             optionorder: value.optionorder
                         });
                     } return result;
                 }, [] );
 
-                console.log( 'saveAnswers:', saveAnswers );
-
                 let qid = saveQuestion.length > 0 ? saveQuestion[0].value : event;
                 let q = saveQuestion.length > 0 ? saveQuestion[0].label : null;
+
                 let a = saveAnswers.map( ( object, key ) => {
-                    // return 'oid=' + object.oid + '&a=' + encodeURIComponent( object.option );
-                    // console.log( 'object:', object );
                     let r = 'oid=' + object.oid + '&a=' + object.option + '&optionorder=';
+
                     if ( object.optionorder === 0 || object.optionorder ) {
                         r += object.optionorder
                     } else {
                         r += key
                     }
-                    // r += object.optionorder ? object.optionorder : key;
-                    // return 'oid=' + object.oid + '&a=' + object.option + '&optionorder=' + key;
+
                     return r;
                 });
+
                 a = a.length > 0 ? a : null;
-
-                console.log( 'a:', a );
-
                 this.setPoll( qid, q, a );
             }
         }
-
-        // handleSettingsRadioClick( event ) {
-        //     console.log( 'handleSettingsRadioClick' );
-        //     console.log( event );
-        // }
-
-        // handleSettingsCheckboxClick( event ) {
-        //     console.log( 'handleSettingsCheckboxClick' );
-        //     console.log( event );
-        // }
 
         setPoll( qid, question, answers ) {
             if ( qid && question ) {
@@ -537,7 +500,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             answersByOid.push({
                                 oid: object.oid,
                                 option: decodeURIComponent( self.stripslashes( object.option ) )
-                                // option: object.option
                             });
                             return [
                                 <p>
@@ -548,18 +510,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                             value={ object.oid }
                                         />
                                         { decodeURIComponent( self.stripslashes( object.option ) ) }
-                                        {/* { object.option } */}
                                     </label>
                                 </p>
                             ];
                         });
                         
-                        // const uuid = self.props.uuid ? self.props.uuid : self.uuidv4();
                         self.setSavePoll( pollOptions );
                         self.setSavePollTitle( results.length > 0 ? results[0].question : '' );
                         self.setSaveQid( results.length > 0 ? results[0].qid : '' );
-                        // self.setSaveUUID( uuid );
-                        // self.setPollStart( uuid );
 
                         self.setState({
                             isLoaded: true,
@@ -590,13 +548,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( result ) => {
-                        // console.log( 'result: ', result );
                         let answersByOid = [];
                         const pollOptions = result.map( ( object, key ) => {
                             answersByOid.push({
                                 oid: object.oid,
                                 option: decodeURIComponent( self.stripslashes( object.option ) )
-                                // option: object.option
                             });
                             return [
                                 <p>
@@ -607,13 +563,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                             value={ object.oid }
                                         />
                                         { decodeURIComponent( self.stripslashes( object.option ) ) }
-                                        {/* { object.option } */}
                                     </label>
                                 </p>
                             ];
                         });
-
-                        // const uuid = self.props.uuid ? self.props.uuid : self.uuidv4();
 
                         self.setState({
                             answers: answersByOid,
@@ -623,8 +576,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             self.setSavePoll( pollOptions );
                             self.setSavePollTitle( result.length > 0 ? result[0].question : '' );
                             self.setSaveQid( result.length > 0 ? result[0].qid : '' );
-                            // self.setSaveUUID( uuid );
-                            // self.setPollStart( uuid );
                         });
                     },
                     ( error ) => {

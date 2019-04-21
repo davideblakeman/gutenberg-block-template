@@ -11,7 +11,7 @@ export default class PotdAnswer extends React.Component {
         super( props );
         this.handleChange = this.handleChange.bind( this );
         this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
-        this.handlePlusMinusClick = this.handlePlusMinusClick.bind( this );
+        this.handleUpDownClick = this.handleUpDownClick.bind( this );
         this.handlePositionChange = this.handlePositionChange.bind( this );
         this.inputHandlers = {};
         this.positionHandlers = {};
@@ -37,8 +37,7 @@ export default class PotdAnswer extends React.Component {
     handlePositionChange( name ) {
         if ( !this.positionHandlers[ name ] ) {
             this.positionHandlers[ name ] = event => {
-                // this.props.onPositionChange( event, [ name ] );
-                this.handlePlusMinusClick( event, [ name ] );
+                this.handleUpDownClick( event, [ name ] );
             };
         }
         return this.positionHandlers[ name ];  
@@ -58,14 +57,12 @@ export default class PotdAnswer extends React.Component {
         } return 0;
     }
 
-    handlePlusMinusClick( event, name ) {
-        // console.log( 'handlePlusMinusClick:', event, name );
+    handleUpDownClick( event, name ) {
         const childNodes = event.target.parentNode.parentNode.parentNode.childNodes;
         const parent = event.target.parentNode.parentNode.parentNode;
         let node = event.target.parentNode.parentNode;
-        const sign = event.target.attributes.value.nodeValue;
+        const direction = event.target.attributes.value.nodeValue;
         let position = null;
-        // let newPosition = null;
         let positions = [];
 
         for ( let [ k, v ] of Object.entries( childNodes ) ) {
@@ -75,7 +72,7 @@ export default class PotdAnswer extends React.Component {
         }
 
         if ( !isNaN( parseFloat( position ) ) && isFinite( position ) ) {
-            if ( sign === 'up' ) {
+            if ( direction === 'up' ) {
                 parent.insertBefore( parent.children[ position ], parent.children[ position ].previousSibling );
             } else {
                 if ( parent.lastChild === parent.children[ position ] ) {
@@ -86,32 +83,13 @@ export default class PotdAnswer extends React.Component {
             }
         }
 
-        // for ( let [ k, v ] of Object.entries( childNodes ) ) {
-        //     if ( v === node ) {
-        //         newPosition = parseInt( k );
-        //     }
-        // }
-        console.log( 'childNodes', childNodes );
-
         for ( let [ k, v ] of Object.entries( childNodes ) ) {
-            // newPosition = parseInt( k );
-            // console.log( 'k', k );
-            // console.log( 'v', v.childNodes[0].attributes.value.nodeValue 
-            // console.log( 'value', v.querySelector( 'input' ).attributes.value.nodeValue );
-            // console.log( 'name', v.querySelector( 'input' ).attributes.name.nodeValue );
-
             let newPosition = parseInt( k );
-            // let value = v.querySelector( 'input' ).attributes.value.nodeValue;
             let name = parseInt( v.querySelector( 'input' ).attributes.name.nodeValue );
-            // positions.push( { name: newPosition } );
             positions[ name ] = newPosition;
-
-            // this.props.onPositionChange( name, newPosition );
         }
-
-        console.log( 'positions', positions );
+        
         this.props.onPositionChange( positions );
-        // this.props.onPositionChange( name, newPosition );
     }
 
     render() {
