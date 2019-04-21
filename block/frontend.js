@@ -1,26 +1,72 @@
 console.log( 'Frontend Block JS' );
-window.addEventListener( "load", function( event ) {
-    var elements = document.getElementsByClassName( 'potd-vote-btn' );
-    let oid = null;
+
+window.addEventListener( "load", function() {
 
     const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
-    console.log( polls );
 
-    for ( let element of elements ) {
-        element.addEventListener( 'click', function( event ) {
-            for ( let el of event.target.parentNode.childNodes ) {
-                if ( el.tagName === 'P' && el.firstChild.checked ) {
-                    oid = el.firstChild.value;
-                    if ( oid ) {
-                        registerVote( oid, event );
-                    }
+    if ( polls.length ) {
+        var elements = document.getElementsByClassName( 'potd-vote-btn' );
+        let oid = null;
+        let uuids = {};
+        for ( let poll of polls ) {
+            for ( let child of poll.children ) {
+                if ( child.className === 'potd-vote-btn' ) {
+                    uuids[ poll.attributes.value.nodeValue ] = child.value;
                 }
             }
-        });
+        }
+    
+        setRotation( uuids );
+    
+        for ( let element of elements ) {
+            element.addEventListener( 'click', function( event ) {
+                for ( let el of event.target.parentNode.childNodes ) {
+                    if ( el.tagName === 'P' && el.firstChild.checked ) {
+                        oid = el.firstChild.value;
+                        if ( oid ) {
+                            registerVote( oid, event );
+                        }
+                    }
+                }
+            });
+        }
     }
 });
 
+const setRotation = ( uuids ) => {
+
+    let setRotationUrl = gutenbergtemplateblock_ajax_object.ajax_url +
+    '?action=gutenbergtemplateblock_setRotation' +
+    '&uuids=' + JSON.stringify( uuids ) +
+    '&security=' + gutenbergtemplateblock_ajax_object.security;
+
+    fetch( setRotationUrl )
+        .then( response => {
+            return response.json();
+        })
+        .then( 
+            ( result ) => {
+                if ( Object.keys( result ).length ) {
+                    const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
+                    for ( let u in uuids ) {
+                        for ( let p of polls ) {
+                            if ( u === p.attributes.value.nodeValue ) {
+                                let el = document.createElement( 'div' );
+                                el.innerHTML = result[ u ].trim();
+                                p.parentNode.replaceChild( el.children[0], p );
+                            }
+                        }
+                    }
+                }
+            },
+            ( error ) => {
+                console.log( 'error: ' + error );
+            }
+        )
+}
+
 const registerVote = ( oid, event ) => {
+
     let qid = event.target.value;
     let resultElement = null;
     for ( let element of event.target.parentNode.childNodes ) {
@@ -39,7 +85,6 @@ const registerVote = ( oid, event ) => {
         })
         .then(
             ( result ) => {
-                console.log( 'result: ', result );
                 if ( result === 'cookie' || result === 'ipcookie' || result === 'user' ) {
                     let liveCookie = document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) > -1;
                     if ( result === 'user' ) {
@@ -61,7 +106,7 @@ const registerVote = ( oid, event ) => {
 };
 
 const vote = ( oid, qid, resultElement ) => {
-    // console.log( 'vote' );
+    
     let url = gutenbergtemplateblock_ajax_object.ajax_url +
                 '?action=gutenbergtemplateblock_setOptionVoteById' +
                 '&oid=' + oid +

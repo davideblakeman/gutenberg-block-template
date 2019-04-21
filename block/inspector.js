@@ -1,7 +1,7 @@
 /**
  * Block dependencies
  */
-import colourAttributes from "./colours";
+// import colourAttributes from "./colours";
 
 /**
  * Internal block libraries
@@ -11,7 +11,7 @@ const { Component } = wp.element;
 const {
   InspectorControls,
 //   ColorPalette,
-  PanelColorSettings,
+//   PanelColorSettings,
 //   ContrastChecker
 } = wp.editor;
 
@@ -67,7 +67,7 @@ export default class Inspector extends Component {
                 </PanelRow>
             </PanelBody>
 
-            <PanelColorSettings
+            {/* <PanelColorSettings
                 title = { __( "Edit Title Colour", "jsforwpblocks" ) }
                 colorSettings = {[{
                     label: __( "Selected Color" ),
@@ -89,7 +89,7 @@ export default class Inspector extends Component {
                     }
                 }]}
                 colors = { colourAttributes.colours }
-            />
+            /> */}
 
         </InspectorControls>
     );

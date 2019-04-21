@@ -148,10 +148,11 @@ class GutenbergtemplateblockCustomTables
             ) $charset_collate;
 
             CREATE TABLE $wpdb->gutenbergtemplateblock_options (
-                oid    BIGINT(20) unsigned NOT NULL auto_increment,
-                qid    BIGINT(20) unsigned NOT NULL default 0,
-                option LONGTEXT            NOT NULL default '',
-                votes  BIGINT(20) unsigned NOT NULL default 0,
+                oid         BIGINT(20) unsigned NOT NULL auto_increment,
+                qid         BIGINT(20) unsigned NOT NULL default 0,
+                option      LONGTEXT            NOT NULL default '',
+                votes       BIGINT(20) unsigned NOT NULL default 0,
+                optionorder BIGINT(20) unsigned NOT NULL default 0
                 PRIMARY KEY  (oid),
                 KEY qid (qid)
             ) $charset_collate;
@@ -172,7 +173,9 @@ class GutenbergtemplateblockCustomTables
                 pid      BIGINT(20)   unsigned NOT NULL auto_increment,
                 uuid     VARCHAR(36)           NOT NULL default '',
                 userid   BIGINT(20)   unsigned NOT NULL default 0,
+                postid   BIGINT(20)   unsigned NOT NULL default 0,
                 date     DATETIME              NOT NULL default '0000-00-00 00:00:00',
+                rotate   VARCHAR(10)           NOT NULL default 'no',
                 PRIMARY KEY  (pid),
                 KEY uuid (uuid),
                 KEY userid (userid),

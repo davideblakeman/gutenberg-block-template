@@ -1,9 +1,13 @@
+import icons from './../icons';
 import PotdAnswers from "./PotdAnswers";
 const {
     SelectControl,
     Button,
-    TextControl
+    TextControl,
+    CheckboxControl,
+    Spinner
 } = wp.components;
+const { select } = wp.data;
 
 export default class PotdSelect extends React.Component {
 
@@ -12,6 +16,7 @@ export default class PotdSelect extends React.Component {
         this.componentDidMount = this.componentDidMount.bind( this );
         this.handleChange = this.handleChange.bind( this );
         this.handleInputChange = this.handleInputChange.bind( this );
+        this.handlePositionChange = this.handlePositionChange.bind( this );
         this.handleSelectInputChange = this.handleSelectInputChange.bind( this );
         this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
         this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this );
@@ -19,18 +24,28 @@ export default class PotdSelect extends React.Component {
         this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
         this.handleCancelClick = this.handleCancelClick.bind( this );
         this.handleSaveClick = this.handleSaveClick.bind( this )
+        this.handleCheckboxChange = this.handleCheckboxChange.bind( this );
         this.getSelectedKey = this.getSelectedKey.bind( this );
 
         this.state = {
             selectedValue: null,
             selectedKey: null,
-            lastSelectableKey: null
+            lastSelectableKey: null,
+            pollRotate: false,
+            rotateCheckboxLoaded: false
         };
     }
 
     componentDidMount() {
-        const { existingBlockQid } = this.props;
-        let lastIndex = this.props.questions.length - 1;
+        const {
+            existingBlockQid,
+            questions,
+            uuid
+        } = this.props;
+
+        const lastIndex = questions.length - 1;
+        this.getRotateOptionByUUID( uuid );
+        
         this.setState({
             selectedValue: existingBlockQid ? existingBlockQid : this.props.questions[0].value
         }, () => this.setState({
@@ -68,6 +83,7 @@ export default class PotdSelect extends React.Component {
     handleCancelClick() { this.props.onCancelClick() }
     handleSaveClick( event ) { this.props.onSaveClick( event.target.value ) }
     handleInputChange( event, name ) { this.props.onInputChange( event, name ) }
+    handlePositionChange( positions ) { this.props.onPositionChange( positions ) }
     handleAddQuestionClick( event ) { this.props.onAddQuestionClick( event ) }
     handleAddAnswerClick( event ) { this.props.onAddAnswerClick( event.target.value ) }
 
@@ -79,6 +95,67 @@ export default class PotdSelect extends React.Component {
         } return 0;
     };
 
+    handleCheckboxChange( event ) {
+        this.setState({
+            rotateCheckboxLoaded: false
+        });
+
+        const uuid = this.props.uuid;
+        var self = this;
+        const postId = select( 'core/editor' ).getCurrentPostId();
+
+        let url = gutenbergtemplateblock_ajax_object.ajax_url +
+                  '?action=gutenbergtemplateblock_setRotateOptionByUUID' +
+                  '&u=' + uuid +
+                  '&r=' + event.toString() +
+                  '&p=' + postId +
+                  '&security=' + gutenbergtemplateblock_ajax_object.security;
+        
+        fetch( url )
+            .then( response => {
+                return response.json();
+            })
+            .then(
+                ( result ) => {
+                    if ( result === 'success' )
+                    {
+                        self.setState({
+                            pollRotate: event,
+                            rotateCheckboxLoaded: true
+                        });
+                    }
+                },
+                ( error ) => {
+                    console.log( error );
+                }
+            )
+    }
+
+    getRotateOptionByUUID( uuid ) {
+        var self = this;
+        let url = gutenbergtemplateblock_ajax_object.ajax_url +
+                  '?action=gutenbergtemplateblock_getRotateOptionByUUID' +
+                  '&u=' + uuid +
+                  '&security=' + gutenbergtemplateblock_ajax_object.security;
+        
+        fetch( url )
+            .then( response => {
+                return response.json();
+            })
+            .then(
+                ( result ) => {
+                    self.setState({
+                        // can also return 'fail' if db error
+                        pollRotate: result == 'true' ? true : false,
+                        rotateCheckboxLoaded: true
+                    });
+                },
+                ( error ) => {
+                    console.log( error );
+                }
+            )
+    }
+
     render() {
         const {
             questions,
@@ -88,7 +165,11 @@ export default class PotdSelect extends React.Component {
             inNewQuestion,
             isLoadedAnswers
         } = this.props;
-        const { selectedValue } = this.state;
+        const {
+            selectedValue,
+            pollRotate,
+            rotateCheckboxLoaded
+        } = this.state;
         const selectedKey = this.getSelectedKey();
         const editTitleText = questions[ selectedKey ].label;
 
@@ -130,19 +211,21 @@ export default class PotdSelect extends React.Component {
                 }
                 { ( editable && editing ) &&
                     <div class="grid">
-                        <div class="inline-flex">
-                            <TextControl
-                                name={ selectedKey }
-                                value={ editTitleText }
-                                onChange={ this.handleSelectInputChange }
-                            />
+                        <div class="potd-question inline-flex">
+                            <div className="edit-input">
+                                <TextControl
+                                    name={ selectedKey }
+                                    value={ editTitleText }
+                                    onChange={ this.handleSelectInputChange }
+                                />
+                            </div>
                             { ( !inNewQuestion && editing ) &&
                                 <Button
-                                    className="gutenbergtemplateblock-delete-question button button-large"
+                                    className="button button-large edit-delete-button"
                                     value={ selectedValue }
                                     onClick={ this.handleDeleteQuestionClick }
                                 > 
-                                    Delete
+                                    { icons.delete }
                                 </Button>
                             }
                         </div>
@@ -153,9 +236,25 @@ export default class PotdSelect extends React.Component {
                         answers={ answers }
                         editable={ editable }
                         onInputChange={ this.handleInputChange }
+                        onPositionChange={ this.handlePositionChange }
                         onDeleteAnswerClick={ this.handleDeleteAnswerClick }
                         isLoadedAnswers={ isLoadedAnswers }
                     />
+                }
+                { !editable &&
+                    ( rotateCheckboxLoaded ?
+                        <CheckboxControl
+                            heading="Rotate poll question each day?"
+                            label={ pollRotate ? 'Yes' : 'No' }
+                            checked={ pollRotate }
+                            onChange={ this.handleCheckboxChange }
+                        />
+                        :
+                        <div>
+                            <label class="components-base-control">Rotate poll question each day?</label>
+                            <Spinner/>
+                        </div>
+                    )
                 }
                 { ( editable && editing ) &&
                     <div>

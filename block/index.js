@@ -8,7 +8,7 @@ import icons from './icons';
 import Inspector from './inspector';
 import Controls from './controls';
 import attributes from './attributes';
-import colourAttributes from './colours';
+// import colourAttributes from './colours';
 import PotdSelect from './components/PotdSelect';
 import PotDSettings from './components/PotdSettings';
 import './style.scss';
@@ -23,10 +23,10 @@ import './editor.scss';
  */
 const { __ } = wp.i18n;
 const { registerBlockType } = wp.blocks;
-const { 
-    RichText,
-    ColorPalette
-} = wp.editor;
+// const {
+//     RichText,
+//     ColorPalette
+// } = wp.editor;
 const { 
     TabPanel,
     Spinner
@@ -37,6 +37,45 @@ const { select } = wp.data;
 
 // console.log( wp.components );
 // console.log( wp.data );
+
+const setPollStart = ( uuid, postId ) => {
+    var self = this;
+    let url = gutenbergtemplateblock_ajax_object.ajax_url + 
+              '?action=gutenbergtemplateblock_setPollByUUID' + 
+              '&uuid=' + uuid +
+              '&postId=' + postId +
+              '&security=' + gutenbergtemplateblock_ajax_object.security;
+
+    fetch( url )
+        .then( response => {
+            return response.json();
+        })
+        .then(
+            ( result ) => {
+                // console.log( 'setPollStart: ', result );
+            },
+            ( error ) => {
+                self.setState({
+                    isLoaded: true,
+                    error
+                });
+            }
+        )
+};
+
+window.addEventListener( "load", function( event ) {
+    var publishBtn = document.querySelector( '.editor-post-publish-button' );
+    publishBtn.addEventListener( 'click', () => {
+        const blocks = document.querySelectorAll( '.wp-block-gutenbergtemplateblock-templateblock-editor-block' );
+        if ( blocks.length ) {
+            const postId = select( 'core/editor' ).getCurrentPostId();
+            for ( let block of blocks ) {
+                let uuid = block.attributes.value.nodeValue;
+                setPollStart( uuid, postId );
+            }
+        }
+    });
+});
 
 registerBlockType( 'gutenbergtemplateblock/templateblock', 
 {
@@ -61,14 +100,15 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
     edit: class extends Component {
         constructor( props ) {
             super( ...arguments );
-            
+            // console.log( 'constructor' );
             const {
                 attributes: {
                     styleToggle,
                 }, 
                 className, 
                 setAttributes,
-                answersQid
+                // answersQid,
+                // uuid
             } = props;
 
             this.state = {
@@ -89,7 +129,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 newQuestion: false
             };
             
-            this.setSaveUUID( this.uuidv4() );
+            if ( typeof this.props.attributes.uuid === undefined || this.props.attributes.uuid === null ) {
+                this.setSaveUUID( this.uuidv4() );
+            }
 
             this.onChangeTitle = this.onChangeTitle.bind( this );
             this.onChangeContent = this.onChangeContent.bind( this );
@@ -102,6 +144,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
             this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this );
             this.handleInputChange = this.handleInputChange.bind( this );
+            this.handlePositionChange = this.handlePositionChange.bind( this );
             this.handleSelectInputChange = this.handleSelectInputChange.bind( this );
             this.handleDeleteQuestionClick = this.handleDeleteQuestionClick.bind( this );
             this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
@@ -130,6 +173,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
          */
         componentDidMount() {
             // console.log( 'componentDidMount' );
+            // console.log( this.props );
+            // console.log( this.props.attributes );
             this.getPollQuestions();
         }
         
@@ -219,6 +264,36 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.setState({ answers: newAnswers });
         }
 
+        handlePositionChange( positions ) {
+            // console.log( 'handlePositionChange' );
+            // console.log( event.target.parentNode.parentNode.parentNode.children );
+            // let options = event.target.parentNode.parentNode.parentNode.children;
+            // console.log( 'position', position );
+            // console.log( 'answers',this.state.answers );
+
+            let newAnswers = this.state.answers.map( ( answer, id ) => {
+                // if ( name[0] !== id ) return answer;
+                let a;
+                positions.forEach( ( v, k, self ) => {
+                    if ( id === k ) {
+                        console.log( 'v', v );
+                        a = { ...answer, ...{ edited: true, optionorder: v } };
+                    }
+                });
+                return a;
+
+                // if ( name !== id ) return answer;
+
+                // console.log( 'name', name, 'position', position, 'id', id );
+
+                // return { ...answer, ...{ edited: true, optionorder: position } };
+            });
+
+            console.log( 'newAnswers:', newAnswers );
+            
+            this.setState({ answers: newAnswers });
+        }
+
         handleSelectInputChange( event, index ) {
             let newQuestions = this.state.questions.map( ( question, id ) => {
                 if ( index !== id ) return question;
@@ -280,26 +355,46 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     if ( value.edited ) {
                         result.push({
                             value: this.isNumeric( value.value ) ? value.value : 'new',
-                            label: encodeURIComponent( value.label )
+                            // label: encodeURIComponent( value.label )
+                            label: value.label
                         });
                     } return result;
                 }, [] );
 
+                console.log( 'answers:', this.state.answers );
+
                 let saveAnswers = this.state.answers.reduce( ( result, value  ) => {
                     if ( value.edited ) {
+                        // console.log( 'value:', value );
                         result.push({
                             oid: this.isNumeric( value.oid ) ? value.oid : 'new',
-                            option: encodeURIComponent( value.option )
+                            // option: encodeURIComponent( value.option )
+                            option: value.option,
+                            optionorder: value.optionorder
                         });
                     } return result;
                 }, [] );
+
+                console.log( 'saveAnswers:', saveAnswers );
 
                 let qid = saveQuestion.length > 0 ? saveQuestion[0].value : event;
                 let q = saveQuestion.length > 0 ? saveQuestion[0].label : null;
                 let a = saveAnswers.map( ( object, key ) => {
-                    return 'oid=' + object.oid + '&a=' + encodeURIComponent( object.option );
+                    // return 'oid=' + object.oid + '&a=' + encodeURIComponent( object.option );
+                    // console.log( 'object:', object );
+                    let r = 'oid=' + object.oid + '&a=' + object.option + '&optionorder=';
+                    if ( object.optionorder === 0 || object.optionorder ) {
+                        r += object.optionorder
+                    } else {
+                        r += key
+                    }
+                    // r += object.optionorder ? object.optionorder : key;
+                    // return 'oid=' + object.oid + '&a=' + object.option + '&optionorder=' + key;
+                    return r;
                 });
                 a = a.length > 0 ? a : null;
+
+                console.log( 'a:', a );
 
                 this.setPoll( qid, q, a );
             }
@@ -388,7 +483,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         // Helpers \\
         getPollQuestions() {
             const { answersQid } = this.props.attributes;
-            // console.log( 'answersQid:', answersQid );
             
             if ( this.state.isLoaded ) {
                 this.setState({ isLoaded: false });
@@ -442,16 +536,20 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         const pollOptions = results.map( ( object, key ) => {
                             answersByOid.push({
                                 oid: object.oid,
-                                option: decodeURIComponent( object.option )
+                                option: decodeURIComponent( self.stripslashes( object.option ) )
+                                // option: object.option
                             });
                             return [
                                 <p>
-                                    <input
-                                        type="radio"
-                                        name="options"
-                                        value={ object.oid }
-                                    />
-                                    { decodeURIComponent( object.option ) }
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="options"
+                                            value={ object.oid }
+                                        />
+                                        { decodeURIComponent( self.stripslashes( object.option ) ) }
+                                        {/* { object.option } */}
+                                    </label>
                                 </p>
                             ];
                         });
@@ -497,16 +595,20 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         const pollOptions = result.map( ( object, key ) => {
                             answersByOid.push({
                                 oid: object.oid,
-                                option: decodeURIComponent( object.option )
+                                option: decodeURIComponent( self.stripslashes( object.option ) )
+                                // option: object.option
                             });
                             return [
                                 <p>
-                                    <input
-                                        type="radio"
-                                        name="options"
-                                        value={ object.oid }
-                                    />
-                                    { decodeURIComponent( object.option ) }
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="options"
+                                            value={ object.oid }
+                                        />
+                                        { decodeURIComponent( self.stripslashes( object.option ) ) }
+                                        {/* { object.option } */}
+                                    </label>
                                 </p>
                             ];
                         });
@@ -601,18 +703,38 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             return !isNaN( parseFloat( n ) ) && isFinite( n );
         }
 
+        /**
+         * http://locutus.io/php/strings/stripslashes/
+         */
+        stripslashes( str ) {
+            return ( str + '' )
+                .replace( /\\(.?)/g, ( s, n1 ) => {
+                    switch ( n1 ) {
+                        case '\\':
+                            return '\\'
+                        case '0':
+                            return '\u0000'
+                        case '':
+                            return ''
+                        default:
+                            return n1
+                    }
+                })
+        }
+
         render() {
             const { 
                 className, 
                 setAttributes,
                 attributes: {
                     classes,
-                    titleColour,
-                    contentColour,
-                    textAlignment,
-                    title,
-                    content,
-                    answersQid
+                    // titleColour,
+                    // contentColour,
+                    // textAlignment,
+                    // title,
+                    // content,
+                    answersQid,
+                    uuid
             }} = this.props;
             
             const {
@@ -627,46 +749,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             return [
                 <Inspector { ...{ setAttributes, ...this.props }} />,
                 <Controls { ...{ setAttributes, ...this.props }} />,
-                <div className = { classes }>
-                    <div className = { classes }>
-                        <ColorPalette
-                            colors = { colourAttributes.colours }
-                            value = { titleColour }
-                            onChange = { titleColour => { setAttributes( { titleColour } ) } }
-                        />
-                        <div>
-                            { __( 'Title', 'gutenbergtemplateblock' ) }
-                        </div>
-                        <RichText
-                            tagName = "h2"
-                            multiline = "p"
-                            placeholder = { __( 'Add title here', 'gutenbergtemplateblock' ) }
-                            style = { { textAlign: textAlignment, color: titleColour } }
-                            onChange = { this.onChangeTitle }
-                            value = { title }
-                        />
-                    </div>
-                    <div className = { classes }>
-                        <ColorPalette
-                            colors = { colourAttributes.colours }
-                            value = { contentColour }
-                            onChange = { contentColour => { setAttributes( { contentColour } ) } }
-                        />
-                        <div id = "GTBContentText">
-                            <div>
-                                { __( 'Content', 'gutenbergtemplateblock' ) }
-                            </div>
-                            <RichText
-                                class = "gutenbergtemplateblock-content"
-                                tagName = "div"
-                                multiline = "p"
-                                placeholder = { __( 'Add content here', 'gutenbergtemplateblock' ) }
-                                style = { { textAlign: textAlignment, color: contentColour } }
-                                onChange = { this.onChangeContent }
-                                value = { content }
-                            />
-                        </div>
-                    </div>
+                <div className = { classes + '-editor-block' } value={ uuid }>
                     <TabPanel
                         className="my-tab-panel"
                         activeClass="active-tab"
@@ -702,6 +785,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     editable={ false }
                                                     isLoadedAnswers={ isLoadedAnswers }
                                                     existingBlockQid={ answersQid }
+                                                    uuid={ uuid }
                                                 />
                                                 :
                                                 <div>
@@ -726,6 +810,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     onAddQuestionClick={ this.handleAddQuestionClick }
                                                     onAddAnswerClick={ this.handleAddAnswerClick }
                                                     onInputChange={ this.handleInputChange }
+                                                    onPositionChange={ this.handlePositionChange }
                                                     onSelectInputChange={ this.handleSelectInputChange }
                                                     onDeleteQuestionClick={ this.handleDeleteQuestionClick }
                                                     onDeleteAnswerClick={ this.handleDeleteAnswerClick }
@@ -758,13 +843,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
     save: props => {
         const { 
             attributes: { 
-                textAlignment, 
-                blockAlignment, 
-                styleToggle, 
-                title, 
-                content,
-                titleColour,
-                contentColour,
+                // textAlignment, 
+                // blockAlignment,
+                styleToggle,
                 pollTitle,
                 poll,
                 answersQid,
@@ -777,55 +858,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             { 'style-toggle': styleToggle },
         );
 
-        const setPollStart = ( uuid ) => {
-            var self = this;
-            let url = gutenbergtemplateblock_ajax_object.ajax_url + 
-                      '?action=gutenbergtemplateblock_setPollByUUID' + 
-                      '&uuid=' + uuid +
-                      '&security=' + gutenbergtemplateblock_ajax_object.security;
-        
-            fetch( url )
-                .then( response => {
-                    return response.json();
-                })
-                .then(
-                    ( result ) => {
-                        console.log( 'setPollStart: ', result );
-                    },
-                    ( error ) => {
-                        self.setState({
-                            isLoaded: true,
-                            error
-                        });
-                    }
-                )
-        }
-
-        // Set a new UUID if the update / publish button is clicked
-        if ( select( 'core/editor' ).isCurrentPostPublished() ) {
-            setPollStart( uuid );
-        }
-
         return (
             <div className = { className } value={ uuid }>
-                <h2 
-                    className = { classnames(
-                        `align${ blockAlignment }`,
-                        'gutenbergtemplateblock-title'
-                    )}
-                    style = { { textAlign: textAlignment, color: titleColour } }
-                >
-                    { title }
-                </h2>
-                <div className = { classnames(
-                        `align${ blockAlignment }`,
-                        'gutenbergtemplateblock-content'
-                    )}
-                    style = { { textAlign: textAlignment, color: contentColour } }
-                >
-                    { content }
-                </div>
-                { pollTitle }
+                <h3>{ pollTitle }</h3>
                 { poll }
                 <button class="potd-vote-btn" value={ answersQid }>Vote!</button>
                 <div class="potd-result"></div>

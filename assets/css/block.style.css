@@ -1,22 +1,51 @@
 .entry-content .wp-block-gutenbergtemplateblock-templateblock,
 .wp-block-gutenbergtemplateblock-templateblock {
-  background: rgba(254, 243, 224, 0.52);
+  background: #fef8ee;
   color: black;
-  border: 2px darkblue solid;
+  border: 3px double #f0b849;
+  border-radius: 5px;
   padding: 1rem; }
   .entry-content .wp-block-gutenbergtemplateblock-templateblock.style-toggle,
   .wp-block-gutenbergtemplateblock-templateblock.style-toggle {
     background: #222;
     border: 2px darkred solid;
     color: white; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .inline-flex,
-  .wp-block-gutenbergtemplateblock-templateblock .inline-flex {
-    display: -ms-inline-flexbox;
-    display: inline-flex; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .edit-input,
+  .wp-block-gutenbergtemplateblock-templateblock .edit-input {
+    width: 100%; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .edit-delete-button,
+  .wp-block-gutenbergtemplateblock-templateblock .edit-delete-button {
+    width: 40px;
+    margin-top: 1px;
+    line-height: 33px !important; }
   .entry-content .wp-block-gutenbergtemplateblock-templateblock .grid,
   .wp-block-gutenbergtemplateblock-templateblock .grid {
     display: -ms-grid;
     display: grid; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .inline-flex,
+  .wp-block-gutenbergtemplateblock-templateblock .inline-flex {
+    display: -ms-inline-flexbox;
+    display: inline-flex; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .inline-grid,
+  .wp-block-gutenbergtemplateblock-templateblock .inline-grid {
+    display: -ms-inline-grid;
+    display: inline-grid; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-question,
+  .wp-block-gutenbergtemplateblock-templateblock .potd-question {
+    width: 100%; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-answers .edit-btn-container,
+  .wp-block-gutenbergtemplateblock-templateblock .potd-answers .edit-btn-container {
+    width: 115px;
+    margin: 1px 0 0 2px;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+        justify-content: center; }
+    .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-answers .edit-btn-container button,
+    .wp-block-gutenbergtemplateblock-templateblock .potd-answers .edit-btn-container button {
+      font-size: 16px;
+      font-weight: bold;
+      line-height: 27px !important; }
   .entry-content .wp-block-gutenbergtemplateblock-templateblock .components-base-control,
   .wp-block-gutenbergtemplateblock-templateblock .components-base-control {
     width: 100%; }
