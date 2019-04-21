@@ -52,7 +52,7 @@ const setPollStart = ( uuid, postId ) => {
         })
         .then(
             ( result ) => {
-                console.log( 'setPollStart: ', result );
+                // console.log( 'setPollStart: ', result );
             },
             ( error ) => {
                 self.setState({
@@ -66,11 +66,13 @@ const setPollStart = ( uuid, postId ) => {
 window.addEventListener( "load", function( event ) {
     var publishBtn = document.querySelector( '.editor-post-publish-button' );
     publishBtn.addEventListener( 'click', () => {
-        const postId = select( 'core/editor' ).getCurrentPostId();
         const blocks = document.querySelectorAll( '.wp-block-gutenbergtemplateblock-templateblock-editor-block' );
-        for ( let block of blocks ) {
-            let uuid = block.attributes.value.nodeValue;
-            setPollStart( uuid, postId );
+        if ( blocks.length ) {
+            const postId = select( 'core/editor' ).getCurrentPostId();
+            for ( let block of blocks ) {
+                let uuid = block.attributes.value.nodeValue;
+                setPollStart( uuid, postId );
+            }
         }
     });
 });
@@ -142,6 +144,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
             this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this );
             this.handleInputChange = this.handleInputChange.bind( this );
+            this.handlePositionChange = this.handlePositionChange.bind( this );
             this.handleSelectInputChange = this.handleSelectInputChange.bind( this );
             this.handleDeleteQuestionClick = this.handleDeleteQuestionClick.bind( this );
             this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
@@ -261,6 +264,36 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.setState({ answers: newAnswers });
         }
 
+        handlePositionChange( positions ) {
+            // console.log( 'handlePositionChange' );
+            // console.log( event.target.parentNode.parentNode.parentNode.children );
+            // let options = event.target.parentNode.parentNode.parentNode.children;
+            // console.log( 'position', position );
+            // console.log( 'answers',this.state.answers );
+
+            let newAnswers = this.state.answers.map( ( answer, id ) => {
+                // if ( name[0] !== id ) return answer;
+                let a;
+                positions.forEach( ( v, k, self ) => {
+                    if ( id === k ) {
+                        console.log( 'v', v );
+                        a = { ...answer, ...{ edited: true, optionorder: v } };
+                    }
+                });
+                return a;
+
+                // if ( name !== id ) return answer;
+
+                // console.log( 'name', name, 'position', position, 'id', id );
+
+                // return { ...answer, ...{ edited: true, optionorder: position } };
+            });
+
+            console.log( 'newAnswers:', newAnswers );
+            
+            this.setState({ answers: newAnswers });
+        }
+
         handleSelectInputChange( event, index ) {
             let newQuestions = this.state.questions.map( ( question, id ) => {
                 if ( index !== id ) return question;
@@ -328,23 +361,40 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     } return result;
                 }, [] );
 
+                console.log( 'answers:', this.state.answers );
+
                 let saveAnswers = this.state.answers.reduce( ( result, value  ) => {
                     if ( value.edited ) {
+                        // console.log( 'value:', value );
                         result.push({
                             oid: this.isNumeric( value.oid ) ? value.oid : 'new',
                             // option: encodeURIComponent( value.option )
-                            option: value.option
+                            option: value.option,
+                            optionorder: value.optionorder
                         });
                     } return result;
                 }, [] );
+
+                console.log( 'saveAnswers:', saveAnswers );
 
                 let qid = saveQuestion.length > 0 ? saveQuestion[0].value : event;
                 let q = saveQuestion.length > 0 ? saveQuestion[0].label : null;
                 let a = saveAnswers.map( ( object, key ) => {
                     // return 'oid=' + object.oid + '&a=' + encodeURIComponent( object.option );
-                    return 'oid=' + object.oid + '&a=' + object.option + '&optionorder=' + key;
+                    // console.log( 'object:', object );
+                    let r = 'oid=' + object.oid + '&a=' + object.option + '&optionorder=';
+                    if ( object.optionorder === 0 || object.optionorder ) {
+                        r += object.optionorder
+                    } else {
+                        r += key
+                    }
+                    // r += object.optionorder ? object.optionorder : key;
+                    // return 'oid=' + object.oid + '&a=' + object.option + '&optionorder=' + key;
+                    return r;
                 });
                 a = a.length > 0 ? a : null;
+
+                console.log( 'a:', a );
 
                 this.setPoll( qid, q, a );
             }
@@ -396,14 +446,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         setAnswers( qid, answers ) {
             var self = this;
-            // console.log( answers );
-            // .sort( ( a, b ) => {
-            //     // console.log( 'a:', a.props.children[0].key );
-            //     // console.log( 'b:', b.props.children[0].key );
-            //     if ( a.props.children[0].key < b.props.children[0].key ) { return -1; }
-            //     if ( a.props.children[0].key > b.props.children[0].key ) { return 1; }
-            //     return 0;
-            // })
 
             for ( let i = 0; i < answers.length; i++ ) {
                 let url = gutenbergtemplateblock_ajax_object.ajax_url +
@@ -441,7 +483,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         // Helpers \\
         getPollQuestions() {
             const { answersQid } = this.props.attributes;
-            // console.log( 'answersQid:', answersQid );
             
             if ( this.state.isLoaded ) {
                 this.setState({ isLoaded: false });
@@ -769,6 +810,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                     onAddQuestionClick={ this.handleAddQuestionClick }
                                                     onAddAnswerClick={ this.handleAddAnswerClick }
                                                     onInputChange={ this.handleInputChange }
+                                                    onPositionChange={ this.handlePositionChange }
                                                     onSelectInputChange={ this.handleSelectInputChange }
                                                     onDeleteQuestionClick={ this.handleDeleteQuestionClick }
                                                     onDeleteAnswerClick={ this.handleDeleteAnswerClick }

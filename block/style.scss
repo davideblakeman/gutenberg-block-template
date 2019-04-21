@@ -1,5 +1,6 @@
 $dark: #222;
-$light: rgba(254, 243, 224, 0.52);
+$background: rgb(254, 248, 238);
+$border: #f0b849;
 $main-colour: darkblue;
 $secondary-colour: darkred;
 $light-text: white;
@@ -8,9 +9,10 @@ $dark-text: black;
 .entry-content .wp-block-gutenbergtemplateblock-templateblock, 
 .wp-block-gutenbergtemplateblock-templateblock {
 
-    background: $light;
+    background: $background;
     color: $dark-text;
-    border: 2px $main-colour solid;
+    border: 3px double $border;
+    border-radius: 5px;
     padding: 1rem;
 
     &.style-toggle {
@@ -23,12 +25,46 @@ $dark-text: black;
         // border: 2px $main-colour solid;
     }
 
-    .inline-flex {
-        display: inline-flex;
+    .edit-input {
+        width: 100%;
+    }
+
+    .edit-delete-button {
+        width: 40px;
+        margin-top: 1px;
+        line-height: 33px !important;
     }
 
     .grid {
         display: grid;
+    }
+
+    .inline-flex {
+        display: inline-flex;
+    }
+
+    .inline-grid {
+        display: inline-grid;
+    }
+
+    .potd-question {
+        width: 100%;
+    }
+
+    .potd-answers {
+    
+        .edit-btn-container {
+            width: 115px;
+            margin: 1px 0 0 2px;
+            display: flex;
+            justify-content: center;
+            button {
+                font-size: 16px;
+                font-weight: bold;
+                line-height: 27px !important;
+            }
+        }
+
     }
 
     .components-base-control {
