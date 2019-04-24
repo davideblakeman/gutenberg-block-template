@@ -5,40 +5,132 @@ window.addEventListener( "load", function() {
     const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
 
     if ( polls.length ) {
-        var elements = document.getElementsByClassName( 'potd-vote-btn' );
-        let oid = null;
-        let uuids = {};
-        for ( let poll of polls ) {
-            for ( let child of poll.children ) {
-                if ( child.className === 'potd-vote-btn' ) {
-                    uuids[ poll.attributes.value.nodeValue ] = child.value;
-                }
-            }
-        }
-    
-        setRotation( uuids );
-    
-        for ( let element of elements ) {
-            element.addEventListener( 'click', function( event ) {
-                for ( let el of event.target.parentNode.childNodes ) {
-                    if ( el.tagName === 'P' && el.firstChild.checked ) {
-                        oid = el.firstChild.value;
-                        if ( oid ) {
-                            registerVote( oid, event );
-                        }
-                    }
-                }
-            });
-        }
+        handleVoteClick();
+        handleResultClick();
+        setRotation( polls );
     }
 });
 
-const setRotation = ( uuids ) => {
+const handleVoteClick = () => {
+    
+    var elements = document.getElementsByClassName( 'potd-vote-btn' );
+    let oid = null;
+
+    for ( let element of elements ) {
+        element.addEventListener( 'click', ( event ) => {
+            for ( let el of event.target.parentNode.parentNode.childNodes ) {
+                if ( el.tagName === 'P' && el.firstChild.children[0].checked ) {
+                    oid = el.firstChild.children[0].value;
+                    if ( oid ) {
+                        setVote( oid, event );
+                        return;
+                    }
+                }
+            }
+        });
+    }
+}
+
+const handleResultClick = () => {
+    
+    var elements = document.getElementsByClassName( 'potd-results-btn' );
+
+    for ( let element of elements ) {
+        element.addEventListener( 'click', ( event ) => {
+            // console.log( 'uuid', event.target.parentNode.parentNode.attributes.value.nodeValue );
+            const uuid = event.target.parentNode.parentNode.attributes.value.nodeValue;
+            const qid = event.target.attributes.value.nodeValue;
+            getResultsByQid( uuid, qid );
+        });
+    }
+}
+
+const getResultsByQid = ( uuid, qid ) => {
+
+    let url = gutenbergtemplateblock_ajax_object.ajax_url +
+        '?action=gutenbergtemplateblock_getResultsByQid' +
+        '&qid=' + qid +
+        '&security=' + gutenbergtemplateblock_ajax_object.security;
+
+    fetch( url )
+        .then( response => {
+            return response.json();
+        })
+        .then( 
+            ( result ) => {
+                const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
+                let html = '<table class="potd-result"><tbody>';
+                let max = 0;
+
+                for ( let r of result ) {
+                    max = r.votes > max ? parseInt( r.votes ) : max;
+                }
+
+                for ( let r of result ) {
+                    html += '<tr>' + 
+                        '<td>' + decodeURIComponent( stripslashes( r.option ) ) + '</td>' +
+                        '<td><meter value="' + r.votes + '" min="0" max="' + max + '">' + r.votes + '</meter>' +
+                    '</tr>';
+                }
+
+                html += '</tbody></table>';
+
+                for ( let p of polls ) {
+                    if ( uuid === p.attributes.value.nodeValue ) {
+                        let el = document.createElement( 'div' );
+                        el.innerHTML = html;
+                        const resultEl = p.querySelector( '.potd-result' );
+
+                        if ( !resultEl.classList.contains( 'active' ) ) {
+                            resultEl.classList.add( 'active' );
+                        } else {
+                            resultEl.classList.remove( 'active' );
+                        }
+
+                        // console.log( 'resultEl.classList', resultEl.classList );
+                        // console.log( resultEl );
+
+                        p.replaceChild( el.firstChild, resultEl );
+
+                        // console.log( p );
+
+                        // let ele = document.getElementsByClassName( 'potd-result' );
+                        // console.log( 'ele', ele );
+                        // ele.classList.add( 'active' );
+
+                        // console.log( 'resultEl.style.display', resultEl.style );
+                        // let style = window.getComputedStyle( resultEl );
+                        // console.log( 'style', style.display === 'block' );
+                        // if ( resultEl.style.display === 'block' ) {
+                        //     resultEl.style.display = 'none';
+                        // } else {
+                        //     resultEl.style.display = 'block';
+                        // }
+                    }
+                }
+            },
+            ( error ) => {
+                console.log( 'error: ' + error );
+            }
+        )
+}
+
+const setRotation = ( polls ) => {
+
+    let uuids = {};
+
+    for ( let poll of polls ) {
+        for ( let child of poll.children ) {
+            if ( child.className === 'potd-vote-btn' ) {
+                uuids[ poll.attributes.value.nodeValue ] = child.value;
+            }
+        }
+    }
 
     let setRotationUrl = gutenbergtemplateblock_ajax_object.ajax_url +
-    '?action=gutenbergtemplateblock_setRotation' +
-    '&uuids=' + JSON.stringify( uuids ) +
-    '&security=' + gutenbergtemplateblock_ajax_object.security;
+        '?action=gutenbergtemplateblock_setRotation' +
+        '&uuids=' + JSON.stringify( uuids ) +
+        '&security=' + gutenbergtemplateblock_ajax_object.security;
 
     fetch( setRotationUrl )
         .then( response => {
@@ -65,19 +157,19 @@ const setRotation = ( uuids ) => {
         )
 }
 
-const registerVote = ( oid, event ) => {
-
+const setVote = ( oid, event ) => {
+    
     let qid = event.target.value;
     let resultElement = null;
-    for ( let element of event.target.parentNode.childNodes ) {
+    for ( let element of event.target.parentNode.parentNode.childNodes ) {
         if ( element.classList.value === 'potd-result' ) {
             resultElement = element;
         }
     }
 
     let limitByCheckUrl = gutenbergtemplateblock_ajax_object.ajax_url +
-                '?action=gutenbergtemplateblock_getLimitByOption' +
-                '&security=' + gutenbergtemplateblock_ajax_object.security;
+        '?action=gutenbergtemplateblock_getLimitByOption' +
+        '&security=' + gutenbergtemplateblock_ajax_object.security;
 
     fetch( limitByCheckUrl )
         .then( response => {
@@ -108,10 +200,10 @@ const registerVote = ( oid, event ) => {
 const vote = ( oid, qid, resultElement ) => {
     
     let url = gutenbergtemplateblock_ajax_object.ajax_url +
-                '?action=gutenbergtemplateblock_setOptionVoteById' +
-                '&oid=' + oid +
-                '&qid=' + qid +
-                '&security=' + gutenbergtemplateblock_ajax_object.security;
+        '?action=gutenbergtemplateblock_setOptionVoteById' +
+        '&oid=' + oid +
+        '&qid=' + qid +
+        '&security=' + gutenbergtemplateblock_ajax_object.security;
 
     fetch( url )
         .then( response => {
@@ -133,4 +225,23 @@ const vote = ( oid, qid, resultElement ) => {
                 console.log( 'error: ' + error );
             }
         )
+}
+
+/**
+ * http://locutus.io/php/strings/stripslashes/
+ */
+const stripslashes = ( str ) => {
+    return ( str + '' )
+        .replace( /\\(.?)/g, ( s, n1 ) => {
+            switch ( n1 ) {
+                case '\\':
+                    return '\\'
+                case '0':
+                    return '\u0000'
+                case '':
+                    return ''
+                default:
+                    return n1
+            }
+        })
 }

@@ -38,6 +38,22 @@ const { select } = wp.data;
 // console.log( wp.components );
 // console.log( wp.data );
 
+window.addEventListener( "load", function( event ) {
+    var publishBtn = document.querySelector( '.editor-post-publish-button' );
+    if ( publishBtn ) {
+        publishBtn.addEventListener( 'click', () => {
+            const blocks = document.querySelectorAll( '.wp-block-gutenbergtemplateblock-templateblock-editor-block' );
+            if ( blocks.length ) {
+                const postId = select( 'core/editor' ).getCurrentPostId();
+                for ( let block of blocks ) {
+                    let uuid = block.attributes.value.nodeValue;
+                    setPollStart( uuid, postId );
+                }
+            }
+        });
+    }
+});
+
 const setPollStart = ( uuid, postId ) => {
     var self = this;
     let url = gutenbergtemplateblock_ajax_object.ajax_url + 
@@ -63,27 +79,13 @@ const setPollStart = ( uuid, postId ) => {
         )
 };
 
-window.addEventListener( "load", function( event ) {
-    var publishBtn = document.querySelector( '.editor-post-publish-button' );
-    publishBtn.addEventListener( 'click', () => {
-        const blocks = document.querySelectorAll( '.wp-block-gutenbergtemplateblock-templateblock-editor-block' );
-        if ( blocks.length ) {
-            const postId = select( 'core/editor' ).getCurrentPostId();
-            for ( let block of blocks ) {
-                let uuid = block.attributes.value.nodeValue;
-                setPollStart( uuid, postId );
-            }
-        }
-    });
-});
-
 registerBlockType( 'gutenbergtemplateblock/templateblock', 
 {
     title: __( 'Template - Block!', 'gutenbergtemplateblock' ),
     description: __( 'A gutenberg block template.', 'gutenbergtemplateblock' ),
     icon: {
         background: 'rgba(254, 243, 224, 0.52)',
-        src: icons.dynamic,
+        src: icons.logo,
     },         
     category: 'common',
     keywords: [
@@ -813,8 +815,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             <div className = { className } value={ uuid }>
                 <h3>{ pollTitle }</h3>
                 { poll }
-                <button class="potd-vote-btn" value={ answersQid }>Vote!</button>
-                <div class="potd-result"></div>
+                <div>
+                    <button class="potd-vote-btn" value={ answersQid }>Vote!</button>
+                    <button class="potd-results-btn" value={ answersQid }>Results</button>
+                </div>
+                <table class="potd-result"></table>
             </div>
         );
     }

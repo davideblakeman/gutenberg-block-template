@@ -46,6 +46,17 @@
       font-size: 16px;
       font-weight: bold;
       line-height: 27px !important; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-vote-btn,
+  .wp-block-gutenbergtemplateblock-templateblock .potd-vote-btn {
+    margin-right: 5px; }
   .entry-content .wp-block-gutenbergtemplateblock-templateblock .components-base-control,
   .wp-block-gutenbergtemplateblock-templateblock .components-base-control {
     width: 100%; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-result,
+  .wp-block-gutenbergtemplateblock-templateblock .potd-result {
+    margin-top: 32px;
+    transition: height 2s;
+    overflow: hidden; }
+  .entry-content .wp-block-gutenbergtemplateblock-templateblock .active,
+  .wp-block-gutenbergtemplateblock-templateblock .active {
+    display: block; }

@@ -778,6 +778,31 @@ class GutenbergtemplateblockWpdb
         return $outcome;
     }
 
+    public function getResultsByQid( $qid )
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+
+        $results = $wpdb->get_results(
+            $wpdb->prepare('
+                SELECT 
+                    option,
+                    votes
+                FROM ' . $wpdb->gutenbergtemplateblock_options . '
+                WHERE qid = %d
+                ORDER BY optionorder ASC',
+                $qid
+            )
+        );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            return 'fail';
+        }
+
+        return $results;
+    }
+
     // HELPERS
 
     function isValidJSON( $string )

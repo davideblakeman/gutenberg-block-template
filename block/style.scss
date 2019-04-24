@@ -58,6 +58,7 @@ $dark-text: black;
             margin: 1px 0 0 2px;
             display: flex;
             justify-content: center;
+
             button {
                 font-size: 16px;
                 font-weight: bold;
@@ -67,7 +68,22 @@ $dark-text: black;
 
     }
 
+    .potd-vote-btn {
+        margin-right: 5px;
+    }
+
     .components-base-control {
         width: 100%;
+    }
+    
+    .potd-result {
+        margin-top: 32px;
+        transition: height 2s;
+        overflow: hidden;
+        // display: none;
+    }
+
+    .active {
+        display: block;
     }
 }
