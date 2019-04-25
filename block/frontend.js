@@ -37,7 +37,6 @@ const handleResultClick = () => {
 
     for ( let element of elements ) {
         element.addEventListener( 'click', ( event ) => {
-            // console.log( 'uuid', event.target.parentNode.parentNode.attributes.value.nodeValue );
             const uuid = event.target.parentNode.parentNode.attributes.value.nodeValue;
             const qid = event.target.attributes.value.nodeValue;
             getResultsByQid( uuid, qid );
@@ -59,8 +58,8 @@ const getResultsByQid = ( uuid, qid ) => {
         .then( 
             ( result ) => {
                 const polls = document.getElementsByClassName( 'wp-block-gutenbergtemplateblock-templateblock' );
-                let html = '<table class="potd-result"><tbody>';
-                let max = 0;
+                let html = '<table class="potd-result-table"><tbody>';
+                let max = 1;
 
                 for ( let r of result ) {
                     max = r.votes > max ? parseInt( r.votes ) : max;
@@ -77,35 +76,14 @@ const getResultsByQid = ( uuid, qid ) => {
 
                 for ( let p of polls ) {
                     if ( uuid === p.attributes.value.nodeValue ) {
-                        let el = document.createElement( 'div' );
-                        el.innerHTML = html;
+
+                        let resultTable = document.createElement( 'div' );
+                        resultTable.innerHTML = html;
+                        let height = testHeight( resultTable );
                         const resultEl = p.querySelector( '.potd-result' );
-
-                        if ( !resultEl.classList.contains( 'active' ) ) {
-                            resultEl.classList.add( 'active' );
-                        } else {
-                            resultEl.classList.remove( 'active' );
-                        }
-
-                        // console.log( 'resultEl.classList', resultEl.classList );
-                        // console.log( resultEl );
-
-                        p.replaceChild( el.firstChild, resultEl );
-
-                        // console.log( p );
-
-                        // let ele = document.getElementsByClassName( 'potd-result' );
-                        // console.log( 'ele', ele );
-                        // ele.classList.add( 'active' );
-
-                        // console.log( 'resultEl.style.display', resultEl.style );
-                        // let style = window.getComputedStyle( resultEl );
-                        // console.log( 'style', style.display === 'block' );
-                        // if ( resultEl.style.display === 'block' ) {
-                        //     resultEl.style.display = 'none';
-                        // } else {
-                        //     resultEl.style.display = 'block';
-                        // }
+                        resultEl.innerHTML = '';
+                        resultEl.appendChild( resultTable );
+                        slideToggle( resultEl, height );
                     }
                 }
             },
@@ -244,4 +222,31 @@ const stripslashes = ( str ) => {
                     return n1
             }
         })
+}
+
+const slideToggle = ( resultEl, height ) => {
+    
+    let open = true;
+
+    if ( resultEl.style.height === '0px' || resultEl.style.height === '' ) {
+        open = false;
+    }
+
+    if ( open ) {
+        resultEl.style.height = '0px';
+    } else {
+        // const initHeight = testHeight( resultTable );
+        resultEl.style.height = height + 'px';
+    }
+}
+
+const testHeight = ( element ) => {
+
+    let el = element.cloneNode();
+    el.style.visibility = "hidden";
+    document.body.appendChild( el );
+    el.style.top = ( window.innerHeight / 2 - el.clientHeight / 2 ) + 'px';
+    let result = el.style.top.replace( 'px', '' );
+    document.body.removeChild( el );
+    return result;
 }

@@ -819,7 +819,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     <button class="potd-vote-btn" value={ answersQid }>Vote!</button>
                     <button class="potd-results-btn" value={ answersQid }>Results</button>
                 </div>
-                <table class="potd-result"></table>
+                <div class="potd-result"></div>
             </div>
         );
     }

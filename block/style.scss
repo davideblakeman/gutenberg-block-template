@@ -14,6 +14,7 @@ $dark-text: black;
     border: 3px double $border;
     border-radius: 5px;
     padding: 1rem;
+    // transition: all 2s ease-in-out;
 
     &.style-toggle {
         background: $dark;
@@ -77,13 +78,23 @@ $dark-text: black;
     }
     
     .potd-result {
-        margin-top: 32px;
-        transition: height 2s;
-        overflow: hidden;
+        // margin-top: 32px;
+        // overflow: hidden;
         // display: none;
+        height: 0px;
+        overflow: hidden;
+        transition: all 1s ease-in-out;
+    }
+
+    .potd-result-table {
+        margin-top: 32px;
     }
 
     .active {
         display: block;
     }
 }
+
+// .wp-block-gutenbergtemplateblock-templateblock {
+//     transition: all 2s ease-in-out;
+// }
