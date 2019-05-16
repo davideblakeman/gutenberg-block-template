@@ -78,8 +78,9 @@ const getResultsByQid = ( uuid, qid ) => {
                     if ( uuid === p.attributes.value.nodeValue ) {
 
                         let resultTable = document.createElement( 'div' );
+                        let pollWidth = p.offsetWidth;
                         resultTable.innerHTML = html;
-                        let height = testHeight( resultTable );
+                        let height = testHeight( resultTable, pollWidth, p );
                         const resultEl = p.querySelector( '.potd-result' );
                         resultEl.innerHTML = '';
                         resultEl.appendChild( resultTable );
@@ -139,6 +140,7 @@ const setVote = ( oid, event ) => {
     
     let qid = event.target.value;
     let resultElement = null;
+    
     for ( let element of event.target.parentNode.parentNode.childNodes ) {
         if ( element.classList.value === 'potd-result' ) {
             resultElement = element;
@@ -225,28 +227,26 @@ const stripslashes = ( str ) => {
 }
 
 const slideToggle = ( resultEl, height ) => {
-    
-    let open = true;
 
     if ( resultEl.style.height === '0px' || resultEl.style.height === '' ) {
-        open = false;
-    }
-
-    if ( open ) {
-        resultEl.style.height = '0px';
-    } else {
-        // const initHeight = testHeight( resultTable );
         resultEl.style.height = height + 'px';
+    } else {
+        resultEl.style.height = '0px';
     }
 }
 
-const testHeight = ( element ) => {
+const testHeight = ( element, width, poll ) => {
 
-    let el = element.cloneNode();
+    const el = element.cloneNode( true );
+    const containerPaddingLeft = parseInt( getComputedStyle( poll ).getPropertyValue( 'padding-left' ).replace( 'px', '' ) );
+    const containerPaddingRight = parseInt( getComputedStyle( poll ).getPropertyValue( 'padding-right' ).replace( 'px', '' ) );
+    const tableMargin = 32; // .potd-result-table margin in pixels
+    el.style.width = ( width - ( containerPaddingLeft + containerPaddingRight ) ) + 'px';
     el.style.visibility = "hidden";
     document.body.appendChild( el );
-    el.style.top = ( window.innerHeight / 2 - el.clientHeight / 2 ) + 'px';
-    let result = el.style.top.replace( 'px', '' );
+    el.style.top = ( el.clientHeight + ( tableMargin * 2 ) ) + 'px';
+    const result = el.style.top.replace( 'px', '' );
     document.body.removeChild( el );
+
     return result;
 }

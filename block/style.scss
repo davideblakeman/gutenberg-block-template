@@ -13,7 +13,8 @@ $dark-text: black;
     color: $dark-text;
     border: 3px double $border;
     border-radius: 5px;
-    padding: 1rem;
+    // padding: 1rem;
+    padding: 20px;
     // transition: all 2s ease-in-out;
 
     &.style-toggle {
@@ -52,6 +53,19 @@ $dark-text: black;
         width: 100%;
     }
 
+    p {
+
+        label {
+
+            cursor: pointer;
+
+            input {
+                margin-right: 5px;
+                cursor: pointer;
+            }
+        }
+    }
+
     .potd-answers {
     
         .edit-btn-container {
@@ -87,7 +101,15 @@ $dark-text: black;
     }
 
     .potd-result-table {
-        margin-top: 32px;
+
+        margin: 32px 0 32px 0;
+
+        tr {
+
+            td:nth-child(even) {
+                text-align: center;
+            }
+        }
     }
 
     .active {
