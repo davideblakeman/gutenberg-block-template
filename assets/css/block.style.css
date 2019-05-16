@@ -61,6 +61,12 @@
     width: 100%; }
   .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-result,
   .wp-block-gutenbergtemplateblock-templateblock .potd-result {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+        justify-content: center;
+    -ms-flex-align: center;
+        align-items: center;
     height: 0px;
     overflow: hidden;
     transition: all 1s ease-in-out; }
