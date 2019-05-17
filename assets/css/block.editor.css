@@ -1,0 +1,60 @@
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .wp-block-gutenbergtemplateblock-templateblock {
+  background: #fef8ee;
+  border: 0px;
+  border-radius: 0px;
+  padding: 0px; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block.style-toggle .active-tab {
+  box-shadow: inset 0 -3px darkred; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block button {
+  color: black; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block button.active-tab {
+    box-shadow: inset 0 -3px darkblue; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .edit-input {
+  width: 100%; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .edit-delete-button {
+  width: 40px;
+  margin-top: 1px;
+  line-height: 33px !important; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .grid {
+  display: -ms-grid;
+  display: grid; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .inline-flex {
+  display: -ms-inline-flexbox;
+  display: inline-flex; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .inline-grid {
+  display: -ms-inline-grid;
+  display: inline-grid; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-question {
+  width: 100%; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block p label {
+  cursor: pointer; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block p label input {
+    margin-right: 5px;
+    cursor: pointer; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-answers .edit-btn-container {
+  width: 115px;
+  margin: 1px 0 0 2px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+      justify-content: center; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-answers .edit-btn-container button {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 27px !important; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .components-base-control {
+  width: 100%; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .active {
+  display: block; }

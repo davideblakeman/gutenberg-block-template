@@ -1,66 +1,16 @@
-.entry-content .wp-block-gutenbergtemplateblock-templateblock,
-.wp-block-gutenbergtemplateblock-templateblock {
-  background: #fef8ee;
+.wp-block-gutenbergtemplateblock-templateblock.client-block {
   color: black;
+  background: #fef8ee;
   border: 3px double #f0b849;
   border-radius: 5px;
   padding: 20px; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock.style-toggle,
-  .wp-block-gutenbergtemplateblock-templateblock.style-toggle {
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle {
     background: #222;
     border: 2px darkred solid;
     color: white; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .edit-input,
-  .wp-block-gutenbergtemplateblock-templateblock .edit-input {
-    width: 100%; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .edit-delete-button,
-  .wp-block-gutenbergtemplateblock-templateblock .edit-delete-button {
-    width: 40px;
-    margin-top: 1px;
-    line-height: 33px !important; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .grid,
-  .wp-block-gutenbergtemplateblock-templateblock .grid {
-    display: -ms-grid;
-    display: grid; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .inline-flex,
-  .wp-block-gutenbergtemplateblock-templateblock .inline-flex {
-    display: -ms-inline-flexbox;
-    display: inline-flex; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .inline-grid,
-  .wp-block-gutenbergtemplateblock-templateblock .inline-grid {
-    display: -ms-inline-grid;
-    display: inline-grid; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-question,
-  .wp-block-gutenbergtemplateblock-templateblock .potd-question {
-    width: 100%; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock p label,
-  .wp-block-gutenbergtemplateblock-templateblock p label {
-    cursor: pointer; }
-    .entry-content .wp-block-gutenbergtemplateblock-templateblock p label input,
-    .wp-block-gutenbergtemplateblock-templateblock p label input {
-      margin-right: 5px;
-      cursor: pointer; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-answers .edit-btn-container,
-  .wp-block-gutenbergtemplateblock-templateblock .potd-answers .edit-btn-container {
-    width: 115px;
-    margin: 1px 0 0 2px;
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-pack: center;
-        justify-content: center; }
-    .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-answers .edit-btn-container button,
-    .wp-block-gutenbergtemplateblock-templateblock .potd-answers .edit-btn-container button {
-      font-size: 16px;
-      font-weight: bold;
-      line-height: 27px !important; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-vote-btn,
-  .wp-block-gutenbergtemplateblock-templateblock .potd-vote-btn {
+  .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-vote-btn {
     margin-right: 5px; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .components-base-control,
-  .wp-block-gutenbergtemplateblock-templateblock .components-base-control {
-    width: 100%; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-result,
-  .wp-block-gutenbergtemplateblock-templateblock .potd-result {
+  .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result {
     display: -ms-flexbox;
     display: flex;
     -ms-flex-pack: center;
@@ -70,12 +20,88 @@
     height: 0px;
     overflow: hidden;
     transition: all 1s ease-in-out; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-result-table,
-  .wp-block-gutenbergtemplateblock-templateblock .potd-result-table {
+  .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result-table {
     margin: 32px 0 32px 0; }
-    .entry-content .wp-block-gutenbergtemplateblock-templateblock .potd-result-table tr td:nth-child(even),
-    .wp-block-gutenbergtemplateblock-templateblock .potd-result-table tr td:nth-child(even) {
+    .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result-table tr td:nth-child(even) {
       text-align: center; }
-  .entry-content .wp-block-gutenbergtemplateblock-templateblock .active,
-  .wp-block-gutenbergtemplateblock-templateblock .active {
-    display: block; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block meter::before {
+    content: attr(data-tooltip);
+    font-size: 10px;
+    position: absolute;
+    z-index: 999;
+    white-space: nowrap;
+    background: #222;
+    color: white;
+    padding: 0px 7px;
+    line-height: 24px;
+    height: 24px;
+    opacity: 0;
+    transition: opacity 0.4s ease-out; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block meter:hover::before {
+    opacity: 1; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .wp-block-gutenbergtemplateblock-templateblock {
+  background: #fef8ee;
+  border: 3px double #f0b849;
+  border-radius: 5px;
+  padding: 20px; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block.style-toggle .active-tab {
+  box-shadow: inset 0 -3px darkred; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .style-toggle {
+  background: #222;
+  border: 2px darkred solid;
+  color: white; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block button {
+  color: black; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block button.active-tab {
+    box-shadow: inset 0 -3px darkblue; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .edit-input {
+  width: 100%; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .edit-delete-button {
+  width: 40px;
+  margin-top: 1px;
+  line-height: 33px !important; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .grid {
+  display: -ms-grid;
+  display: grid; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .inline-flex {
+  display: -ms-inline-flexbox;
+  display: inline-flex; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .inline-grid {
+  display: -ms-inline-grid;
+  display: inline-grid; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-question {
+  width: 100%; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block p label {
+  cursor: pointer; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block p label input {
+    margin-right: 5px;
+    cursor: pointer; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-answers .edit-btn-container {
+  width: 115px;
+  margin: 1px 0 0 2px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+      justify-content: center; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-answers .edit-btn-container button {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 27px !important; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .components-base-control {
+  width: 100%; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .active {
+  display: block; }

@@ -6,16 +6,29 @@ $secondary-colour: darkred;
 $light-text: white;
 $dark-text: black;
 
-.entry-content .wp-block-gutenbergtemplateblock-templateblock, 
-.wp-block-gutenbergtemplateblock-templateblock {
+// .wp-block-gutenbergtemplateblock-templateblock,
+// .wp-block-gutenbergtemplateblock-templateblock.editor-block {
+.wp-block-gutenbergtemplateblock-templateblock.client-block {
+
+    color: $dark-text;
 
     background: $background;
-    color: $dark-text;
     border: 3px double $border;
     border-radius: 5px;
-    // padding: 1rem;
     padding: 20px;
-    // transition: all 2s ease-in-out;
+
+    // .wp-block-gutenbergtemplateblock-templateblock {
+    //     background: $background;
+    //     border: 3px double $border;
+    //     border-radius: 5px;
+    //     padding: 20px;
+    // }
+
+    // &.style-toggle {
+    //     .active-tab {
+    //         box-shadow: inset 0 -3px $secondary-colour;
+    //     }
+    // }
 
     &.style-toggle {
         background: $dark;
@@ -23,8 +36,158 @@ $dark-text: black;
         color: $light-text;
     }
 
+    // button {
+
+    //     color: $dark-text;
+
+    //     &.active-tab {
+    //         box-shadow: inset 0 -3px $main-colour;
+    //     }
+    // }
+
     .gutenbergtemplateblock-title {
         // border: 2px $main-colour solid;
+    }
+
+    // .edit-input {
+    //     width: 100%;
+    // }
+
+    // .edit-delete-button {
+    //     width: 40px;
+    //     margin-top: 1px;
+    //     line-height: 33px !important;
+    // }
+
+    // .grid {
+    //     display: grid;
+    // }
+
+    // .inline-flex {
+    //     display: inline-flex;
+    // }
+
+    // .inline-grid {
+    //     display: inline-grid;
+    // }
+
+    // .potd-question {
+    //     width: 100%;
+    // }
+
+    // p {
+
+    //     label {
+
+    //         cursor: pointer;
+
+    //         input {
+    //             margin-right: 5px;
+    //             cursor: pointer;
+    //         }
+    //     }
+    // }
+
+    // .potd-answers {
+    
+    //     .edit-btn-container {
+    //         width: 115px;
+    //         margin: 1px 0 0 2px;
+    //         display: flex;
+    //         justify-content: center;
+
+    //         button {
+    //             font-size: 16px;
+    //             font-weight: bold;
+    //             line-height: 27px !important;
+    //         }
+    //     }
+
+    // }
+
+    .potd-vote-btn {
+        margin-right: 5px;
+    }
+
+    // .components-base-control {
+    //     width: 100%;
+    // }
+    
+    .potd-result {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 0px;
+        overflow: hidden;
+        transition: all 1s ease-in-out;
+    }
+
+    .potd-result-table {
+
+        margin: 32px 0 32px 0;
+
+        tr {
+
+            td:nth-child(even) {
+                text-align: center;
+            }
+        }
+    }
+
+    // .active {
+    //     display: block;
+    // }
+
+    meter {
+        &::before {
+            content: attr(data-tooltip);
+            font-size: 10px;
+            position: absolute;
+            z-index: 999;
+            white-space: nowrap;
+            background: $dark;
+            color: $light-text;
+            padding: 0px 7px;
+            line-height: 24px;
+            height: 24px;
+            opacity: 0;  
+            transition: opacity 0.4s ease-out;
+        }
+
+        &:hover::before {
+            opacity: 1;
+        }
+    }
+}
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block {
+
+    .wp-block-gutenbergtemplateblock-templateblock {
+        background: $background;
+        border: 3px double $border;
+        border-radius: 5px;
+        padding: 20px;
+    }
+
+    &.style-toggle {
+        .active-tab {
+            box-shadow: inset 0 -3px $secondary-colour;
+        }
+    }
+
+    .style-toggle {
+        background: $dark;
+        border: 2px $secondary-colour solid;
+        color: $light-text;
+    }
+
+    button {
+
+        color: $dark-text;
+
+        &.active-tab {
+            box-shadow: inset 0 -3px $main-colour;
+        }
     }
 
     .edit-input {
@@ -83,42 +246,11 @@ $dark-text: black;
 
     }
 
-    .potd-vote-btn {
-        margin-right: 5px;
-    }
-
     .components-base-control {
         width: 100%;
-    }
-    
-    .potd-result {
-        // margin-top: 32px;
-        // overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 0px;
-        overflow: hidden;
-        transition: all 1s ease-in-out;
-    }
-
-    .potd-result-table {
-
-        margin: 32px 0 32px 0;
-
-        tr {
-
-            td:nth-child(even) {
-                text-align: center;
-            }
-        }
     }
 
     .active {
         display: block;
     }
 }
-
-// .wp-block-gutenbergtemplateblock-templateblock {
-//     transition: all 2s ease-in-out;
-// }

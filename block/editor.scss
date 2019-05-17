@@ -1,25 +1,96 @@
 $dark: #222;
-$light: rgba(254, 243, 224, 0.52);
+$background: rgb(254, 248, 238);
+$border: #f0b849;
 $main-colour: darkblue;
+$secondary-colour: darkred;
+$light-text: white;
+$dark-text: black;
 
-// .entry-content .wp-block-gutenbergtemplateblock-templateblock, 
-// .wp-block-gutenbergtemplateblock-templateblock {
-//     .components-button {
-//         height: 81%;
-//     }
-// }
+.wp-block-gutenbergtemplateblock-templateblock.editor-block {
 
-// .wp-block-gutenbergtemplateblock-templateblock 
-// .wp-block-gutenbergtemplateblock-templateblock
-// .grid .inline-flex .components-button {
-//     height: 81%;
-// }
+    .wp-block-gutenbergtemplateblock-templateblock {
+        background: $background;
+        border: 0px;
+        border-radius: 0px;
+        padding: 0px;
+    }
 
-// .entry-content .wp-block-gutenbergtemplateblock-templateblock, 
-// .wp-block-gutenbergtemplateblock-templateblock {
+    &.style-toggle {
+        .active-tab {
+            box-shadow: inset 0 -3px $secondary-colour;
+        }
+    }
+
+    button {
+
+        color: $dark-text;
+
+        &.active-tab {
+            box-shadow: inset 0 -3px $main-colour;
+        }
+    }
+
+    .edit-input {
+        width: 100%;
+    }
+
+    .edit-delete-button {
+        width: 40px;
+        margin-top: 1px;
+        line-height: 33px !important;
+    }
+
+    .grid {
+        display: grid;
+    }
+
+    .inline-flex {
+        display: inline-flex;
+    }
+
+    .inline-grid {
+        display: inline-grid;
+    }
+
+    .potd-question {
+        width: 100%;
+    }
+
+    p {
+
+        label {
+
+            cursor: pointer;
+
+            input {
+                margin-right: 5px;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .potd-answers {
     
-//     .components-button {
-//         height: 81% !important;
-//     }
+        .edit-btn-container {
+            width: 115px;
+            margin: 1px 0 0 2px;
+            display: flex;
+            justify-content: center;
 
-// }
+            button {
+                font-size: 16px;
+                font-weight: bold;
+                line-height: 27px !important;
+            }
+        }
+
+    }
+
+    .components-base-control {
+        width: 100%;
+    }
+
+    .active {
+        display: block;
+    }
+}

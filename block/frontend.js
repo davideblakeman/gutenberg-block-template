@@ -69,7 +69,7 @@ const onResultClick = ( event ) => {
                     for ( let r of result ) {
                         html += '<tr>' + 
                             '<td>' + decodeURIComponent( stripslashes( r.option ) ) + '</td>' +
-                            '<td><meter value="' + r.votes + '" min="0" max="' + max + '">' + r.votes + '</meter>' +
+                            '<td><meter value="' + r.votes + '" min="0" max="' + max + '" data-tooltip="' + r.votes + ' votes"></meter>' +
                         '</tr>'
                     }
 
