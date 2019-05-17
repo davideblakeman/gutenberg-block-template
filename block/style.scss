@@ -1,3 +1,4 @@
+$light: white;
 $dark: #222;
 $background: rgb(254, 248, 238);
 $border: #f0b849;
@@ -70,6 +71,90 @@ $dark-text: black;
             opacity: 1;
         }
     }
+
+    // Radio's
+
+    div[class^="group-"] {
+        align-items: center;
+        margin-bottom: 2em;
+
+        p {
+            display: flex;
+            align-content: center;
+        }
+    }
+    
+    input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        z-index: -1;
+    }
+
+    label {
+
+        position: relative;
+        margin-right: 1em;
+        padding-left: 2em;
+        padding-right: 1em;
+        line-height: 2;
+        z-index: 1;
+        cursor: pointer;
+
+        &:before {
+            box-sizing: border-box;
+            content: " ";
+            position: absolute;
+            top: 0.3em;
+            left: 0;
+            display: block;
+            width: 1.4em;
+            height: 1.4em;
+            border: 2px solid $dark;
+            border-radius: .25em;
+            z-index: -1;
+        }
+    }
+
+    input[type="radio"] + label::before {
+        border-radius: 12px;
+    }
+
+    &.style-toggle {
+
+        label {
+            &:before {
+                border: 2px solid $light-text;
+            }
+        }
+
+        input[type="radio"]:checked + label {
+            color: $dark-text;
+            text-shadow: -1px 0 2px $light,
+                         0 1px 2px $light,
+                         1px 0 2px $light,
+                         0 -1px 2px $light;
+        }
+    }
+    input[type="radio"]:checked + label {
+
+        padding-left: 1em;
+        color: $light-text;
+        text-shadow: -1px 0 2px $dark,
+                     0 1px 2px $dark,
+                     1px 0 2px $dark,
+                     0 -1px 2px $dark;
+
+        &:before {
+            top: 0;
+            width: 100%;
+            height: 2em;
+        }
+    }
+    
+    label,
+    label::before {
+        transition: .25s all ease;
+    }
 }
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block {
@@ -82,15 +167,16 @@ $dark-text: black;
     }
 
     &.style-toggle {
+
+        .wp-block-gutenbergtemplateblock-templateblock {
+            background: $dark;
+            border: 2px $secondary-colour solid;
+            color: $light-text;
+        }
+
         .active-tab {
             box-shadow: inset 0 -3px $secondary-colour;
         }
-    }
-
-    .style-toggle {
-        background: $dark;
-        border: 2px $secondary-colour solid;
-        color: $light-text;
     }
 
     button {
@@ -126,19 +212,6 @@ $dark-text: black;
 
     .potd-question {
         width: 100%;
-    }
-
-    p {
-
-        label {
-
-            cursor: pointer;
-
-            input {
-                margin-right: 5px;
-                cursor: pointer;
-            }
-        }
     }
 
     .potd-answers {

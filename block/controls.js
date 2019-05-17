@@ -1,19 +1,19 @@
 /**
  * Block dependencies
  */
-import classnames from "classnames";
-import icons from './icons';
+import classnames from "classnames"
+import icons from './icons'
 
 /**
  * Internal block libraries
  */
-const { __ } = wp.i18n;
-const { Component } = wp.element;
+const { __ } = wp.i18n
+const { Component } = wp.element
 const {
     AlignmentToolbar,
     BlockControls,
     BlockAlignmentToolbar,
-} = wp.editor;
+} = wp.editor
 const {
     Toolbar,
     Tooltip,
@@ -21,21 +21,44 @@ const {
     // ColorIndicator,
     // ColorPalette,
     // ColorPicker
-} = wp.components;
+} = wp.components
 
 /**
  * Create a Block Controls wrapper Component
  */
 export default class Inspector extends Component {
 
-    constructor()
-    {
-        super( ...arguments );
+    constructor() {
+        super( ...arguments )
+        this.handleStyleChange = this.handleStyleChange.bind( this )
+    }
+
+    handleStyleChange() {
+        const {
+            attributes: {
+                styleToggle
+            }
+        } = this.props
+        console.log( 'this.props.attributes', styleToggle )
+        this.props.setAttributes( { styleToggle: !styleToggle } )
+        this.props.onStyleChange( styleToggle )
     }
 
     render() {
-        const { attributes: { blockAlignment, textAlignment, styleToggle }, setAttributes } = this.props;
-        const formStyleToggle = () => setAttributes( { styleToggle: !styleToggle } );
+        const {
+            attributes: { 
+                blockAlignment,
+                textAlignment,
+                styleToggle
+            },
+            className,
+            setAttributes
+        } = this.props
+        // const formStyleToggle = () => setAttributes( { styleToggle: !styleToggle } )
+        // const classes = classnames(
+        //     className,
+        //     { 'style-toggle': styleToggle }
+        // )
 
         return (
             <BlockControls>
@@ -55,13 +78,13 @@ export default class Inspector extends Component {
                                 'components-toolbar__control',
                                 { 'is-active': styleToggle },
                             )}
-                            onClick = { formStyleToggle }
+                            onClick = { this.handleStyleChange }
                         >
                             { icons.contrast }
                         </Button>
                     </Tooltip>
                 </Toolbar>
             </BlockControls>
-        );
+        )
     }
 }

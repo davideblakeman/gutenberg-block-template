@@ -39,6 +39,57 @@
     transition: opacity 0.4s ease-out; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block meter:hover::before {
     opacity: 1; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block div[class^="group-"] {
+    -ms-flex-align: center;
+        align-items: center;
+    margin-bottom: 2em; }
+    .wp-block-gutenbergtemplateblock-templateblock.client-block div[class^="group-"] p {
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-line-pack: center;
+          align-content: center; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    z-index: -1; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block label {
+    position: relative;
+    margin-right: 1em;
+    padding-left: 2em;
+    padding-right: 1em;
+    line-height: 2;
+    z-index: 1;
+    cursor: pointer; }
+    .wp-block-gutenbergtemplateblock-templateblock.client-block label:before {
+      box-sizing: border-box;
+      content: " ";
+      position: absolute;
+      top: 0.3em;
+      left: 0;
+      display: block;
+      width: 1.4em;
+      height: 1.4em;
+      border: 2px solid #222;
+      border-radius: .25em;
+      z-index: -1; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"] + label::before {
+    border-radius: 12px; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle label:before {
+    border: 2px solid white; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle input[type="radio"]:checked + label {
+    color: black;
+    text-shadow: -1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"]:checked + label {
+    padding-left: 1em;
+    color: white;
+    text-shadow: -1px 0 2px #222, 0 1px 2px #222, 1px 0 2px #222, 0 -1px 2px #222; }
+    .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"]:checked + label:before {
+      top: 0;
+      width: 100%;
+      height: 2em; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block label,
+  .wp-block-gutenbergtemplateblock-templateblock.client-block label::before {
+    transition: .25s all ease; }
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block .wp-block-gutenbergtemplateblock-templateblock {
   background: #fef8ee;
@@ -46,13 +97,13 @@
   border-radius: 5px;
   padding: 20px; }
 
-.wp-block-gutenbergtemplateblock-templateblock.editor-block.style-toggle .active-tab {
-  box-shadow: inset 0 -3px darkred; }
-
-.wp-block-gutenbergtemplateblock-templateblock.editor-block .style-toggle {
+.wp-block-gutenbergtemplateblock-templateblock.editor-block.style-toggle .wp-block-gutenbergtemplateblock-templateblock {
   background: #222;
   border: 2px darkred solid;
   color: white; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block.style-toggle .active-tab {
+  box-shadow: inset 0 -3px darkred; }
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block button {
   color: black; }
@@ -81,12 +132,6 @@
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-question {
   width: 100%; }
-
-.wp-block-gutenbergtemplateblock-templateblock.editor-block p label {
-  cursor: pointer; }
-  .wp-block-gutenbergtemplateblock-templateblock.editor-block p label input {
-    margin-right: 5px;
-    cursor: pointer; }
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-answers .edit-btn-container {
   width: 115px;

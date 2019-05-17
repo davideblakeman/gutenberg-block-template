@@ -43,7 +43,6 @@ window.addEventListener( 'load', function( event ) {
     if ( publishBtn ) {
         publishBtn.addEventListener( 'click', () => {
             const blocks = document.querySelectorAll( '.wp-block-gutenbergtemplateblock-templateblock.editor-block' )
-            console.log( blocks )
             if ( blocks.length ) {
                 const postId = select( 'core/editor' ).getCurrentPostId()
                 for ( let block of blocks ) {
@@ -157,6 +156,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.deleteAnswerById = this.deleteAnswerById.bind( this )
             this.setPoll = this.setPoll.bind( this )
             this.setAnswers = this.setAnswers.bind( this )
+            this.handleStyleClick = this.handleStyleClick.bind( this );
 
             setAttributes({
                 classes: classnames(
@@ -376,6 +376,17 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             }
         }
 
+        handleStyleClick( style ) {
+            console.log( 'handleStyleClick', style )
+            const {
+                attributes: {
+                    styleToggle
+                }
+            } = this.props
+
+            this.props.setAttributes( { styleToggle: !styleToggle } )
+        }
+
         setPoll( qid, question, answers ) {
             if ( qid && question ) {
                 var self = this
@@ -499,6 +510,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 .then(
                     ( results ) => {
                         let answersByOid = []
+                        let uuid = this.uuidv4()
                         const pollOptions = results.map( ( object, key ) => {
                             answersByOid.push({
                                 oid: object.oid,
@@ -506,16 +518,29 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             })
                             return [
                                 <p>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="options"
-                                            value={ object.oid }
-                                        />
+                                    <input
+                                        id={ 'id-' + object.oid + '-' + uuid }
+                                        type="radio"
+                                        name={ "options-" + object.qid + '-' + uuid }
+                                        value={ object.oid }
+                                    />
+                                    <label for={ 'id-' + object.oid + '-' + uuid }>
                                         { decodeURIComponent( self.stripslashes( object.option ) ) }
                                     </label>
                                 </p>
                             ]
+                            // return [
+                            //     <p>
+                            //         <label>
+                            //             <input
+                            //                 type="radio"
+                            //                 name="options"
+                            //                 value={ object.oid }
+                            //             />
+                            //             { decodeURIComponent( self.stripslashes( object.option ) ) }
+                            //         </label>
+                            //     </p>
+                            // ]
                         })
                         
                         self.setSavePoll( pollOptions )
@@ -552,6 +577,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 .then(
                     ( result ) => {
                         let answersByOid = []
+                        let uuid = this.uuidv4()
                         const pollOptions = result.map( ( object, key ) => {
                             answersByOid.push({
                                 oid: object.oid,
@@ -559,16 +585,29 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             })
                             return [
                                 <p>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="options"
-                                            value={ object.oid }
-                                        />
+                                    <input
+                                        id={ 'id-' + object.oid + '-' + uuid }
+                                        type="radio"
+                                        name={ "options-" + object.qid + '-' + uuid }
+                                        value={ object.oid }
+                                    />
+                                    <label for={ 'id-' + object.oid + '-' + uuid }>
                                         { decodeURIComponent( self.stripslashes( object.option ) ) }
                                     </label>
                                 </p>
                             ]
+                            // return [
+                            //     <p>
+                            //         <label>
+                            //             <input
+                            //                 type="radio"
+                            //                 name="options"
+                            //                 value={ object.oid }
+                            //             />
+                            //             { decodeURIComponent( self.stripslashes( object.option ) ) }
+                            //         </label>
+                            //     </p>
+                            // ]
                         })
 
                         self.setState({
@@ -682,6 +721,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 setAttributes,
                 attributes: {
                     classes,
+                    styleToggle,
                     // titleColour,
                     // contentColour,
                     // textAlignment,
@@ -700,12 +740,21 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 newQuestion
             }  = this.state
 
-            console.log( 'classes', classes )
-
             return [
                 <Inspector { ...{ setAttributes, ...this.props }} />,
-                <Controls { ...{ setAttributes, ...this.props }} />,
-                <div className = { classes + ' editor-block' } value={ uuid }>
+                <Controls 
+                    { ...{ setAttributes, ...this.props }}
+                    onStyleChange={ this.handleStyleClick }
+                />,
+                <div className = {
+                        classes +
+                        ' editor-block' +
+                        classnames({
+                            ' style-toggle': styleToggle
+                        })
+                    }
+                    value={ uuid }
+                >
                     <TabPanel
                         className="my-tab-panel"
                         activeClass="active-tab"
@@ -817,7 +866,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         return (
             <div className = { className + ' client-block' } value={ uuid }>
                 <h3>{ pollTitle }</h3>
-                { poll }
+                <div class={"group-" + uuid}>
+                    { poll }
+                </div>
                 <div>
                     <button class="potd-vote-btn" value={ answersQid }>Vote!</button>
                     <button class="potd-results-btn" value={ answersQid }>Results</button>

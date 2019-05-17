@@ -104,11 +104,14 @@ const onVoteClick = ( event ) => {
     
     let oid;
     const qid = event.target.value
-    const resultEl = event.target.parentNode.parentNode.querySelector( '.potd-result' )
+    const parent = event.target.parentNode.parentNode
+    const resultEl = parent.querySelector( '.potd-result' )
+    const radioGroup = parent.querySelectorAll( 'input' )
 
-    for ( let el of event.target.parentNode.parentNode.childNodes ) {
-        if ( el.tagName === 'P' && el.firstChild.children[0].checked ) {
-            oid = el.firstChild.children[0].value
+    for ( let el of radioGroup ) {
+        if ( el.checked ) {
+            
+            oid = el.value
         }
     }
 
