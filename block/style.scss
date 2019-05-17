@@ -6,8 +6,6 @@ $secondary-colour: darkred;
 $light-text: white;
 $dark-text: black;
 
-// .wp-block-gutenbergtemplateblock-templateblock,
-// .wp-block-gutenbergtemplateblock-templateblock.editor-block {
 .wp-block-gutenbergtemplateblock-templateblock.client-block {
 
     color: $dark-text;
@@ -17,101 +15,19 @@ $dark-text: black;
     border-radius: 5px;
     padding: 20px;
 
-    // .wp-block-gutenbergtemplateblock-templateblock {
-    //     background: $background;
-    //     border: 3px double $border;
-    //     border-radius: 5px;
-    //     padding: 20px;
-    // }
-
-    // &.style-toggle {
-    //     .active-tab {
-    //         box-shadow: inset 0 -3px $secondary-colour;
-    //     }
-    // }
-
     &.style-toggle {
         background: $dark;
         border: 2px $secondary-colour solid;
         color: $light-text;
     }
 
-    // button {
-
-    //     color: $dark-text;
-
-    //     &.active-tab {
-    //         box-shadow: inset 0 -3px $main-colour;
-    //     }
-    // }
-
     .gutenbergtemplateblock-title {
         // border: 2px $main-colour solid;
     }
 
-    // .edit-input {
-    //     width: 100%;
-    // }
-
-    // .edit-delete-button {
-    //     width: 40px;
-    //     margin-top: 1px;
-    //     line-height: 33px !important;
-    // }
-
-    // .grid {
-    //     display: grid;
-    // }
-
-    // .inline-flex {
-    //     display: inline-flex;
-    // }
-
-    // .inline-grid {
-    //     display: inline-grid;
-    // }
-
-    // .potd-question {
-    //     width: 100%;
-    // }
-
-    // p {
-
-    //     label {
-
-    //         cursor: pointer;
-
-    //         input {
-    //             margin-right: 5px;
-    //             cursor: pointer;
-    //         }
-    //     }
-    // }
-
-    // .potd-answers {
-    
-    //     .edit-btn-container {
-    //         width: 115px;
-    //         margin: 1px 0 0 2px;
-    //         display: flex;
-    //         justify-content: center;
-
-    //         button {
-    //             font-size: 16px;
-    //             font-weight: bold;
-    //             line-height: 27px !important;
-    //         }
-    //     }
-
-    // }
-
     .potd-vote-btn {
         margin-right: 5px;
     }
-
-    // .components-base-control {
-    //     width: 100%;
-    // }
     
     .potd-result {
         display: flex;
@@ -133,10 +49,6 @@ $dark-text: black;
             }
         }
     }
-
-    // .active {
-    //     display: block;
-    // }
 
     meter {
         &::before {
