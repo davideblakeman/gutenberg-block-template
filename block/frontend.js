@@ -1,6 +1,6 @@
-console.log( 'Frontend Block JS' );
+console.log( 'Frontend Block JS' )
 
-var transitionTime = 1001;
+var transitionTime = 1001
 
 window.addEventListener( "load", function() {
 
@@ -11,7 +11,7 @@ window.addEventListener( "load", function() {
         handleResultClick()
         setRotation( polls )
     }
-});
+})
 
 // Handlers
 
@@ -146,7 +146,7 @@ const onVoteClick = ( event ) => {
     } else {
         slideToggle( resultEl, event, 'vote' )
     }
-};
+}
 
 // Setters
 
@@ -255,7 +255,7 @@ const testHeight = ( element ) => {
     const el = element.cloneNode( true )
     const containerPaddingLeft = parseInt( getComputedStyle( poll ).getPropertyValue( 'padding-left' ).replace( 'px', '' ) )
     const containerPaddingRight = parseInt( getComputedStyle( poll ).getPropertyValue( 'padding-right' ).replace( 'px', '' ) )
-    const tableMargin = 32; // .potd-result-table margin in pixels
+    const tableMargin = 32 // .potd-result-table margin in pixels
     el.style.width = ( width - ( containerPaddingLeft + containerPaddingRight ) ) + 'px'
     el.style.visibility = "hidden"
     document.body.appendChild( el )

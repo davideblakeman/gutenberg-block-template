@@ -9,8 +9,9 @@ import Inspector from './inspector'
 import Controls from './controls'
 import attributes from './attributes'
 // import colourAttributes from './colours'
-import PotdSelect from './components/PotdSelect'
+import PotDSelect from './components/PotdSelect'
 import PotDSettings from './components/PotdSettings'
+import PotDStyle from './components/PotdStyle'
 import './style.scss'
 import './editor.scss'
 
@@ -156,7 +157,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.deleteAnswerById = this.deleteAnswerById.bind( this )
             this.setPoll = this.setPoll.bind( this )
             this.setAnswers = this.setAnswers.bind( this )
-            this.handleStyleClick = this.handleStyleClick.bind( this );
+            this.handleStyleClick = this.handleStyleClick.bind( this )
 
             setAttributes({
                 classes: classnames(
@@ -774,6 +775,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                 name: 'tab3',
                                 title: 'Settings',
                                 className: 'tab-three'
+                            },
+                            {
+                                name: 'tab4',
+                                title: 'Style',
+                                className: 'tab-four'
                             }
                         ]}
                     >
@@ -783,7 +789,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                     return [
                                         <div className = { classes }>
                                             { isLoaded ? 
-                                                <PotdSelect
+                                                <PotDSelect
                                                     onSelectChange={ this.handleSelectChange }
                                                     questions={ questions }
                                                     answers={ answers }
@@ -804,7 +810,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                     return [
                                         <div className={ className }>
                                             { isLoaded ?
-                                                <PotdSelect
+                                                <PotDSelect
                                                     onSelectChange={ this.handleSelectChange }
                                                     questions={ questions }
                                                     answers={ answers }
@@ -834,6 +840,12 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                     return [
                                         <div className={ className }>
                                             <PotDSettings/>
+                                        </div>
+                                    ]
+                                } else if ( tab.name === 'tab4' ) {
+                                    return [
+                                        <div className={ className }>
+                                            <PotDStyle/>
                                         </div>
                                     ]
                                 }

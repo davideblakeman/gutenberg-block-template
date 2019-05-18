@@ -1,19 +1,19 @@
 /**
  * Block dependencies
  */
-// import colourAttributes from "./colours";
+// import colourAttributes from "./colours"
 
 /**
  * Internal block libraries
  */
-const { __ } = wp.i18n;
-const { Component } = wp.element;
+const { __ } = wp.i18n
+const { Component } = wp.element
 const {
   InspectorControls,
 //   ColorPalette,
 //   PanelColorSettings,
 //   ContrastChecker
-} = wp.editor;
+} = wp.editor
 
 const {
 //   CheckboxControl,
@@ -26,7 +26,7 @@ const {
 //   TextareaControl,
 //   ToggleControl,
 //   SelectControl
-} = wp.components;
+} = wp.components
 
 /**
  * Create an Inspector Controls wrapper Component
@@ -34,7 +34,7 @@ const {
 export default class Inspector extends Component {
   constructor()
   {
-    super( ...arguments );
+    super( ...arguments )
   }
 
   render() {
@@ -44,8 +44,8 @@ export default class Inspector extends Component {
             titleColour,
             contentColour
         }, setAttributes 
-    } = this.props;
-    const formStyleToggle = () => setAttributes( { styleToggle: !styleToggle } );
+    } = this.props
+    const formStyleToggle = () => setAttributes( { styleToggle: !styleToggle } )
 
     return (
         <InspectorControls>
@@ -73,7 +73,7 @@ export default class Inspector extends Component {
                     label: __( "Selected Color" ),
                     value: titleColour,
                     onChange: titleColour => {
-                        setAttributes({ titleColour });
+                        setAttributes({ titleColour })
                     }
                 }]}
                 colors = { colourAttributes.colours }
@@ -85,13 +85,13 @@ export default class Inspector extends Component {
                     label: __( "Selected Color" ),
                     value: contentColour,
                     onChange: contentColour => {
-                        setAttributes({ contentColour });
+                        setAttributes({ contentColour })
                     }
                 }]}
                 colors = { colourAttributes.colours }
             /> */}
 
         </InspectorControls>
-    );
+    )
   }
 }

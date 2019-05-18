@@ -1,1 +1,1 @@
-wp.i18n.setLocaleData( { '': {} }, 'gutenbergtemplateblock' );
+wp.i18n.setLocaleData( { '': {} }, 'gutenbergtemplateblock' )

@@ -315,6 +315,26 @@ class GutenbergtemplateblockWpdb
         return $result;
     }
 
+    public function getStyleOptions()
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+
+        $result = $wpdb->get_results('
+            SELECT option_name, option_value
+            FROM ' . $wpdb->options . '
+            WHERE option_name LIKE "gutenbergtemplateblock_style"',
+            OBJECT_K
+        );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            return 'fail';
+        }
+        
+        return $result;
+    }
+
     public function votedToday( $clientIp, $qid )
     {
         global $wpdb;
