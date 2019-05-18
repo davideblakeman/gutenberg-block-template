@@ -10,7 +10,6 @@ $dark-text: black;
 .wp-block-gutenbergtemplateblock-templateblock.client-block {
 
     color: $dark-text;
-
     background: $background;
     border: 3px double $border;
     border-radius: 5px;
@@ -20,10 +19,6 @@ $dark-text: black;
         background: $dark;
         border: 2px $secondary-colour solid;
         color: $light-text;
-    }
-
-    .gutenbergtemplateblock-title {
-        // border: 2px $main-colour solid;
     }
 
     .potd-vote-btn {
@@ -51,30 +46,42 @@ $dark-text: black;
         }
     }
 
-    meter {
-        &::before {
-            content: attr(data-tooltip);
-            font-size: 10px;
-            position: absolute;
-            z-index: 999;
-            white-space: nowrap;
-            background: $dark;
-            color: $light-text;
-            padding: 0px 7px;
-            line-height: 24px;
-            height: 24px;
-            opacity: 0;  
-            transition: opacity 0.4s ease-out;
-        }
-
-        &:hover::before {
-            opacity: 1;
-        }
+    .tooltip {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .tooltip-info {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+    
+    span.tooltip::before {
+        content: attr(data-tooltip);
+        position: absolute;
+        font-size: 0.9em;
+        padding: 1px 5px;
+        display: none;
+        color: $light-text;
+        background: $dark;
+        border-radius: 4px;
+        transition: opacity 0.1s ease-out;
+        z-index: 99;
+        text-align: left;
+    }
+    
+    span:hover::before {
+        display: inline-block;
     }
 
     // Radio's
 
     div[class^="group-"] {
+
         align-items: center;
         margin-bottom: 2em;
 
@@ -113,6 +120,10 @@ $dark-text: black;
             border-radius: .25em;
             z-index: -1;
         }
+
+        &:hover:before {
+            box-shadow: inset 0px 0px 10px rgb( 0, 0, 0 );
+        }
     }
 
     input[type="radio"] + label::before {
@@ -122,8 +133,13 @@ $dark-text: black;
     &.style-toggle {
 
         label {
+
             &:before {
                 border: 2px solid $light-text;
+            }
+
+            &:hover:before {
+                box-shadow: inset 0px 0px 15px rgb( 255, 255, 255 );
             }
         }
 
@@ -135,6 +151,7 @@ $dark-text: black;
                          0 -1px 2px $light;
         }
     }
+
     input[type="radio"]:checked + label {
 
         padding-left: 1em;
@@ -217,6 +234,7 @@ $dark-text: black;
     .potd-answers {
     
         .edit-btn-container {
+
             width: 115px;
             margin: 1px 0 0 2px;
             display: flex;
@@ -228,7 +246,6 @@ $dark-text: black;
                 line-height: 27px !important;
             }
         }
-
     }
 
     .components-base-control {

@@ -69,7 +69,12 @@ const onResultClick = ( event ) => {
                     for ( let r of result ) {
                         html += '<tr>' + 
                             '<td>' + decodeURIComponent( stripslashes( r.option ) ) + '</td>' +
-                            '<td><meter value="' + r.votes + '" min="0" max="' + max + '" data-tooltip="' + r.votes + ' votes"></meter>' +
+                            '<td>' + 
+                                '<span class="tooltip" data-tooltip="' + r.votes + ' votes">' +
+                                    '<span class="tooltip-info"></span>' +
+                                    '<meter value="' + r.votes + '" min="0" max="' + max + '"></meter>' +
+                                '</span>' +
+                            '</td>' +
                         '</tr>'
                     }
 
@@ -102,18 +107,11 @@ const onResultClick = ( event ) => {
 
 const onVoteClick = ( event ) => {
     
-    let oid;
     const qid = event.target.value
     const parent = event.target.parentNode.parentNode
     const resultEl = parent.querySelector( '.potd-result' )
-    const radioGroup = parent.querySelectorAll( 'input' )
-
-    for ( let el of radioGroup ) {
-        if ( el.checked ) {
-            
-            oid = el.value
-        }
-    }
+    const checkedRadio = parent.querySelector( 'input:checked' )
+    const oid = checkedRadio.value
 
     if ( resultEl.clientHeight === 0 ) {
         let limitByCheckUrl = gutenbergtemplateblock_ajax_object.ajax_url +
@@ -265,7 +263,7 @@ const testHeight = ( element ) => {
     const result = el.style.top.replace( 'px', '' )
     document.body.removeChild( el )
 
-    return result;
+    return result
 }
 
 /**

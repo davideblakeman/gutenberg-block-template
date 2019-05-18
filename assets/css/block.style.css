@@ -24,21 +24,33 @@
     margin: 32px 0 32px 0; }
     .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result-table tr td:nth-child(even) {
       text-align: center; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block meter::before {
-    content: attr(data-tooltip);
-    font-size: 10px;
+  .wp-block-gutenbergtemplateblock-templateblock.client-block .tooltip {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-pack: center;
+        justify-content: center;
+    -ms-flex-align: center;
+        align-items: center;
+    position: relative;
+    cursor: pointer; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block .tooltip-info {
     position: absolute;
-    z-index: 999;
-    white-space: nowrap;
-    background: #222;
+    top: -9999px;
+    left: -9999px; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block span.tooltip::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    font-size: 0.9em;
+    padding: 1px 5px;
+    display: none;
     color: white;
-    padding: 0px 7px;
-    line-height: 24px;
-    height: 24px;
-    opacity: 0;
-    transition: opacity 0.4s ease-out; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block meter:hover::before {
-    opacity: 1; }
+    background: #222;
+    border-radius: 4px;
+    transition: opacity 0.1s ease-out;
+    z-index: 99;
+    text-align: left; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block span:hover::before {
+    display: inline-block; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block div[class^="group-"] {
     -ms-flex-align: center;
         align-items: center;
@@ -72,10 +84,14 @@
       border: 2px solid #222;
       border-radius: .25em;
       z-index: -1; }
+    .wp-block-gutenbergtemplateblock-templateblock.client-block label:hover:before {
+      box-shadow: inset 0px 0px 10px black; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"] + label::before {
     border-radius: 12px; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle label:before {
     border: 2px solid white; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle label:hover:before {
+    box-shadow: inset 0px 0px 15px white; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle input[type="radio"]:checked + label {
     color: black;
     text-shadow: -1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white; }
