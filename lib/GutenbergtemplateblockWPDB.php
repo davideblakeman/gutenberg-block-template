@@ -790,7 +790,7 @@ class GutenbergtemplateblockWpdb
                     votes
                 FROM ' . $wpdb->gutenbergtemplateblock_options . '
                 WHERE qid = %d
-                ORDER BY votes DESC',
+                ORDER BY votes DESC, option ASC',
                 $qid
             )
         );
