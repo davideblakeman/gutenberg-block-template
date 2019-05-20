@@ -106,7 +106,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             // console.log( 'constructor' )
             const {
                 attributes: {
+                    styleDefault,
                     styleToggle,
+                    styleLight,
+                    styleDark,
                 }, 
                 className, 
                 setAttributes,
@@ -129,7 +132,13 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 // answersQid: null,
                 // firstQid: null,
                 editing: false,
-                newQuestion: false
+                newQuestion: false,
+                style: [{
+                    default: true,
+                    toggle: false,
+                    light: false,
+                    dark: false,
+                }]
             }
             
             if ( typeof this.props.attributes.uuid === undefined || this.props.attributes.uuid === null ) {
@@ -162,9 +171,12 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             setAttributes({
                 classes: classnames(
                     className,
-                    { 'style-toggle': styleToggle }
-                )
+                    // styleToggle
+                ),
             })
+
+            console.log( 'attributes', this.props.attributes )
+            console.log( 'className', className )
         }
 
         /**
@@ -179,6 +191,17 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             // console.log( this.props )
             // console.log( this.props.attributes )
             this.getPollQuestions()
+            
+            // let s = [{
+            //     default: false,
+            //     toggle: false,
+            //     light: false,
+            //     dark: true,
+            // }]
+
+            // this.setState({
+            //     style: s
+            // }, () => console.log( 'this.state', this.state ) )
         }
         
         // Events \\
@@ -376,7 +399,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 this.setPoll( qid, q, a )
             }
         }
-
+        
         handleStyleClick( style ) {
             console.log( 'handleStyleClick', style )
             const {
@@ -384,6 +407,32 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     styleToggle
                 }
             } = this.props
+
+            const defaultStyle = ( style ) => {
+                if ( style === true || style === 'default' ) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+
+            const darkStyle = ( style ) => {
+                if ( style === false || style === 'dark' ) {
+                    return true
+                } else {
+                    return false
+                }
+            }
+
+            const s = [{
+                default: defaultStyle( style ),
+                light: style === 'light' ? true : false,
+                dark: darkStyle( style )
+            }]
+
+            this.setState({
+                style: s
+            }, () => console.log( 'this.state', this.state.style[0] ) )
 
             this.props.setAttributes( { styleToggle: !styleToggle } )
         }
@@ -738,7 +787,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 questions,
                 answers,
                 editing,
-                newQuestion
+                newQuestion,
+                style
             }  = this.state
 
             return [
@@ -751,7 +801,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         classes +
                         ' editor-block' +
                         classnames({
-                            ' style-toggle': styleToggle
+                            ' style-toggle': styleToggle,
+                            ' style-default': style[0].default,
+                            ' style-dark': style[0].dark,
+                            ' style-light': style[0].light,
                         })
                     }
                     value={ uuid }
@@ -845,7 +898,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                 } else if ( tab.name === 'tab4' ) {
                                     return [
                                         <div className={ className }>
-                                            <PotDStyle/>
+                                            <PotDStyle
+                                                onStyleRadioChange={ this.handleStyleClick }
+                                            />
                                         </div>
                                     ]
                                 }

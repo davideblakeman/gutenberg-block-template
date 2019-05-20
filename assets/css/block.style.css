@@ -121,6 +121,15 @@
 .wp-block-gutenbergtemplateblock-templateblock.editor-block.style-toggle .active-tab {
   box-shadow: inset 0 -3px darkred; }
 
+.wp-block-gutenbergtemplateblock-templateblock.editor-block.style-default {
+  background: red; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block.style-light {
+  background: yellow; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block.style-dark {
+  background: black; }
+
 .wp-block-gutenbergtemplateblock-templateblock.editor-block button {
   color: black; }
   .wp-block-gutenbergtemplateblock-templateblock.editor-block button.active-tab {

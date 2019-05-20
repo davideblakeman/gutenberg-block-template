@@ -196,6 +196,18 @@ $dark-text: black;
         }
     }
 
+    &.style-default {
+        background: red;
+    }
+
+    &.style-light {
+        background: yellow;
+    }
+
+    &.style-dark {
+        background: black;
+    }
+
     button {
 
         color: $dark-text;

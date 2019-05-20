@@ -23,6 +23,7 @@ export default class PotDStyle extends React.Component {
         // }, () => this.setOption( 'limit_by', event ) )
         })
         this.getOptions()
+        this.props.onStyleRadioChange( event )
     }
 
     getOptions() {
@@ -71,12 +72,13 @@ export default class PotDStyle extends React.Component {
                             label="Select Style"
                             selected={ selectedRadio }
                             options={[
-                                { label: 'Light Style', value: 'ls' },
-                                { label: 'Dark Style', value: 'ds' },
-                                { label: 'Style 1', value: '1' },
-                                { label: 'Style 2', value: '2' },
-                                { label: 'Style 3', value: '3' },
-                                { label: 'Custom Style', value: 'c' },
+                                { label: 'Default Style', value: 'default' },
+                                { label: 'Light Style', value: 'light' },
+                                { label: 'Dark Style', value: 'dark' },
+                                // { label: 'Style 1', value: '1' },
+                                // { label: 'Style 2', value: '2' },
+                                // { label: 'Style 3', value: '3' },
+                                // { label: 'Custom Style', value: 'c' },
                             ]}
                             onChange={ this.handleRadioChange }
                         />

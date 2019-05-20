@@ -13,10 +13,22 @@ const attributes = {
         source: 'children',
         selector: '.gutenbergtemplateblock-content'
     },
+    // styleDefault: {
+    //     type: 'boolean',
+    //     default: true,
+    // },
     styleToggle: {
         type: 'boolean',
         default: false,
     },
+    // styleLight: {
+    //     type: 'boolean',
+    //     default: false,
+    // },
+    // styleDark: {
+    //     type: 'boolean',
+    //     default: false,
+    // },
     textAlignment: {
         type: 'string'
     },
