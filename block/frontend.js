@@ -70,8 +70,8 @@ const onResultClick = ( event ) => {
                         html += '<tr>' + 
                             '<td>' + decodeURIComponent( stripslashes( r.option ) ) + '</td>' +
                             '<td>' + 
-                                '<span class="tooltip" data-tooltip="' + r.votes + ' votes">' +
-                                    '<span class="tooltip-info"></span>' +
+                                '<span class="potd-tooltip" data-tooltip="' + r.votes + ' votes">' +
+                                    '<span class="potd-tooltip-info"></span>' +
                                     '<meter value="' + r.votes + '" min="0" max="' + max + '"></meter>' +
                                 '</span>' +
                             '</td>' +

@@ -105,12 +105,12 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             super( ...arguments )
             // console.log( 'constructor' )
             const {
-                attributes: {
-                    styleDefault,
-                    styleToggle,
-                    styleLight,
-                    styleDark,
-                }, 
+                // attributes: {
+                //     styleDefault,
+                //     styleToggle,
+                //     styleLight,
+                //     styleDark,
+                // }, 
                 className, 
                 setAttributes,
                 // answersQid,
@@ -175,8 +175,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 ),
             })
 
-            console.log( 'attributes', this.props.attributes )
-            console.log( 'className', className )
+            // console.log( 'attributes', this.props.attributes )
+            // console.log( 'className', className )
         }
 
         /**
@@ -401,15 +401,17 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
         
         handleStyleClick( style ) {
-            console.log( 'handleStyleClick', style )
-            const {
-                attributes: {
-                    styleToggle
-                }
-            } = this.props
+            // console.log( 'handleStyleClick', style )
+            // const {
+            //     attributes: {
+            //         styleToggle
+            //     }
+            // } = this.props
 
             const defaultStyle = ( style ) => {
                 if ( style === true || style === 'default' ) {
+                    this.props.setAttributes( { styleToggle: false } )
+                    this.props.setAttributes( { styleLight: false } )
                     return true
                 } else {
                     return false
@@ -418,7 +420,18 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
             const darkStyle = ( style ) => {
                 if ( style === false || style === 'dark' ) {
+                    this.props.setAttributes( { styleToggle: true } )
+                    this.props.setAttributes( { styleLight: false } )
                     return true
+                } else {
+                    return false
+                }
+            }
+
+            const lightStyle = ( style ) => {
+                if ( style === 'light' ) {
+                    this.props.setAttributes( { styleLight: true } )
+                    this.props.setAttributes( { styleToggle: false } )
                 } else {
                     return false
                 }
@@ -426,15 +439,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
             const s = [{
                 default: defaultStyle( style ),
-                light: style === 'light' ? true : false,
+                light: lightStyle( style ),
                 dark: darkStyle( style )
             }]
 
             this.setState({
                 style: s
-            }, () => console.log( 'this.state', this.state.style[0] ) )
-
-            this.props.setAttributes( { styleToggle: !styleToggle } )
+            })
+            // }, () => console.log( 'this.state', this.state.style[0] ) )
         }
 
         setPoll( qid, question, answers ) {
@@ -772,6 +784,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 attributes: {
                     classes,
                     styleToggle,
+                    styleLight,
                     // titleColour,
                     // contentColour,
                     // textAlignment,
@@ -802,9 +815,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         ' editor-block' +
                         classnames({
                             ' style-toggle': styleToggle,
-                            ' style-default': style[0].default,
-                            ' style-dark': style[0].dark,
-                            ' style-light': style[0].light,
+                            ' style-light': styleLight,
                         })
                     }
                     value={ uuid }
@@ -918,6 +929,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 // textAlignment, 
                 // blockAlignment,
                 styleToggle,
+                styleLight,
                 pollTitle,
                 poll,
                 answersQid,
@@ -927,7 +939,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         const className = classnames(
             'wp-block-gutenbergtemplateblock-templateblock',
-            { 'style-toggle': styleToggle },
+            // { 'style-toggle': styleToggle },
+            classnames({
+                ' style-toggle': styleToggle,
+                ' style-light': styleLight,
+            })
         )
 
         return (

@@ -21,10 +21,10 @@ const attributes = {
         type: 'boolean',
         default: false,
     },
-    // styleLight: {
-    //     type: 'boolean',
-    //     default: false,
-    // },
+    styleLight: {
+        type: 'boolean',
+        default: false,
+    },
     // styleDark: {
     //     type: 'boolean',
     //     default: false,
