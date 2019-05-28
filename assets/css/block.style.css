@@ -175,3 +175,6 @@
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block .active {
   display: block; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-edit-results {
+  transition: all 1s ease-in-out; }

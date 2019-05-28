@@ -51,6 +51,8 @@ $light-text: white;
 
     .potd-result-table {
 
+        // margin px size assigned to variable in testHeight in frontend.js
+        // if this value changes also change the value in testHeight
         margin: 32px 0 32px 0;
 
         tr {
@@ -294,5 +296,9 @@ $light-text: white;
 
     .active {
         display: block;
+    }
+
+    .potd-edit-results {
+        transition: all 1s ease-in-out;
     }
 }

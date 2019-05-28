@@ -44,8 +44,18 @@ export default class PotdAnswer extends React.Component {
     }
 
     handleDeleteAnswerClick( event ) {
-        let index = this.getAnswerKey( event.target.value )
-        let oid = event.target.value
+        let value
+
+        if ( event.target.tagName === 'svg' ) {
+            value = event.target.parentNode.value
+        } else if ( event.target.tagName === 'path' ) {
+            value = event.target.parentNode.parentNode.value
+        } else {
+            value = event.target.value
+        }
+
+        let index = this.getAnswerKey( value )
+        let oid = value
         this.props.onDeleteAnswerClick( index, oid )
     }
 
@@ -122,6 +132,7 @@ export default class PotdAnswer extends React.Component {
                                         className="gutenbergtemplateblock-templateblock-plusmins-btn button button-large"
                                         value="up"
                                         onClick={ this.handlePositionChange( key ) }
+                                        tabindex={ -1 }
                                     >
                                         &#9650;
                                     </Button>
@@ -129,6 +140,7 @@ export default class PotdAnswer extends React.Component {
                                         className="gutenbergtemplateblock-templateblock-plusmins-btn button button-large"
                                         value="down"
                                         onClick={ this.handlePositionChange( key ) }
+                                        tabindex={ -1 }
                                     >
                                         &#9660;
                                     </Button>
@@ -139,6 +151,7 @@ export default class PotdAnswer extends React.Component {
                                     className="button button-large edit-delete-button"
                                     onClick={ this.handleDeleteAnswerClick }
                                     value={ object.oid }
+                                    tabindex={ -1 }
                                 > 
                                     { icons.delete }
                                 </Button>

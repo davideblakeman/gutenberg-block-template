@@ -67,7 +67,16 @@ export default class PotDSelect extends React.Component {
     }
 
     handleDeleteQuestionClick( event ) {
-        let qid = event.target.value
+        let qid
+
+        if ( event.target.tagName === 'svg' ) {
+            qid = event.target.parentNode.value
+        } else if ( event.target.tagName === 'path' ) {
+            qid = event.target.parentNode.parentNode.value
+        } else {
+            qid = event.target.value
+        }
+
         this.props.onDeleteQuestionClick( this.getSelectedKey(), qid )
     }
 

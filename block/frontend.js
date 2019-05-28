@@ -111,40 +111,45 @@ const onVoteClick = ( event ) => {
     const parent = event.target.parentNode.parentNode
     const resultEl = parent.querySelector( '.potd-result' )
     const checkedRadio = parent.querySelector( 'input:checked' )
-    const oid = checkedRadio.value
 
-    if ( resultEl.clientHeight === 0 ) {
-        let limitByCheckUrl = gutenbergtemplateblock_ajax_object.ajax_url +
-        '?action=gutenbergtemplateblock_getLimitByOption' +
-        '&security=' + gutenbergtemplateblock_ajax_object.security
-
-        fetch( limitByCheckUrl )
-            .then( response => {
-                return response.json()
-            })
-            .then(
-                ( result ) => {
-                    if ( result === 'cookie' || result === 'ipcookie' || result === 'user' ) {
-                        let liveCookie = document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) > -1
-                        if ( result === 'user' ) {
-                            setVote( oid, qid, resultEl )
-                        } else if ( !liveCookie ) {
-                            setVote( oid, qid, resultEl )
-                            document.cookie = 'gutenbergtemplateblock_limit_cookie=1;path=/;max-age=86400' // 1 day cookie
+    if ( checkedRadio ) {
+        const oid = checkedRadio.value
+        if ( resultEl.clientHeight === 0 ) {
+            let limitByCheckUrl = gutenbergtemplateblock_ajax_object.ajax_url +
+            '?action=gutenbergtemplateblock_getLimitByOption' +
+            '&security=' + gutenbergtemplateblock_ajax_object.security
+    
+            fetch( limitByCheckUrl )
+                .then( response => {
+                    return response.json()
+                })
+                .then(
+                    ( result ) => {
+                        if ( result === 'cookie' || result === 'ipcookie' || result === 'user' ) {
+                            let liveCookie = document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) > -1
+                            if ( result === 'user' ) {
+                                setVote( oid, qid, resultEl )
+                            } else if ( !liveCookie ) {
+                                setVote( oid, qid, resultEl )
+                                document.cookie = 'gutenbergtemplateblock_limit_cookie=1;path=/;max-age=86400' // 1 day cookie
+                            } else {
+                                resultEl.innerHTML = 'You have already voted today.'
+                                slideToggle( resultEl )
+                            }
                         } else {
-                            resultEl.innerHTML = 'You have already voted today.'
-                            slideToggle( resultEl )
+                            setVote( oid, qid, resultEl )
                         }
-                    } else {
-                        setVote( oid, qid, resultEl )
+                    },
+                    ( error ) => {
+                        console.log( 'error: ' + error )
                     }
-                },
-                ( error ) => {
-                    console.log( 'error: ' + error )
-                }
-            )   
+                )   
+        } else {
+            slideToggle( resultEl, event, 'vote' )
+        }
     } else {
-        slideToggle( resultEl, event, 'vote' )
+        resultEl.innerHTML = 'Please selected an option before voting.'
+        slideToggle( resultEl )
     }
 }
 

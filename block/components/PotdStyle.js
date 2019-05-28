@@ -8,7 +8,22 @@ export default class PotDStyle extends React.Component {
     constructor( props ) {
         super( props )
         this.handleRadioChange = this.handleRadioChange.bind( this )
-        this.state = { selectedRadio: 'default' }
+    }
+
+    componentDidMount() {
+        const defaultStyle = this.props.styleAttributes.toggle
+        const lightStyle = this.props.styleAttributes.light
+        let style = null
+
+        if ( lightStyle ) {
+            style = 'light'
+        } else if ( defaultStyle ) {
+            style = 'dark'
+        } else {
+            style = 'default'
+        }
+        
+        this.handleRadioChange( style )
     }
 
     handleRadioChange( event ) {
@@ -17,7 +32,7 @@ export default class PotDStyle extends React.Component {
     }
 
     render() {
-        const { selectedRadio } = this.state
+        const { activeStyle } = this.props
 
         return (
             <Tooltip 
@@ -26,7 +41,7 @@ export default class PotDStyle extends React.Component {
                 <div>
                     <RadioControl
                         label="Select Style"
-                        selected={ selectedRadio }
+                        selected={ activeStyle }
                         options={[
                             { label: 'Default Style', value: 'default' },
                             { label: 'Light Style', value: 'light' },

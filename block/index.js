@@ -138,7 +138,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     toggle: false,
                     light: false,
                     dark: false,
-                }]
+                }],
+                activeStyle: 'default',
+                ajaxResults: '',
+                showResults: false
             }
             
             if ( typeof this.props.attributes.uuid === undefined || this.props.attributes.uuid === null ) {
@@ -188,7 +191,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
          */
         componentDidMount() {
             // console.log( 'componentDidMount' )
-            // console.log( this.props )
+            // console.log( 'this.props', this.props )
             // console.log( this.props.attributes )
             this.getPollQuestions()
             
@@ -332,6 +335,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         handleDeleteAnswerClick( index, oid ) {
+            console.log( 'handleDeleteAnswerClick', 'index', index, 'oid', oid )
             // Change to <Notice/> ?
             if ( confirm( 'Are you sure you wish to PERMANENTLY delete this poll answer?' ) ) {
                 let newAnswers = [
@@ -401,12 +405,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
         
         handleStyleClick( style ) {
-            // console.log( 'handleStyleClick', style )
-            // const {
-            //     attributes: {
-            //         styleToggle
-            //     }
-            // } = this.props
+            let active = 'default';
 
             const defaultStyle = ( style ) => {
                 if ( style === true || style === 'default' ) {
@@ -422,6 +421,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 if ( style === false || style === 'dark' ) {
                     this.props.setAttributes( { styleToggle: true } )
                     this.props.setAttributes( { styleLight: false } )
+                    active = 'dark'
                     return true
                 } else {
                     return false
@@ -432,6 +432,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 if ( style === 'light' ) {
                     this.props.setAttributes( { styleLight: true } )
                     this.props.setAttributes( { styleToggle: false } )
+                    active = 'light'
                 } else {
                     return false
                 }
@@ -444,9 +445,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             }]
 
             this.setState({
-                style: s
+                style: s,
+                activeStyle: active
             })
-            // }, () => console.log( 'this.state', this.state.style[0] ) )
         }
 
         setPoll( qid, question, answers ) {
@@ -458,16 +459,39 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                           '&q=' + question +
                           '&security=' + gutenbergtemplateblock_ajax_object.security
                 
+                let transitionTime = 2000
+
+                // const { showResults } = this.state
+                
                 fetch( url )
                     .then( response => {
                         return response.json()
                     })
                     .then(
                         ( result ) => {
+                            self.setState({
+                                showResults: true,
+                                ajaxResults: 'Poll question saved successfully'
+                            }, () => {
+                                setTimeout( () => self.setState({
+                                    showResults: false,
+                                    ajaxResults: ''
+                                }), transitionTime )
+                            })
+                            
                             if ( result && answers ) {
                                 let qid = result
                                 this.setAnswers( qid, answers )
                             }
+
+                            // if ( !answers && result !== 'fail' ) {
+                            //     self.setState({
+                            //         showResults: true,
+                            //         ajaxResults: 'Poll question saved successfully'
+                            //     }, () => {
+                            //         setTimeout( () => self.setState({ showResults: false }), transitionTime )
+                            //     })
+                            // }
                         },
                         ( error ) => {
                             self.setState({
@@ -801,7 +825,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 answers,
                 editing,
                 newQuestion,
-                style
+                style,
+                activeStyle,
+                showResults,
+                ajaxResults
             }  = this.state
 
             return [
@@ -874,24 +901,29 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                     return [
                                         <div className={ className }>
                                             { isLoaded ?
-                                                <PotDSelect
-                                                    onSelectChange={ this.handleSelectChange }
-                                                    questions={ questions }
-                                                    answers={ answers }
-                                                    editable={ true }
-                                                    editing={ editing }
-                                                    isLoadedAnswers={ isLoadedAnswers }
-                                                    inNewQuestion={ newQuestion }
-                                                    onAddQuestionClick={ this.handleAddQuestionClick }
-                                                    onAddAnswerClick={ this.handleAddAnswerClick }
-                                                    onInputChange={ this.handleInputChange }
-                                                    onPositionChange={ this.handlePositionChange }
-                                                    onSelectInputChange={ this.handleSelectInputChange }
-                                                    onDeleteQuestionClick={ this.handleDeleteQuestionClick }
-                                                    onDeleteAnswerClick={ this.handleDeleteAnswerClick }
-                                                    onCancelClick={ this.handleCancelClick }
-                                                    onSaveClick={ this.handleSaveClick }
-                                                />
+                                                <div>
+                                                    <PotDSelect
+                                                        onSelectChange={ this.handleSelectChange }
+                                                        questions={ questions }
+                                                        answers={ answers }
+                                                        editable={ true }
+                                                        editing={ editing }
+                                                        isLoadedAnswers={ isLoadedAnswers }
+                                                        inNewQuestion={ newQuestion }
+                                                        onAddQuestionClick={ this.handleAddQuestionClick }
+                                                        onAddAnswerClick={ this.handleAddAnswerClick }
+                                                        onInputChange={ this.handleInputChange }
+                                                        onPositionChange={ this.handlePositionChange }
+                                                        onSelectInputChange={ this.handleSelectInputChange }
+                                                        onDeleteQuestionClick={ this.handleDeleteQuestionClick }
+                                                        onDeleteAnswerClick={ this.handleDeleteAnswerClick }
+                                                        onCancelClick={ this.handleCancelClick }
+                                                        onSaveClick={ this.handleSaveClick }
+                                                    />
+                                                    { showResults &&
+                                                        <div class="potd-edit-results">{ ajaxResults }</div>
+                                                    }
+                                                </div>
                                                 :
                                                 <div>
                                                     <Spinner />
@@ -911,6 +943,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                         <div className={ className }>
                                             <PotDStyle
                                                 onStyleRadioChange={ this.handleStyleClick }
+                                                styleAttributes={{ 'toggle': styleToggle, 'light': styleLight }}
+                                                activeStyle={ activeStyle }
                                             />
                                         </div>
                                     ]
