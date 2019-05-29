@@ -299,6 +299,11 @@ $light-text: white;
     }
 
     .potd-edit-results {
-        transition: all 1s ease-in-out;
+        opacity: 0;
+        transition: all 2s ease-in-out;
+    }
+
+    .potd-edit-results-show {
+        opacity: 1;
     }
 }
