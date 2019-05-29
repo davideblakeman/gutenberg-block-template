@@ -76,6 +76,8 @@ class GutenbergtemplateblockWpdb
         global $wpdb;
         $wpdb->show_errors();
         $outcome = null;
+        
+        $userId = is_user_logged_in() ? get_current_user_id() : 0;
 
         if ( $qid === 'new' )
         {
@@ -83,10 +85,12 @@ class GutenbergtemplateblockWpdb
             $wpdb->insert(
                 $wpdb->gutenbergtemplateblock_questions, 
                 array(
-                    'question' => $question
+                    'question' => $question,
+                    'added_by_user' => $userId
                 ),
                 array(
-                    '%s'
+                    '%s',
+                    '%d'
                 )
             );
 
@@ -98,9 +102,12 @@ class GutenbergtemplateblockWpdb
             $wpdb->query(
                 $wpdb->prepare('
                     UPDATE ' . $wpdb->gutenbergtemplateblock_questions . '
-                    SET question = %s
+                    SET 
+                        question = %s,
+                        added_by_user = %d
                     WHERE qid = %d',
                     $question,
+                    $userId,
                     $qid
                 )
             );
@@ -304,6 +311,26 @@ class GutenbergtemplateblockWpdb
             SELECT option_name, option_value
             FROM ' . $wpdb->options . '
             WHERE option_name LIKE "gutenbergtemplateblock_%"',
+            OBJECT_K
+        );
+
+        if ( $wpdb->last_error !== '' )
+        {
+            return 'fail';
+        }
+        
+        return $result;
+    }
+
+    public function getStyleOptions()
+    {
+        global $wpdb;
+        $wpdb->show_errors();
+
+        $result = $wpdb->get_results('
+            SELECT option_name, option_value
+            FROM ' . $wpdb->options . '
+            WHERE option_name LIKE "gutenbergtemplateblock_style"',
             OBJECT_K
         );
 

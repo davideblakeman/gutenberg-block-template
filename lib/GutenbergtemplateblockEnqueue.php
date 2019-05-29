@@ -77,6 +77,7 @@ class GutenbergtemplateblockEnqueue
         add_action( 'wp_ajax_gutenbergtemplateblock_setPollByUUID', [ __CLASS__, 'gutenbergtemplateblock_setPollByUUID'] );
         add_action( 'wp_ajax_gutenbergtemplateblock_getRotateOptionByUUID', [ __CLASS__, 'gutenbergtemplateblock_getRotateOptionByUUID'] );
         add_action( 'wp_ajax_gutenbergtemplateblock_setRotateOptionByUUID', [ __CLASS__, 'gutenbergtemplateblock_setRotateOptionByUUID'] );
+        add_action( 'wp_ajax_gutenbergtemplateblock_getStyleOptions', [ __CLASS__, 'gutenbergtemplateblock_getStyleOptions'] );
         
         // AJAX - No Privilege - Frontend
         add_action( 'wp_ajax_gutenbergtemplateblock_setOptionVoteById', [ __CLASS__, 'gutenbergtemplateblock_setOptionVoteById'] );
@@ -408,6 +409,18 @@ class GutenbergtemplateblockEnqueue
 
         $GTBWPDB = new GutenbergtemplateblockWpdb;
         echo json_encode( $GTBWPDB->getResultsByQid( $qid ) );
+
+        wp_die();
+    }
+
+    public static function gutenbergtemplateblock_getStyleOptions()
+    {
+        check_ajax_referer( 'gutenbergtemplateblock-security-token', 'security' );
+
+        // $qid = $_REQUEST[ 'qid' ];
+
+        $GTBWPDB = new GutenbergtemplateblockWpdb;
+        echo json_encode( $GTBWPDB->getStyleOptions() );
 
         wp_die();
     }

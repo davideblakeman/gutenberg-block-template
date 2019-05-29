@@ -1,6 +1,6 @@
-console.log( 'Frontend Block JS' );
+console.log( 'Frontend Block JS' )
 
-var transitionTime = 1001;
+var transitionTime = 1001
 
 window.addEventListener( "load", function() {
 
@@ -11,7 +11,7 @@ window.addEventListener( "load", function() {
         handleResultClick()
         setRotation( polls )
     }
-});
+})
 
 // Handlers
 
@@ -70,8 +70,8 @@ const onResultClick = ( event ) => {
                         html += '<tr>' + 
                             '<td>' + decodeURIComponent( stripslashes( r.option ) ) + '</td>' +
                             '<td>' + 
-                                '<span class="tooltip" data-tooltip="' + r.votes + ' votes">' +
-                                    '<span class="tooltip-info"></span>' +
+                                '<span class="potd-tooltip" data-tooltip="' + r.votes + ' votes">' +
+                                    '<span class="potd-tooltip-info"></span>' +
                                     '<meter value="' + r.votes + '" min="0" max="' + max + '"></meter>' +
                                 '</span>' +
                             '</td>' +
@@ -111,42 +111,47 @@ const onVoteClick = ( event ) => {
     const parent = event.target.parentNode.parentNode
     const resultEl = parent.querySelector( '.potd-result' )
     const checkedRadio = parent.querySelector( 'input:checked' )
-    const oid = checkedRadio.value
 
-    if ( resultEl.clientHeight === 0 ) {
-        let limitByCheckUrl = gutenbergtemplateblock_ajax_object.ajax_url +
-        '?action=gutenbergtemplateblock_getLimitByOption' +
-        '&security=' + gutenbergtemplateblock_ajax_object.security
-
-        fetch( limitByCheckUrl )
-            .then( response => {
-                return response.json()
-            })
-            .then(
-                ( result ) => {
-                    if ( result === 'cookie' || result === 'ipcookie' || result === 'user' ) {
-                        let liveCookie = document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) > -1
-                        if ( result === 'user' ) {
-                            setVote( oid, qid, resultEl )
-                        } else if ( !liveCookie ) {
-                            setVote( oid, qid, resultEl )
-                            document.cookie = 'gutenbergtemplateblock_limit_cookie=1;path=/;max-age=86400' // 1 day cookie
+    if ( checkedRadio ) {
+        const oid = checkedRadio.value
+        if ( resultEl.clientHeight === 0 ) {
+            let limitByCheckUrl = gutenbergtemplateblock_ajax_object.ajax_url +
+            '?action=gutenbergtemplateblock_getLimitByOption' +
+            '&security=' + gutenbergtemplateblock_ajax_object.security
+    
+            fetch( limitByCheckUrl )
+                .then( response => {
+                    return response.json()
+                })
+                .then(
+                    ( result ) => {
+                        if ( result === 'cookie' || result === 'ipcookie' || result === 'user' ) {
+                            let liveCookie = document.cookie.indexOf( 'gutenbergtemplateblock_limit_cookie=1' ) > -1
+                            if ( result === 'user' ) {
+                                setVote( oid, qid, resultEl )
+                            } else if ( !liveCookie ) {
+                                setVote( oid, qid, resultEl )
+                                document.cookie = 'gutenbergtemplateblock_limit_cookie=1;path=/;max-age=86400' // 1 day cookie
+                            } else {
+                                resultEl.innerHTML = 'You have already voted today.'
+                                slideToggle( resultEl )
+                            }
                         } else {
-                            resultEl.innerHTML = 'You have already voted today.'
-                            slideToggle( resultEl )
+                            setVote( oid, qid, resultEl )
                         }
-                    } else {
-                        setVote( oid, qid, resultEl )
+                    },
+                    ( error ) => {
+                        console.log( 'error: ' + error )
                     }
-                },
-                ( error ) => {
-                    console.log( 'error: ' + error )
-                }
-            )   
+                )   
+        } else {
+            slideToggle( resultEl, event, 'vote' )
+        }
     } else {
-        slideToggle( resultEl, event, 'vote' )
+        resultEl.innerHTML = 'Please selected an option before voting.'
+        slideToggle( resultEl )
     }
-};
+}
 
 // Setters
 
@@ -255,7 +260,7 @@ const testHeight = ( element ) => {
     const el = element.cloneNode( true )
     const containerPaddingLeft = parseInt( getComputedStyle( poll ).getPropertyValue( 'padding-left' ).replace( 'px', '' ) )
     const containerPaddingRight = parseInt( getComputedStyle( poll ).getPropertyValue( 'padding-right' ).replace( 'px', '' ) )
-    const tableMargin = 32; // .potd-result-table margin in pixels
+    const tableMargin = 32 // .potd-result-table margin in pixels
     el.style.width = ( width - ( containerPaddingLeft + containerPaddingRight ) ) + 'px'
     el.style.visibility = "hidden"
     document.body.appendChild( el )

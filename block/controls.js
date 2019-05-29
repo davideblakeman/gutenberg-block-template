@@ -39,7 +39,7 @@ export default class Inspector extends Component {
                 styleToggle
             }
         } = this.props
-        console.log( 'this.props.attributes', styleToggle )
+        
         this.props.setAttributes( { styleToggle: !styleToggle } )
         this.props.onStyleChange( styleToggle )
     }

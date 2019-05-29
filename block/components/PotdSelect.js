@@ -1,31 +1,31 @@
-import icons from './../icons';
-import PotdAnswers from "./PotdAnswers";
+import icons from './../icons'
+import PotdAnswers from "./PotdAnswers"
 const {
     SelectControl,
     Button,
     TextControl,
     CheckboxControl,
     Spinner
-} = wp.components;
-const { select } = wp.data;
+} = wp.components
+const { select } = wp.data
 
-export default class PotdSelect extends React.Component {
+export default class PotDSelect extends React.Component {
 
     constructor( props ) {
-        super( props );
-        this.componentDidMount = this.componentDidMount.bind( this );
-        this.handleChange = this.handleChange.bind( this );
-        this.handleInputChange = this.handleInputChange.bind( this );
-        this.handlePositionChange = this.handlePositionChange.bind( this );
-        this.handleSelectInputChange = this.handleSelectInputChange.bind( this );
-        this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this );
-        this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this );
-        this.handleDeleteQuestionClick = this.handleDeleteQuestionClick.bind( this );
-        this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this );
-        this.handleCancelClick = this.handleCancelClick.bind( this );
+        super( props )
+        this.componentDidMount = this.componentDidMount.bind( this )
+        this.handleChange = this.handleChange.bind( this )
+        this.handleInputChange = this.handleInputChange.bind( this )
+        this.handlePositionChange = this.handlePositionChange.bind( this )
+        this.handleSelectInputChange = this.handleSelectInputChange.bind( this )
+        this.handleAddQuestionClick = this.handleAddQuestionClick.bind( this )
+        this.handleAddAnswerClick = this.handleAddAnswerClick.bind( this )
+        this.handleDeleteQuestionClick = this.handleDeleteQuestionClick.bind( this )
+        this.handleDeleteAnswerClick = this.handleDeleteAnswerClick.bind( this )
+        this.handleCancelClick = this.handleCancelClick.bind( this )
         this.handleSaveClick = this.handleSaveClick.bind( this )
-        this.handleCheckboxChange = this.handleCheckboxChange.bind( this );
-        this.getSelectedKey = this.getSelectedKey.bind( this );
+        this.handleCheckboxChange = this.handleCheckboxChange.bind( this )
+        this.getSelectedKey = this.getSelectedKey.bind( this )
 
         this.state = {
             selectedValue: null,
@@ -33,7 +33,7 @@ export default class PotdSelect extends React.Component {
             lastSelectableKey: null,
             pollRotate: false,
             rotateCheckboxLoaded: false
-        };
+        }
     }
 
     componentDidMount() {
@@ -41,17 +41,17 @@ export default class PotdSelect extends React.Component {
             existingBlockQid,
             questions,
             uuid
-        } = this.props;
+        } = this.props
 
-        const lastIndex = questions.length - 1;
-        this.getRotateOptionByUUID( uuid );
+        const lastIndex = questions.length - 1
+        this.getRotateOptionByUUID( uuid )
         
         this.setState({
             selectedValue: existingBlockQid ? existingBlockQid : this.props.questions[0].value
         }, () => this.setState({
             selectedKey: this.getSelectedKey(),
             lastSelectableKey : lastIndex
-        }));
+        }))
     }
 
     handleChange( event ) {
@@ -61,23 +61,32 @@ export default class PotdSelect extends React.Component {
         }, () => {
             this.setState({
                 selectedKey: this.getSelectedKey() 
-            });
-            this.props.onSelectChange( event, this.props.editable );
-        });
+            })
+            this.props.onSelectChange( event, this.props.editable )
+        })
     }
 
     handleDeleteQuestionClick( event ) {
-        let qid = event.target.value;
-        this.props.onDeleteQuestionClick( this.getSelectedKey(), qid );
+        let qid
+
+        if ( event.target.tagName === 'svg' ) {
+            qid = event.target.parentNode.value
+        } else if ( event.target.tagName === 'path' ) {
+            qid = event.target.parentNode.parentNode.value
+        } else {
+            qid = event.target.value
+        }
+
+        this.props.onDeleteQuestionClick( this.getSelectedKey(), qid )
     }
 
     handleDeleteAnswerClick( index, oid ) {
-        this.props.onDeleteAnswerClick( index, oid );
+        this.props.onDeleteAnswerClick( index, oid )
     }
 
     handleSelectInputChange( event ) {
-        let index = this.props.inNewQuestion ? 0 : this.state.selectedKey;
-        this.props.onSelectInputChange( event, index );
+        let index = this.props.inNewQuestion ? 0 : this.state.selectedKey
+        this.props.onSelectInputChange( event, index )
     }
 
     handleCancelClick() { this.props.onCancelClick() }
@@ -90,30 +99,30 @@ export default class PotdSelect extends React.Component {
     getSelectedKey() {
         for ( let i = 0; i < this.props.questions.length; i++ ) {
             if ( parseInt( this.props.questions[i].value ) == this.state.selectedValue ) {
-                return i;
+                return i
             }
-        } return 0;
-    };
+        } return 0
+    }
 
     handleCheckboxChange( event ) {
         this.setState({
             rotateCheckboxLoaded: false
-        });
+        })
 
-        const uuid = this.props.uuid;
-        var self = this;
-        const postId = select( 'core/editor' ).getCurrentPostId();
+        const uuid = this.props.uuid
+        var self = this
+        const postId = select( 'core/editor' ).getCurrentPostId()
 
         let url = gutenbergtemplateblock_ajax_object.ajax_url +
                   '?action=gutenbergtemplateblock_setRotateOptionByUUID' +
                   '&u=' + uuid +
                   '&r=' + event.toString() +
                   '&p=' + postId +
-                  '&security=' + gutenbergtemplateblock_ajax_object.security;
+                  '&security=' + gutenbergtemplateblock_ajax_object.security
         
         fetch( url )
             .then( response => {
-                return response.json();
+                return response.json()
             })
             .then(
                 ( result ) => {
@@ -122,25 +131,25 @@ export default class PotdSelect extends React.Component {
                         self.setState({
                             pollRotate: event,
                             rotateCheckboxLoaded: true
-                        });
+                        })
                     }
                 },
                 ( error ) => {
-                    console.log( error );
+                    console.log( error )
                 }
             )
     }
 
     getRotateOptionByUUID( uuid ) {
-        var self = this;
+        var self = this
         let url = gutenbergtemplateblock_ajax_object.ajax_url +
                   '?action=gutenbergtemplateblock_getRotateOptionByUUID' +
                   '&u=' + uuid +
-                  '&security=' + gutenbergtemplateblock_ajax_object.security;
+                  '&security=' + gutenbergtemplateblock_ajax_object.security
         
         fetch( url )
             .then( response => {
-                return response.json();
+                return response.json()
             })
             .then(
                 ( result ) => {
@@ -148,10 +157,10 @@ export default class PotdSelect extends React.Component {
                         // can also return 'fail' if db error
                         pollRotate: result == 'true' ? true : false,
                         rotateCheckboxLoaded: true
-                    });
+                    })
                 },
                 ( error ) => {
-                    console.log( error );
+                    console.log( error )
                 }
             )
     }
@@ -164,14 +173,14 @@ export default class PotdSelect extends React.Component {
             editing,
             inNewQuestion,
             isLoadedAnswers
-        } = this.props;
+        } = this.props
         const {
             selectedValue,
             pollRotate,
             rotateCheckboxLoaded
-        } = this.state;
-        const selectedKey = this.getSelectedKey();
-        const editTitleText = questions[ selectedKey ].label;
+        } = this.state
+        const selectedKey = this.getSelectedKey()
+        const editTitleText = questions[ selectedKey ].label
 
         return (
             <div>
@@ -275,7 +284,7 @@ export default class PotdSelect extends React.Component {
                     </div>
                 }
             </div>
-        );
+        )
     }
 
 }

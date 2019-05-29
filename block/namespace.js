@@ -1,19 +1,19 @@
 // This is the reducer
 function reducer( state = [], action ) {
     if ( action.type === 'ADD_TODO' ) {
-      return state.concat( [ action.todo ] );
+      return state.concat( [ action.todo ] )
     }
   
-    return state;
+    return state
   }
   
   // These are some selectors
   function getTodos( state ) {
-    return state;
+    return state
   }
   
   function countTodos( state ) {
-    return state.length;
+    return state.length
   }
   
   // These are the actions
@@ -21,13 +21,13 @@ function reducer( state = [], action ) {
     return {
       type: 'ADD_TODO',
       todo: { text: text, done: done }
-    };
+    }
   }
   
   // Now let's register our custom namespace
-  var myNamespace = 'my-todos-plugin';
+  var myNamespace = 'my-todos-plugin'
   wp.data.registerStore( myNamespace, { 
     reducer: reducer,
     selectors: { getTodos: getTodos, countTodos: countTodos },
     actions: { addTodo: addTodo }
-  } );
+  } )

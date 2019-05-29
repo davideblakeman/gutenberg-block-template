@@ -1,11 +1,20 @@
+// default
+$background: none;
+$border: none;
+$active-tab-colour: darkblue;
+
+// light
 $light: white;
-$dark: #222;
-$background: rgb(254, 248, 238);
-$border: #f0b849;
-$main-colour: darkblue;
-$secondary-colour: darkred;
-$light-text: white;
 $dark-text: black;
+$light-border: #f0b849;
+$light-background: rgb(254, 248, 238);
+
+// dark
+$dark: #222;
+$dark-background: #222;
+$dark-active-tab-colour: rgb(55, 0, 157);
+$dark-border: rgb(55, 0, 157);
+$light-text: white;
 
 .wp-block-gutenbergtemplateblock-templateblock.client-block {
 
@@ -16,9 +25,15 @@ $dark-text: black;
     padding: 20px;
 
     &.style-toggle {
-        background: $dark;
-        border: 2px $secondary-colour solid;
+        background: $dark-background;
+        border: 2px $dark-border solid;
         color: $light-text;
+    }
+
+    &.style-light {
+        background: $light-background;
+        border: 2px $light-border solid;
+        color: $dark-text;
     }
 
     .potd-vote-btn {
@@ -36,6 +51,8 @@ $dark-text: black;
 
     .potd-result-table {
 
+        // margin px size assigned to variable in testHeight in frontend.js
+        // if this value changes also change the value in testHeight
         margin: 32px 0 32px 0;
 
         tr {
@@ -46,7 +63,7 @@ $dark-text: black;
         }
     }
 
-    .tooltip {
+    .potd-tooltip {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -54,13 +71,13 @@ $dark-text: black;
         cursor: pointer;
     }
     
-    .tooltip-info {
+    .potd-tooltip-info {
         position: absolute;
         top: -9999px;
         left: -9999px;
     }
     
-    span.tooltip::before {
+    span.potd-tooltip::before {
         content: attr(data-tooltip);
         position: absolute;
         font-size: 0.9em;
@@ -172,6 +189,14 @@ $dark-text: black;
     label::before {
         transition: .25s all ease;
     }
+
+    // meter {
+    //     // background: darkred;
+    //     // border-radius: 3px;
+    //     // width: 100%;
+    //     // appearance: none;
+    //     // box-shadow: 0 2px 3px rgba(0,0,0,0.2) inset;
+    // }
 }
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block {
@@ -183,25 +208,42 @@ $dark-text: black;
         padding: 20px;
     }
 
-    &.style-toggle {
+    &.style-toggle { // dark style
 
         .wp-block-gutenbergtemplateblock-templateblock {
             background: $dark;
-            border: 2px $secondary-colour solid;
+            border: 2px $dark-active-tab-colour solid;
             color: $light-text;
         }
 
         .active-tab {
-            box-shadow: inset 0 -3px $secondary-colour;
+            box-shadow: inset 0 -3px $dark-active-tab-colour;
         }
     }
+
+    &.style-default {
+        // background: red;
+    }
+
+    &.style-light {
+
+        .wp-block-gutenbergtemplateblock-templateblock {
+            background: $light-background;
+            border: 2px $light-border solid;
+            color: $dark-text;
+        }
+    }
+
+    // &.style-dark {
+    //     background: black;
+    // }
 
     button {
 
         color: $dark-text;
 
         &.active-tab {
-            box-shadow: inset 0 -3px $main-colour;
+            box-shadow: inset 0 -3px $active-tab-colour;
         }
     }
 
@@ -254,5 +296,14 @@ $dark-text: black;
 
     .active {
         display: block;
+    }
+
+    .potd-edit-results {
+        opacity: 0;
+        transition: all 2s ease-in-out;
+    }
+
+    .potd-edit-results-show {
+        opacity: 1;
     }
 }

@@ -8,4 +8,4 @@ const colourAttributes = {
     ]
 }
 
-export default colourAttributes;
+export default colourAttributes

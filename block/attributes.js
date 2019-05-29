@@ -17,6 +17,10 @@ const attributes = {
         type: 'boolean',
         default: false,
     },
+    styleLight: {
+        type: 'boolean',
+        default: false,
+    },
     textAlignment: {
         type: 'string'
     },
@@ -36,21 +40,6 @@ const attributes = {
         type: 'boolean',
         default: 'a'
     },
-    // questions: {
-    //     type: 'array',
-    //     default: [{ 
-    //         value: null, 
-    //         label: 'Select Poll Question' 
-    //     }]
-    // }, 
-    // selectedPoll: {
-    //     type: 'string',
-    //     default: '0'
-    // }
-    // pollOptionsHidden: {
-    //     type: 'string',
-    //     default: false
-    // },
     pollQuestionId: {
         type: 'string',
         default: '0'
@@ -63,14 +52,6 @@ const attributes = {
         type: 'string',
         default: null
     },
-    // selectedIndex: {
-    //     type: 'string',
-    //     default: '1'
-    // },
-    // currentQid: {
-    //     type: 'string',
-    //     default: null
-    // },
     tabRefresh: {
         type: 'boolean',
         default: false
@@ -113,4 +94,4 @@ const attributes = {
     }
 }
 
-export default attributes;
+export default attributes

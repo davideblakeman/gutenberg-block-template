@@ -1,13 +1,17 @@
 .wp-block-gutenbergtemplateblock-templateblock.client-block {
   color: black;
-  background: #fef8ee;
-  border: 3px double #f0b849;
+  background: none;
+  border: 3px double none;
   border-radius: 5px;
   padding: 20px; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle {
     background: #222;
-    border: 2px darkred solid;
+    border: 2px #37009d solid;
     color: white; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-light {
+    background: #fef8ee;
+    border: 2px #f0b849 solid;
+    color: black; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-vote-btn {
     margin-right: 5px; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result {
@@ -24,7 +28,7 @@
     margin: 32px 0 32px 0; }
     .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result-table tr td:nth-child(even) {
       text-align: center; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block .tooltip {
+  .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-tooltip {
     display: -ms-flexbox;
     display: flex;
     -ms-flex-pack: center;
@@ -33,11 +37,11 @@
         align-items: center;
     position: relative;
     cursor: pointer; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block .tooltip-info {
+  .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-tooltip-info {
     position: absolute;
     top: -9999px;
     left: -9999px; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block span.tooltip::before {
+  .wp-block-gutenbergtemplateblock-templateblock.client-block span.potd-tooltip::before {
     content: attr(data-tooltip);
     position: absolute;
     font-size: 0.9em;
@@ -108,18 +112,23 @@
     transition: .25s all ease; }
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block .wp-block-gutenbergtemplateblock-templateblock {
-  background: #fef8ee;
-  border: 3px double #f0b849;
+  background: none;
+  border: 3px double none;
   border-radius: 5px;
   padding: 20px; }
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block.style-toggle .wp-block-gutenbergtemplateblock-templateblock {
   background: #222;
-  border: 2px darkred solid;
+  border: 2px #37009d solid;
   color: white; }
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block.style-toggle .active-tab {
-  box-shadow: inset 0 -3px darkred; }
+  box-shadow: inset 0 -3px #37009d; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block.style-light .wp-block-gutenbergtemplateblock-templateblock {
+  background: #fef8ee;
+  border: 2px #f0b849 solid;
+  color: black; }
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block button {
   color: black; }
@@ -166,3 +175,10 @@
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block .active {
   display: block; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-edit-results {
+  opacity: 0;
+  transition: all 2s ease-in-out; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-edit-results-show {
+  opacity: 1; }
