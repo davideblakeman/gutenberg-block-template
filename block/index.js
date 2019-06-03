@@ -28,7 +28,8 @@ const { registerBlockType } = wp.blocks
 //     RichText,
 //     ColorPalette
 // } = wp.editor
-const { 
+const {
+    Button,
     TabPanel,
     Spinner
 } = wp.components
@@ -125,6 +126,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.state = {
                 isLoaded: false,
                 isLoadedAnswers: true,
+                isResultLoaded: true,
                 error: null,
                 questions: [],
                 answers: [{
@@ -147,7 +149,9 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 activeStyle: 'default',
                 activeShadow: false,
                 ajaxResults: '',
-                showResults: false
+                showResults: false,
+                showPollResults: false,
+                pollResults: ''
             }
             
             if ( typeof this.props.attributes.uuid === undefined || this.props.attributes.uuid === null ) {
@@ -178,6 +182,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.handleStyleClick = this.handleStyleClick.bind( this )
             this.handleStyleCheckboxClick = this.handleStyleCheckboxClick.bind( this )
             this.handleAlignClick = this.handleAlignClick.bind( this )
+            this.handleShowPollResultsClick = this.handleShowPollResultsClick.bind( this )
 
             setAttributes({
                 classes: classnames(
@@ -213,8 +218,16 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         handleSelectChange( event, editable = null ) {
 
             if ( editable ) {
-                this.setState({ editing: true })
+                this.setState({
+                    editing: true,
+                })
             }
+
+            this.setState({
+                showPollResults: false,
+                pollResults: [],
+                isResultLoaded: true
+            })
 
             this.getPollAnswersById( event )
         }
@@ -223,7 +236,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
             this.setState({
                 editing: false,
-                newQuestion: false
+                newQuestion: false,
+                showPollResults: false,
+                pollResults: [],
+                isResultLoaded: true
             })
 
             this.getPollQuestions()
@@ -468,6 +484,67 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         handleAlignClick() {
 
             this.getPollAnswersById( this.props.attributes.answersQid )
+        }
+
+        handleShowPollResultsClick( event ) {
+            
+            const self = this
+            const qid = event.target.value
+            const {
+                isResultLoaded,
+                showPollResults
+            } = this.state
+
+            if ( isResultLoaded ) {
+                this.setState({ isResultLoaded: false })
+            }
+
+            if ( showPollResults ) {
+                this.setState({
+                    pollResults: [],
+                    showPollResults: false,
+                    isResultLoaded: true
+                })
+            } else {
+                let url = gutenbergtemplateblock_ajax_object.ajax_url +
+                '?action=gutenbergtemplateblock_getResultsByQid' +
+                '&qid=' + qid +
+                '&security=' + gutenbergtemplateblock_ajax_object.security
+        
+                fetch( url )
+                    .then( response => {
+                        return response.json()
+                    })
+                    .then( 
+                        ( results ) => {
+                            let max = 1
+        
+                            for ( let r of results ) {
+                                max = r.votes > max ? parseInt( r.votes ) : max
+                            }
+    
+                            const html = results.map( ( object, key ) => {
+                                return [
+                                    <tr>
+                                        <td>{ decodeURIComponent( self.stripslashes( object.option ) ) }</td>
+                                        <td>
+                                            <meter value={ object.votes } min="0" max={ max }></meter>{ object.votes }
+                                        </td>
+                                    </tr>
+                                ]
+                            })
+        
+                            self.setState({
+                                pollResults: html,
+                                showPollResults: true,
+                                isResultLoaded: true
+                            })
+                        },
+                        ( error ) => {
+                            console.log( 'error: ' + error )
+                        }
+                    )
+            }
         }
 
         setPoll( qid, question, answers ) {
@@ -860,6 +937,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             const {
                 isLoaded,
                 isLoadedAnswers,
+                isResultLoaded,
                 questions,
                 answers,
                 editing,
@@ -868,8 +946,12 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 activeStyle,
                 activeShadow,
                 showResults,
-                ajaxResults
+                ajaxResults,
+                showPollResults,
+                pollResults
             }  = this.state
+
+            const keyShowResults = `${isResultLoaded}-${showPollResults}`;
 
             return [
                 <Inspector { ...{ setAttributes, ...this.props }} />,
@@ -923,15 +1005,32 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                     return [
                                         <div className = { classes }>
                                             { isLoaded ? 
-                                                <PotDSelect
-                                                    onSelectChange={ this.handleSelectChange }
-                                                    questions={ questions }
-                                                    answers={ answers }
-                                                    editable={ false }
-                                                    isLoadedAnswers={ isLoadedAnswers }
-                                                    existingBlockQid={ answersQid }
-                                                    uuid={ uuid }
-                                                />
+                                                <div>
+                                                    <PotDSelect
+                                                        onSelectChange={ this.handleSelectChange }
+                                                        questions={ questions }
+                                                        answers={ answers }
+                                                        editable={ false }
+                                                        isLoadedAnswers={ isLoadedAnswers }
+                                                        existingBlockQid={ answersQid }
+                                                        uuid={ uuid }
+                                                    />
+                                                    <Button
+                                                        isDefault
+                                                        value={ answersQid }
+                                                        onClick={ this.handleShowPollResultsClick }
+                                                    >
+                                                        Show Results
+                                                    </Button>
+                                                    <div>
+                                                        {{
+                                                            ['true-true']: <table class="potd-result-table"><tbody>{ pollResults }</tbody></table>,
+                                                            ['true-false']: <div></div>,
+                                                            ['false-true']: <div><Spinner/><div>Loading...</div></div>,
+                                                            ['false-false']: <div><Spinner/><div>Loading...</div></div>,
+                                                        }[ keyShowResults ]}
+                                                    </div>
+                                                </div>
                                                 :
                                                 <div>
                                                     <Spinner/>
@@ -1025,7 +1124,6 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
 
         const className = classnames(
             'wp-block-gutenbergtemplateblock-templateblock',
-            // { 'style-toggle': styleToggle },
             classnames({
                 ' style-toggle': styleToggle,
                 ' style-light': styleLight,

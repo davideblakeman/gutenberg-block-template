@@ -190,3 +190,15 @@
 
 .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-edit-results-show {
   opacity: 1; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-result-table {
+  border: 1px solid black;
+  border-collapse: collapse;
+  width: 100%; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-result-table td {
+    border: 1px solid black;
+    padding: 15px; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-result-table tr td:nth-child(even) {
+    text-align: center; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-result-table meter {
+    margin-right: 5px; }

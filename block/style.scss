@@ -56,7 +56,6 @@ $light-text: white;
         margin: 32px 0 32px 0;
 
         tr {
-
             td:nth-child(even) {
                 text-align: center;
             }
@@ -330,5 +329,27 @@ $light-text: white;
 
     .potd-edit-results-show {
         opacity: 1;
+    }
+
+    .potd-result-table {
+        
+        border: 1px solid black;
+        border-collapse: collapse;
+        width: 100%;
+
+        td {
+            border: 1px solid black;
+            padding: 15px;
+        }
+
+        tr {
+            td:nth-child(even) {
+                text-align: center;
+            }
+        }
+
+        meter { 
+            margin-right: 5px;
+        }
     }
 }
