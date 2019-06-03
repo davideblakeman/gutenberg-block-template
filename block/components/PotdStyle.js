@@ -20,8 +20,6 @@ export default class PotDStyle extends React.Component {
         } = this.props.styleAttributes
         let style = null
 
-        console.log( 'styleAttributes' ,this.props.styleAttributes )
-
         if ( light ) {
             style = 'light'
         } else if ( toggle ) {
@@ -35,7 +33,6 @@ export default class PotDStyle extends React.Component {
     }
 
     handleRadioChange( event ) {
-        // this.setState({ selectedRadio: event })
         this.props.onStyleRadioChange( event )
     }
 
