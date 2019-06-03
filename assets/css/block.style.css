@@ -88,21 +88,29 @@
       border: 2px solid #222;
       border-radius: .25em;
       z-index: -1; }
-    .wp-block-gutenbergtemplateblock-templateblock.client-block label:hover:before {
-      box-shadow: inset 0px 0px 10px black; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"] + label::before {
     border-radius: 12px; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle label:before {
-    border: 2px solid white; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle label:hover:before {
-    box-shadow: inset 0px 0px 15px white; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle input[type="radio"]:checked + label {
-    color: black;
-    text-shadow: -1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"]:checked + label {
-    padding-left: 1em;
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-shadow label:hover:before {
+    box-shadow: inset 0px 0px 10px #222; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-shadow input[type="radio"]:checked + label {
     color: white;
     text-shadow: -1px 0 2px #222, 0 1px 2px #222, 1px 0 2px #222, 0 -1px 2px #222; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle label:before {
+    border: 2px solid white; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle input[type="radio"]:checked + label {
+    color: white; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle.style-shadow label:hover:before {
+    box-shadow: inset 0px 0px 10px white; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle.style-shadow input[type="radio"]:checked + label {
+    color: black;
+    text-shadow: -1px 0 2px white, 0 1px 2px white, 1px 0 2px white, 0 -1px 2px white; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle.style-shadow:hover:before {
+    box-shadow: inset 0px 0px 15px white; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"]:checked + label {
+    padding-left: 1em; }
+    .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"]:checked + label.style-shadow {
+      color: white;
+      text-shadow: -1px 0 2px #222, 0 1px 2px #222, 1px 0 2px #222, 0 -1px 2px #222; }
     .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"]:checked + label:before {
       top: 0;
       width: 100%;

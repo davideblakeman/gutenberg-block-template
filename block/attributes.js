@@ -21,6 +21,10 @@ const attributes = {
         type: 'boolean',
         default: false,
     },
+    styleShadow: {
+        type: 'boolean',
+        default: false,
+    },
     textAlignment: {
         type: 'string'
     },

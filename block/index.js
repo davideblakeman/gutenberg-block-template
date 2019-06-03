@@ -112,12 +112,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             super( ...arguments )
             // console.log( 'constructor' )
             const {
-                // attributes: {
-                //     styleDefault,
-                //     styleToggle,
-                //     styleLight,
-                //     styleDark,
-                // }, 
+                attributes: {
+                    // blockAlignment,
+                    // textAlignment
+                }, 
                 className, 
                 setAttributes,
                 // answersQid,
@@ -147,6 +145,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     dark: false,
                 }],
                 activeStyle: 'default',
+                activeShadow: false,
                 ajaxResults: '',
                 showResults: false
             }
@@ -177,6 +176,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.setPoll = this.setPoll.bind( this )
             this.setAnswers = this.setAnswers.bind( this )
             this.handleStyleClick = this.handleStyleClick.bind( this )
+            this.handleStyleCheckboxClick = this.handleStyleCheckboxClick.bind( this )
+            this.handleAlignClick = this.handleAlignClick.bind( this )
 
             setAttributes({
                 classes: classnames(
@@ -456,6 +457,19 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             })
         }
 
+        handleStyleCheckboxClick( event ) {
+
+            this.props.setAttributes( { styleShadow: event } )
+            this.setState({
+                activeShadow: event
+            })
+        }
+
+        handleAlignClick() {
+
+            this.getPollAnswersById( this.props.attributes.answersQid )
+        }
+
         setPoll( qid, question, answers ) {
 
             if ( qid && question ) {
@@ -595,36 +609,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 .then(
                     ( results ) => {
                         if ( results ) {
-                            let answersByOid = []
-                            let uuid = self.uuidv4()
-                            const pollOptions = results.map( ( object, key ) => {
-                                answersByOid.push({
-                                    oid: object.oid,
-                                    option: decodeURIComponent( self.stripslashes( object.option ) )
-                                })
-                                return [
-                                    <p>
-                                        <input
-                                            id={ 'id-' + object.oid + '-' + uuid }
-                                            type="radio"
-                                            name={ "options-" + object.qid + '-' + uuid }
-                                            value={ object.oid }
-                                        />
-                                        <label for={ 'id-' + object.oid + '-' + uuid }>
-                                            { decodeURIComponent( self.stripslashes( object.option ) ) }
-                                        </label>
-                                    </p>
-                                ]
-                            })
-                            
-                            self.setSavePoll( pollOptions )
-                            self.setSavePollTitle( results.length > 0 ? results[0].question : '' )
-                            self.setSaveQid( results.length > 0 ? results[0].qid : '' )
-    
-                            self.setState({
-                                isLoaded: true,
-                                answers: answersByOid
-                            })
+                            self.setPollSaveDetails( results )
                         } else {
                             self.setResultMessage( 'getFirstPoll-fail' )
                         }
@@ -656,37 +641,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 .then(
                     ( results ) => {
                         if ( results ) {
-                            let answersByOid = []
-                            let uuid = self.uuidv4()
-                            const pollOptions = results.map( ( object, key ) => {
-                                answersByOid.push({
-                                    oid: object.oid,
-                                    option: decodeURIComponent( self.stripslashes( object.option ) )
-                                })
-                                return [
-                                    <p>
-                                        <input
-                                            id={ 'id-' + object.oid + '-' + uuid }
-                                            type="radio"
-                                            name={ "options-" + object.qid + '-' + uuid }
-                                            value={ object.oid }
-                                        />
-                                        <label for={ 'id-' + object.oid + '-' + uuid }>
-                                            { decodeURIComponent( self.stripslashes( object.option ) ) }
-                                        </label>
-                                    </p>
-                                ]
-                            })
-    
-                            self.setState({
-                                answers: answersByOid,
-                                isLoadedAnswers: true,
-                                isLoaded: true
-                            }, () => {
-                                self.setSavePoll( pollOptions )
-                                self.setSavePollTitle( results.length > 0 ? results[0].question : '' )
-                                self.setSaveQid( results.length > 0 ? results[0].qid : '' )
-                            })
+                            self.setPollSaveDetails( results )
                         } else {
                             self.setResultMessage( 'getPollAnswersById-fail' )
                         }
@@ -701,9 +656,47 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 )
         }
 
-        // getPollInputHTML(  ) {
+        setPollSaveDetails( results ) {
+            const {
+                attributes: {
+                    textAlignment
+                }
+            } = this.props
 
-        // }
+            let answersByOid = []
+            let uuid = this.uuidv4()
+            const pollOptions = results.map( ( object, key ) => {
+                answersByOid.push({
+                    oid: object.oid,
+                    option: decodeURIComponent( this.stripslashes( object.option ) )
+                })
+                return [
+                    <p
+                        style={ 'justify-content:' + textAlignment }
+                    >
+                        <input
+                            id={ 'id-' + object.oid + '-' + uuid }
+                            type="radio"
+                            name={ "options-" + object.qid + '-' + uuid }
+                            value={ object.oid }
+                        />
+                        <label for={ 'id-' + object.oid + '-' + uuid }>
+                            { decodeURIComponent( this.stripslashes( object.option ) ) }
+                        </label>
+                    </p>
+                ]
+            })
+
+            this.setState({
+                answers: answersByOid,
+                isLoadedAnswers: true,
+                isLoaded: true
+            }, () => {
+                this.setSavePoll( pollOptions )
+                this.setSavePollTitle( results.length > 0 ? results[0].question : '' )
+                this.setSaveQid( results.length > 0 ? results[0].qid : '' )
+            })
+        }
 
         deleteQuestionById( qid ) {
 
@@ -854,9 +847,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     classes,
                     styleToggle,
                     styleLight,
+                    styleShadow,
                     // titleColour,
                     // contentColour,
-                    // textAlignment,
+                    textAlignment,
                     // title,
                     // content,
                     answersQid,
@@ -872,6 +866,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 newQuestion,
                 style,
                 activeStyle,
+                activeShadow,
                 showResults,
                 ajaxResults
             }  = this.state
@@ -881,6 +876,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 <Controls 
                     { ...{ setAttributes, ...this.props }}
                     onStyleChange={ this.handleStyleClick }
+                    onAlignChange={ this.handleAlignClick }
                 />,
                 <div className = {
                         classes +
@@ -888,9 +884,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         classnames({
                             ' style-toggle': styleToggle,
                             ' style-light': styleLight,
+                            ' style-shadow': styleShadow
                         })
                     }
                     value={ uuid }
+                    style={ { textAlign: textAlignment } }
                 >
                     <TabPanel
                         className="my-tab-panel"
@@ -983,8 +981,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                         <div className={ className }>
                                             <PotDStyle
                                                 onStyleRadioChange={ this.handleStyleClick }
-                                                styleAttributes={{ 'toggle': styleToggle, 'light': styleLight }}
+                                                onStyleCheckboxChange={ this.handleStyleCheckboxClick }
+                                                styleAttributes={{
+                                                    'toggle': styleToggle,
+                                                    'light': styleLight,
+                                                    'shadow': styleShadow
+                                                }}
                                                 activeStyle={ activeStyle }
+                                                activeShadow={ activeShadow }
                                             />
                                         </div>
                                     ]
@@ -1007,10 +1011,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
     save: props => {
         const { 
             attributes: { 
-                // textAlignment, 
-                // blockAlignment,
+                textAlignment,
+                blockAlignment,
                 styleToggle,
                 styleLight,
+                styleShadow,
                 pollTitle,
                 poll,
                 answersQid,
@@ -1024,11 +1029,17 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             classnames({
                 ' style-toggle': styleToggle,
                 ' style-light': styleLight,
-            })
+                ' style-shadow': styleShadow,
+            }),
+            `align${blockAlignment}`,
         )
 
         return (
-            <div className = { className + ' client-block' } value={ uuid }>
+            <div
+                className={ className + ' client-block' }
+                value={ uuid }
+                style={ { textAlign: textAlignment } }
+            >
                 <h3>{ pollTitle }</h3>
                 <div class={"group-" + uuid}>
                     { poll }

@@ -31,6 +31,7 @@ export default class Inspector extends Component {
     constructor() {
         super( ...arguments )
         this.handleStyleChange = this.handleStyleChange.bind( this )
+        this.handleAlignChange = this.handleAlignChange.bind( this )
     }
 
     handleStyleChange() {
@@ -44,6 +45,11 @@ export default class Inspector extends Component {
         this.props.onStyleChange( styleToggle )
     }
 
+    handleAlignChange( event ) {
+        this.props.setAttributes( { textAlignment: event } )
+        this.props.onAlignChange( event )
+    }
+
     render() {
         const {
             attributes: { 
@@ -51,14 +57,8 @@ export default class Inspector extends Component {
                 textAlignment,
                 styleToggle
             },
-            className,
             setAttributes
         } = this.props
-        // const formStyleToggle = () => setAttributes( { styleToggle: !styleToggle } )
-        // const classes = classnames(
-        //     className,
-        //     { 'style-toggle': styleToggle }
-        // )
 
         return (
             <BlockControls>
@@ -68,7 +68,7 @@ export default class Inspector extends Component {
                 />
                 <AlignmentToolbar
                     value = { textAlignment }
-                    onChange = { textAlignment => setAttributes( { textAlignment } ) }
+                    onChange = { this.handleAlignChange }
                 />
                 <Toolbar>
                     <Tooltip text = { __( 'Style Toggle', 'gutenbergtemplateblock' ) }>

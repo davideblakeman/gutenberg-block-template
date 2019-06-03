@@ -137,14 +137,25 @@ $light-text: white;
             border-radius: .25em;
             z-index: -1;
         }
-
-        &:hover:before {
-            box-shadow: inset 0px 0px 10px rgb( 0, 0, 0 );
-        }
     }
 
     input[type="radio"] + label::before {
         border-radius: 12px;
+    }
+
+    &.style-shadow {
+
+        label:hover:before {
+            box-shadow: inset 0px 0px 10px $dark;
+        }
+
+        input[type="radio"]:checked + label {
+            color: $light-text;
+            text-shadow: -1px 0 2px $dark,
+                             0 1px 2px $dark,
+                             1px 0 2px $dark,
+                             0 -1px 2px $dark;
+        }
     }
 
     &.style-toggle {
@@ -154,29 +165,43 @@ $light-text: white;
             &:before {
                 border: 2px solid $light-text;
             }
-
-            &:hover:before {
-                box-shadow: inset 0px 0px 15px rgb( 255, 255, 255 );
-            }
         }
 
         input[type="radio"]:checked + label {
-            color: $dark-text;
-            text-shadow: -1px 0 2px $light,
-                         0 1px 2px $light,
-                         1px 0 2px $light,
-                         0 -1px 2px $light;
+            color: $light-text;
         }
+
+        &.style-shadow {
+
+            label:hover:before {
+                box-shadow: inset 0px 0px 10px $light;
+            }
+    
+            input[type="radio"]:checked + label {
+                color: $dark-text;
+                text-shadow: -1px 0 2px $light,
+                                 0 1px 2px $light,
+                                 1px 0 2px $light,
+                                 0 -1px 2px $light;
+            }
+        }
+    }
+
+    &.style-toggle.style-shadow:hover:before {
+        box-shadow: inset 0px 0px 15px rgb( 255, 255, 255 );
     }
 
     input[type="radio"]:checked + label {
 
         padding-left: 1em;
-        color: $light-text;
-        text-shadow: -1px 0 2px $dark,
-                     0 1px 2px $dark,
-                     1px 0 2px $dark,
-                     0 -1px 2px $dark;
+
+        &.style-shadow {
+            color: $light-text;
+            text-shadow: -1px 0 2px $dark,
+                         0 1px 2px $dark,
+                         1px 0 2px $dark,
+                         0 -1px 2px $dark;
+        }
 
         &:before {
             top: 0;
