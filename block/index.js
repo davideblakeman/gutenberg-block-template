@@ -73,7 +73,7 @@ const setPollStart = ( uuid, postId ) => {
         .then(
             ( result ) => {
                 if ( result === 'fail' ) {
-                    setResultMessage( 'setPollStart-fail' )
+                    setResultMessage( 'setPollStart-fail' ) // function call out of scope? needs testing
                 }
             },
             ( error ) => {
@@ -517,6 +517,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     })
                     .then( 
                         ( results ) => {
+                            // needs exception handling
                             let max = 1
         
                             for ( let r of results ) {
@@ -650,7 +651,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 })
                 .then(
                     ( results ) => {
-                        self.setState({ questions: results }, () => {
+                        self.setState( { questions: results }, () => {
                             if ( this.isNumeric( answersQid ) ) {
                                 this.getPollAnswersById( answersQid )
                             } else {
@@ -734,6 +735,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
         }
 
         setPollSaveDetails( results ) {
+
             const {
                 attributes: {
                     textAlignment
@@ -833,6 +835,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             const transitionTimeMessage = 5000;
             const transitionTimeOpacity = 2000;
             
+            // Wants i18n
             const resultSwitch = ( result ) => ({
                 'setPollStart-fail': 'Failed to set poll, possible database issue.',
                 'setPollStart-error': 'Failed to set poll, fetch error encountered.',
