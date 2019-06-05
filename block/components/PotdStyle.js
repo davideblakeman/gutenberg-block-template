@@ -1,3 +1,9 @@
+// import colourAttributes from "./../colours"
+
+const {
+    // PanelColorSettings
+} = wp.editor
+
 const {
     CheckboxControl,
     RadioControl,
@@ -7,12 +13,16 @@ const {
 export default class PotDStyle extends React.Component {
 
     constructor( props ) {
-        super( props )
+        // super( props )
+        super( ...arguments )
         this.handleRadioChange = this.handleRadioChange.bind( this )
         this.handleCheckboxChange = this.handleCheckboxChange.bind( this )
+        // console.log( 'constructor', props )
     }
 
     componentDidMount() {
+        console.log( 'componentDidMount', this.props )
+
         const {
             toggle,
             light,
@@ -42,8 +52,10 @@ export default class PotDStyle extends React.Component {
 
     render() {
         const {
-            activeStyle,
-            activeShadow
+            activeStyle,        // state
+            activeShadow,       // state
+            // backgroundColour,
+            // setAttributes
         } = this.props
 
         return (
@@ -71,6 +83,18 @@ export default class PotDStyle extends React.Component {
                     checked={ activeShadow }
                     onChange={ this.handleCheckboxChange }
                 />
+                {/* <PanelColorSettings
+                    // title = { __( "Edit Title Colour", "jsforwpblocks" ) }
+                    title={ 'Background colour' }
+                    colorSettings={[{
+                        label: "Selected Colour",
+                        value: backgroundColour,
+                        onChange: backgroundColour => {
+                            setAttributes({ backgroundColour })
+                        }
+                    }]}
+                    colors={ colourAttributes.colours }
+                />  */}
             </div>
         )
     }

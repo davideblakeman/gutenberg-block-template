@@ -36,9 +36,13 @@ const attributes = {
         type: 'string',
         default: '#000000'
     },
-    contentColour: {
+    // contentColour: {
+    //     type: 'string',
+    //     default: '#000000'
+    // },
+    backgroundColour: {
         type: 'string',
-        default: '#000000'
+        default: '#FFF'
     },
     radioControl: {
         type: 'boolean',

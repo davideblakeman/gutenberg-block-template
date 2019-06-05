@@ -1,7 +1,8 @@
 /**
  * Block dependencies
  */
-// import colourAttributes from "./colours"
+import colourAttributes from "./colours"
+import PotDStyle from './components/PotdStyle'
 
 /**
  * Internal block libraries
@@ -11,7 +12,7 @@ const { Component } = wp.element
 const {
   InspectorControls,
 //   ColorPalette,
-//   PanelColorSettings,
+  PanelColorSettings,
 //   ContrastChecker
 } = wp.editor
 
@@ -41,8 +42,9 @@ export default class Inspector extends Component {
     const { 
         attributes: { 
             styleToggle,
-            titleColour,
-            contentColour
+            // titleColour,
+            // contentColour,
+            backgroundColour
         }, setAttributes 
     } = this.props
     const formStyleToggle = () => setAttributes( { styleToggle: !styleToggle } )
@@ -66,7 +68,18 @@ export default class Inspector extends Component {
                     />
                 </PanelRow>
             </PanelBody>
-
+            <PanelColorSettings
+                // title = { __( "Edit Title Colour", "jsforwpblocks" ) }
+                title={ 'Background colour' }
+                colorSettings={[{
+                    label: "Selected Colour",
+                    value: backgroundColour,
+                    onChange: backgroundColour => {
+                        setAttributes({ backgroundColour })
+                    }
+                }]}
+                colors={ colourAttributes.colours }
+            />
             {/* <PanelColorSettings
                 title = { __( "Edit Title Colour", "jsforwpblocks" ) }
                 colorSettings = {[{

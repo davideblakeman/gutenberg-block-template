@@ -927,6 +927,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     styleShadow,
                     // titleColour,
                     // contentColour,
+                    backgroundColour,
                     textAlignment,
                     // title,
                     // content,
@@ -951,7 +952,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 pollResults
             }  = this.state
 
-            const keyShowResults = `${isResultLoaded}-${showPollResults}`;
+            const keyShowResults = `${ isResultLoaded }-${ showPollResults }`;
 
             return [
                 <Inspector { ...{ setAttributes, ...this.props }} />,
@@ -970,7 +971,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         })
                     }
                     value={ uuid }
-                    style={ { textAlign: textAlignment } }
+                    style={{
+                        textAlign: textAlignment,
+                        backgroundColor: backgroundColour
+                    }}
                 >
                     <TabPanel
                         className="my-tab-panel"
@@ -1079,6 +1083,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                     return [
                                         <div className={ className }>
                                             <PotDStyle
+                                                { ...{ setAttributes, ...this.props }}
                                                 onStyleRadioChange={ this.handleStyleClick }
                                                 onStyleCheckboxChange={ this.handleStyleCheckboxClick }
                                                 styleAttributes={{
@@ -1088,6 +1093,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                                 }}
                                                 activeStyle={ activeStyle }
                                                 activeShadow={ activeShadow }
+                                                // backgroundColour={ backgroundColour }
                                             />
                                         </div>
                                     ]
@@ -1118,7 +1124,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 pollTitle,
                 poll,
                 answersQid,
-                uuid
+                uuid,
+                backgroundColour
             }
         } = props
 
@@ -1127,7 +1134,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             classnames({
                 ' style-toggle': styleToggle,
                 ' style-light': styleLight,
-                ' style-shadow': styleShadow,
+                ' style-shadow': styleShadow
             }),
             `align${blockAlignment}`,
         )
@@ -1136,7 +1143,10 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             <div
                 className={ className + ' client-block' }
                 value={ uuid }
-                style={ { textAlign: textAlignment } }
+                style={{
+                    textAlign: textAlignment,
+                    backgroundColor: backgroundColour
+                }}
             >
                 <h3>{ pollTitle }</h3>
                 <div class={"group-" + uuid}>
