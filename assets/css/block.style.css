@@ -90,9 +90,12 @@
       z-index: -1; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block input[type="radio"] + label::before {
     border-radius: 12px; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-shadow label:hover:before {
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-shadow-title h3 {
+    color: white;
+    text-shadow: -1px 0 2px #222, 0 1px 2px #222, 1px 0 2px #222, 0 -1px 2px #222; }
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-shadow-options label:hover:before {
     box-shadow: inset 0px 0px 10px #222; }
-  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-shadow input[type="radio"]:checked + label {
+  .wp-block-gutenbergtemplateblock-templateblock.client-block.style-shadow-options input[type="radio"]:checked + label {
     color: white;
     text-shadow: -1px 0 2px #222, 0 1px 2px #222, 1px 0 2px #222, 0 -1px 2px #222; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block.style-toggle label:before {
@@ -202,3 +205,41 @@
     text-align: center; }
   .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-result-table meter {
     margin-right: 5px; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-tab-panel .components-tab-panel__tabs .components-button:first-child {
+  border-radius: 5px 0 0 5px; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-tab-panel .components-tab-panel__tabs .components-button {
+  padding: 0 10px 1px;
+  line-height: 26px;
+  height: 28px;
+  white-space: nowrap;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #ccc;
+  background: #f7f7f7;
+  box-shadow: inset 0 -1px 0 #ccc;
+  vertical-align: top; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-tab-panel .components-tab-panel__tabs .components-button:hover {
+    background: #fafafa;
+    border-color: #999;
+    box-shadow: inset 0 -1px 0 #999;
+    color: #23282d;
+    text-decoration: none; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-tab-panel .components-tab-panel__tabs .components-button:active {
+    background: #eee;
+    border-color: #999;
+    box-shadow: inset 0 1px 0 #999; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-tab-panel .components-tab-panel__tabs .components-button:last-child {
+  border-radius: 0 5px 5px 0; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .style-shadow-checked {
+  color: white;
+  transition: all .25s ease-in-out;
+  text-shadow: -1px 0 2px #222, 0 1px 2px #222, 1px 0 2px #222, 0 -1px 2px #222; }
+
+.wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-shadows {
+  margin-bottom: 0px; }
+  .wp-block-gutenbergtemplateblock-templateblock.editor-block .potd-shadows .components-base-control__field {
+    margin-bottom: 0px; }

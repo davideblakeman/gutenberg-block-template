@@ -12,21 +12,20 @@ const {
 
 export default class PotDStyle extends React.Component {
 
-    constructor( props ) {
-        // super( props )
+    constructor() {
         super( ...arguments )
+
         this.handleRadioChange = this.handleRadioChange.bind( this )
-        this.handleCheckboxChange = this.handleCheckboxChange.bind( this )
-        // console.log( 'constructor', props )
+        this.handleTitleShadowCheckboxChange = this.handleTitleShadowCheckboxChange.bind( this )
+        this.handleOptionsShadowCheckboxChange = this.handleOptionsShadowCheckboxChange.bind( this )
     }
 
     componentDidMount() {
-        console.log( 'componentDidMount', this.props )
-
         const {
             toggle,
             light,
-            shadow
+            shadowTitle,
+            shadowOptions
         } = this.props.styleAttributes
         let style = null
 
@@ -39,23 +38,27 @@ export default class PotDStyle extends React.Component {
         }
 
         this.handleRadioChange( style )
-        this.handleCheckboxChange( shadow )
+        this.handleTitleShadowCheckboxChange( shadowTitle )
+        this.handleOptionsShadowCheckboxChange( shadowOptions )
     }
 
     handleRadioChange( event ) {
         this.props.onStyleRadioChange( event )
     }
 
-    handleCheckboxChange( event ) {
-        this.props.onStyleCheckboxChange( event )
+    handleTitleShadowCheckboxChange( event ) {
+        this.props.onTitleShadowCheckboxChange( event )
+    }
+
+    handleOptionsShadowCheckboxChange( event ) {
+        this.props.onOptionsShadowCheckboxChange( event )
     }
 
     render() {
         const {
             activeStyle,        // state
-            activeShadow,       // state
-            // backgroundColour,
-            // setAttributes
+            activeTitleShadow,  // state
+            activeOptionsShadow, // state
         } = this.props
 
         return (
@@ -76,25 +79,19 @@ export default class PotDStyle extends React.Component {
                         />
                     </div>
                 </Tooltip>
+                <div className={ 'components-base-control' }>{ 'Shadow Options' }</div>
                 <CheckboxControl
-                    heading="Style Options"
-                    label="Shadows"
-                    // help="Test help"
-                    checked={ activeShadow }
-                    onChange={ this.handleCheckboxChange }
+                    className={ activeTitleShadow ? 'potd-shadows style-shadow-checked' : 'potd-shadows' }
+                    label="Title Shadow"
+                    checked={ activeTitleShadow }
+                    onChange={ this.handleTitleShadowCheckboxChange }
                 />
-                {/* <PanelColorSettings
-                    // title = { __( "Edit Title Colour", "jsforwpblocks" ) }
-                    title={ 'Background colour' }
-                    colorSettings={[{
-                        label: "Selected Colour",
-                        value: backgroundColour,
-                        onChange: backgroundColour => {
-                            setAttributes({ backgroundColour })
-                        }
-                    }]}
-                    colors={ colourAttributes.colours }
-                />  */}
+                <CheckboxControl
+                    className={ activeOptionsShadow ? 'potd-shadows style-shadow-checked' : 'potd-shadows' }
+                    label="Option Shadows"
+                    checked={ activeOptionsShadow }
+                    onChange={ this.handleOptionsShadowCheckboxChange }
+                />
             </div>
         )
     }

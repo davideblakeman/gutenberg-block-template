@@ -21,7 +21,15 @@ const attributes = {
         type: 'boolean',
         default: false,
     },
-    styleShadow: {
+    // styleShadow: {
+    //     type: 'boolean',
+    //     default: false,
+    // },
+    styleTitleShadow: {
+        type: 'boolean',
+        default: false,
+    },
+    styleOptionsShadow: {
         type: 'boolean',
         default: false,
     },
@@ -36,17 +44,50 @@ const attributes = {
         type: 'string',
         default: '#000000'
     },
-    // contentColour: {
-    //     type: 'string',
-    //     default: '#000000'
-    // },
     backgroundColour: {
         type: 'string',
-        default: '#FFF'
+        default: null
+    },
+    fontColour: {
+        type: 'string',
+        default: null
+    },
+    radiusControl: {
+        type: 'number',
+        default: null
+    },
+    borderWidth: {
+        type: 'string',
+        default: null
+    },
+    borderColour: {
+        type: 'string',
+        default: null
+    },
+    borderStyle: {
+        type: 'string',
+        default: null
     },
     radioControl: {
         type: 'boolean',
         default: 'a'
+    },
+    imageUrl: {
+        type: 'string',
+        source: 'attribute',
+        attribute: 'src',
+        selector: 'img',
+        default: ''
+    },
+    imageId: {
+        type: 'number',
+    },
+    imageAlt: {
+        type: 'string',
+        source: 'attribute',
+        attribute: 'alt',
+        selector: 'img',
+        default: null
     },
     pollQuestionId: {
         type: 'string',

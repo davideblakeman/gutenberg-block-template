@@ -147,7 +147,8 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     dark: false,
                 }],
                 activeStyle: 'default',
-                activeShadow: false,
+                activeTitleShadow: false,
+                activeOptionsShadow: false,
                 ajaxResults: '',
                 showResults: false,
                 showPollResults: false,
@@ -180,14 +181,14 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             this.setPoll = this.setPoll.bind( this )
             this.setAnswers = this.setAnswers.bind( this )
             this.handleStyleClick = this.handleStyleClick.bind( this )
-            this.handleStyleCheckboxClick = this.handleStyleCheckboxClick.bind( this )
+            this.handleTitleShadowCheckboxClick = this.handleTitleShadowCheckboxClick.bind( this )
+            this.handleOptionsShadowCheckboxClick = this.handleOptionsShadowCheckboxClick.bind( this )
             this.handleAlignClick = this.handleAlignClick.bind( this )
             this.handleShowPollResultsClick = this.handleShowPollResultsClick.bind( this )
 
             setAttributes({
                 classes: classnames(
-                    className,
-                    // styleToggle
+                    className
                 ),
             })
         }
@@ -473,11 +474,19 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             })
         }
 
-        handleStyleCheckboxClick( event ) {
+        handleTitleShadowCheckboxClick( event ) {
 
-            this.props.setAttributes( { styleShadow: event } )
+            this.props.setAttributes( { styleTitleShadow: event } )
             this.setState({
-                activeShadow: event
+                activeTitleShadow: event
+            })
+        }
+
+        handleOptionsShadowCheckboxClick( event ) {
+            
+            this.props.setAttributes( { styleOptionsShadow: event } )
+            this.setState({
+                activeOptionsShadow: event
             })
         }
 
@@ -494,6 +503,13 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 isResultLoaded,
                 showPollResults
             } = this.state
+            const {
+                attributes: {
+                    backgroundColour
+                }
+            } = this.props
+
+            const bg = backgroundColour ? backgroundColour : '#eee'
 
             if ( isResultLoaded ) {
                 this.setState({ isResultLoaded: false })
@@ -526,7 +542,12 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
     
                             const html = results.map( ( object, key ) => {
                                 return [
-                                    <tr>
+                                    <tr
+                                        style={{
+                                            backgroundColor: bg,
+                                            opacity: '0.9'
+                                        }}
+                                    >
                                         <td>{ decodeURIComponent( self.stripslashes( object.option ) ) }</td>
                                         <td>
                                             <meter value={ object.votes } min="0" max={ max }></meter>{ object.votes }
@@ -927,10 +948,18 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     classes,
                     styleToggle,
                     styleLight,
-                    styleShadow,
+                    // styleShadow,
+                    styleTitleShadow,
+                    styleOptionsShadow,
                     // titleColour,
                     // contentColour,
                     backgroundColour,
+                    fontColour,
+                    radiusControl,
+                    borderWidth,
+                    borderColour,
+                    borderStyle,
+                    imageUrl,
                     textAlignment,
                     // title,
                     // content,
@@ -946,9 +975,11 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 answers,
                 editing,
                 newQuestion,
-                style,
+                // style,
                 activeStyle,
-                activeShadow,
+                // activeShadow,
+                activeTitleShadow,
+                activeOptionsShadow,
                 showResults,
                 ajaxResults,
                 showPollResults,
@@ -956,6 +987,19 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             }  = this.state
 
             const keyShowResults = `${ isResultLoaded }-${ showPollResults }`;
+            const divStyle = {
+                textAlign: textAlignment,
+                backgroundColor: backgroundColour,
+                color: fontColour,
+                borderRadius: radiusControl,
+                borderWidth: borderWidth,
+                borderColor: borderColour,
+                borderStyle: borderStyle,
+                backgroundImage: 'url("' + imageUrl + '")',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                backgroundRepeat: 'no-repeat'
+            };
 
             return [
                 <Inspector { ...{ setAttributes, ...this.props }} />,
@@ -970,17 +1014,15 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                         classnames({
                             ' style-toggle': styleToggle,
                             ' style-light': styleLight,
-                            ' style-shadow': styleShadow
+                            ' style-shadow-title': styleTitleShadow,
+                            ' style-shadow-options': styleOptionsShadow
+                            // ' style-shadow': styleShadow
                         })
                     }
                     value={ uuid }
-                    style={{
-                        textAlign: textAlignment,
-                        backgroundColor: backgroundColour
-                    }}
                 >
                     <TabPanel
-                        className="my-tab-panel"
+                        className="potd-tab-panel"
                         activeClass="active-tab"
                         onSelect={ this.handleTabChange }
                         tabs={[
@@ -1010,7 +1052,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                             ( tab ) => {
                                 if ( tab.name === 'tab1' ) {
                                     return [
-                                        <div className = { classes }>
+                                        <div className = { classes } style={ divStyle }>
                                             { isLoaded ? 
                                                 <div>
                                                     <PotDSelect
@@ -1048,7 +1090,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                     ]
                                 } else if ( tab.name === 'tab2' ) {
                                     return [
-                                        <div className={ className }>
+                                        <div className={ className } style={ divStyle }>
                                             { isLoaded ?
                                                 <PotDSelect
                                                     onSelectChange={ this.handleSelectChange }
@@ -1078,25 +1120,29 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                                     ]
                                 } else if ( tab.name === 'tab3' ) {
                                     return [
-                                        <div className={ className }>
+                                        <div className={ className } style={ divStyle }>
                                             <PotDSettings/>
                                         </div>
                                     ]
                                 } else if ( tab.name === 'tab4' ) {
                                     return [
-                                        <div className={ className }>
+                                        <div className={ className } style={ divStyle }>
                                             <PotDStyle
                                                 { ...{ setAttributes, ...this.props }}
                                                 onStyleRadioChange={ this.handleStyleClick }
-                                                onStyleCheckboxChange={ this.handleStyleCheckboxClick }
+                                                // onStyleCheckboxChange={ this.handleStyleCheckboxClick }
+                                                onTitleShadowCheckboxChange={ this.handleTitleShadowCheckboxClick }
+                                                onOptionsShadowCheckboxChange={ this.handleOptionsShadowCheckboxClick }
                                                 styleAttributes={{
                                                     'toggle': styleToggle,
                                                     'light': styleLight,
-                                                    'shadow': styleShadow
+                                                    'shadowTitle': styleTitleShadow,
+                                                    'shadowOptions': styleOptionsShadow,
+                                                    // 'title-shadow': styleShadow,
                                                 }}
                                                 activeStyle={ activeStyle }
-                                                activeShadow={ activeShadow }
-                                                // backgroundColour={ backgroundColour }
+                                                activeTitleShadow={ activeTitleShadow }
+                                                activeOptionsShadow={ activeOptionsShadow }
                                             />
                                         </div>
                                     ]
@@ -1123,21 +1169,43 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                 blockAlignment,
                 styleToggle,
                 styleLight,
-                styleShadow,
+                // styleShadow,
+                styleTitleShadow,
+                styleOptionsShadow,
                 pollTitle,
                 poll,
                 answersQid,
                 uuid,
-                backgroundColour
+                backgroundColour,
+                fontColour,
+                radiusControl,
+                borderWidth,
+                borderColour,
+                borderStyle,
+                imageUrl
             }
         } = props
+        const divStyle = {
+            textAlign: textAlignment,
+            backgroundColor: backgroundColour,
+            color: fontColour,
+            borderRadius: radiusControl,
+            borderWidth: borderWidth,
+            borderColor: borderColour,
+            borderStyle: borderStyle,
+            backgroundImage: 'url("' + imageUrl + '")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat'
+        };
 
         const className = classnames(
             'wp-block-gutenbergtemplateblock-templateblock',
             classnames({
                 ' style-toggle': styleToggle,
                 ' style-light': styleLight,
-                ' style-shadow': styleShadow
+                ' style-shadow-title': styleTitleShadow,
+                ' style-shadow-options': styleOptionsShadow
             }),
             `align${blockAlignment}`,
         )
@@ -1146,10 +1214,7 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
             <div
                 className={ className + ' client-block' }
                 value={ uuid }
-                style={{
-                    textAlign: textAlignment,
-                    backgroundColor: backgroundColour
-                }}
+                style={ divStyle }
             >
                 <h3>{ pollTitle }</h3>
                 <div class={"group-" + uuid}>
@@ -1159,7 +1224,13 @@ registerBlockType( 'gutenbergtemplateblock/templateblock',
                     <button class="potd-vote-btn" value={ answersQid }>Vote!</button>
                     <button class="potd-results-btn" value={ answersQid }>Results</button>
                 </div>
-                <div class="potd-result"></div>
+                <div 
+                    class="potd-result"
+                    // style={{
+                    //     backgroundColor: 'rgba(255,255,255,0.5)',
+
+                    // }}
+                ></div>
             </div>
         )
     }
