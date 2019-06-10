@@ -26,8 +26,11 @@
     transition: all 1s ease-in-out; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result-table {
     margin: 32px 0 32px 0; }
-    .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result-table tr td:nth-child(even) {
-      text-align: center; }
+    .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result-table tr {
+      background-color: #eee;
+      opacity: 0.9; }
+      .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-result-table tr td:nth-child(even) {
+        text-align: center; }
   .wp-block-gutenbergtemplateblock-templateblock.client-block .potd-tooltip {
     display: -ms-flexbox;
     display: flex;

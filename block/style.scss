@@ -56,6 +56,10 @@ $light-text: white;
         margin: 32px 0 32px 0;
 
         tr {
+
+            background-color: #eee;
+            opacity: 0.9;
+            
             td:nth-child(even) {
                 text-align: center;
             }

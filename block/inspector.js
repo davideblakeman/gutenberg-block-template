@@ -88,7 +88,7 @@ export default class Inspector extends Component {
                         <label
                             htmlFor='Style-form-toggle'
                         >
-                            Style Toggle
+                            Toggle between default and dark styles
                         </label>
                         <FormToggle
                             id='Style-form-toggle'
@@ -99,7 +99,7 @@ export default class Inspector extends Component {
                     </PanelRow>
                 </PanelBody>
                 <PanelColorSettings
-                    title='Background colour'
+                    title='Background'
                     colorSettings={[{
                         label: 'Selected Colour',
                         value: backgroundColour,
@@ -154,7 +154,7 @@ export default class Inspector extends Component {
                 )}
 
                 <PanelColorSettings
-                    title='Font colour'
+                    title='Font'
                     colorSettings={[{
                         label: 'Selected Colour',
                         value: fontColour,
@@ -164,30 +164,8 @@ export default class Inspector extends Component {
                     }]}
                     colors={ colourAttributes.colours }
                 />
-                <PanelBody>
-                    <RangeControl
-                        beforeIcon='arrow-left-alt2'
-                        afterIcon='arrow-right-alt2'
-                        label='Border Radius'
-                        value={ radiusControl }
-                        onChange={ radiusControl => setAttributes({ radiusControl }) }
-                        min={ 0 }
-                        max={ 1000 }
-                    />
-                </PanelBody>
-                <PanelBody>
-                    <RangeControl
-                        beforeIcon='arrow-left-alt2'
-                        afterIcon='arrow-right-alt2'
-                        label='Border Width'
-                        value={ borderWidth }
-                        onChange={ borderWidth => setAttributes({ borderWidth }) }
-                        min={ 0 }
-                        max={ 100 }
-                    />
-                </PanelBody>
                 <PanelColorSettings
-                    title='Border colour'
+                    title='Border'
                     colorSettings={[{
                         label: 'Selected Colour',
                         value: borderColour,
@@ -214,7 +192,29 @@ export default class Inspector extends Component {
                         { value: 'outset', label: 'Outset' },
                     ]}
                 />
-
+                <PanelBody>
+                    <RangeControl
+                        beforeIcon='arrow-left-alt2'
+                        afterIcon='arrow-right-alt2'
+                        label='Border Radius'
+                        value={ radiusControl }
+                        onChange={ radiusControl => setAttributes({ radiusControl }) }
+                        min={ 0 }
+                        max={ 1000 }
+                    />
+                </PanelBody>
+                <PanelBody>
+                    <RangeControl
+                        beforeIcon='arrow-left-alt2'
+                        afterIcon='arrow-right-alt2'
+                        label='Border Width'
+                        value={ borderWidth }
+                        onChange={ borderWidth => setAttributes({ borderWidth }) }
+                        min={ 0 }
+                        max={ 100 }
+                    />
+                </PanelBody>
+                
             </InspectorControls>
         )
     }
